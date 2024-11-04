@@ -1,0 +1,31 @@
+anpassungen:
+daten neu labeln -> fine tuning
+neu labeln vs regularisierung
+eigene loss funktion
+regularisierer aus white box
+
+todo:
+    - noise in process modell
+        - transitions
+        - neue activitäten
+        - sequenzen von activitäen -> retrace
+        - timestamps 
+        - case attributes
+
+    - updated fairness
+        - dt centered
+            - find all "root" deleted nodes
+            - print metrics for all such nodes before and after using the nns
+        - nn centered
+            - save a priori problematic attributes/outcomes
+            - evaluate each combination before and afterwards
+
+    - automated finetuning
+
+    - gegebenes modell nachbauen
+    
+    - state of the art per ssh
+    
+    - trace zu pandas df zu XES?
+    
+    - better shell for interactive mode

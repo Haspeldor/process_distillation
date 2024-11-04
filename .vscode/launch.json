@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Main with arguments",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/code/main.py",
+      "console": "integratedTerminal",
+      "args": [
+      ],
+      "justMyCode": true
+    }
+  ]
+}

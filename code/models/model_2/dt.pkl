@@ -1,0 +1,188 @@
+{
+    "root": {
+        "node_id": 0,
+        "feature_index": 16,
+        "threshold": 0.5,
+        "num_samples": 4000,
+        "removed_features": [],
+        "left": {
+            "node_id": 1,
+            "feature_index": 14,
+            "threshold": 0.5,
+            "num_samples": 3198,
+            "removed_features": [],
+            "left": {
+                "node_id": 2,
+                "feature_index": 0,
+                "threshold": 0.5,
+                "num_samples": 2397,
+                "removed_features": [],
+                "left": {
+                    "node_id": 3,
+                    "feature_index": 6,
+                    "threshold": 0.5,
+                    "num_samples": 1597,
+                    "removed_features": [],
+                    "left": {
+                        "node_id": 4,
+                        "feature_index": null,
+                        "threshold": null,
+                        "num_samples": 788,
+                        "removed_features": [],
+                        "left": null,
+                        "right": null,
+                        "output": 2,
+                        "depth": 4
+                    },
+                    "right": {
+                        "node_id": 5,
+                        "feature_index": 29,
+                        "threshold": 0.5,
+                        "num_samples": 809,
+                        "removed_features": [],
+                        "left": {
+                            "node_id": 6,
+                            "feature_index": null,
+                            "threshold": null,
+                            "num_samples": 645,
+                            "removed_features": [],
+                            "left": null,
+                            "right": null,
+                            "output": 0,
+                            "depth": 5
+                        },
+                        "right": {
+                            "node_id": 7,
+                            "feature_index": 18,
+                            "threshold": 0.5,
+                            "num_samples": 164,
+                            "removed_features": [],
+                            "left": {
+                                "node_id": 8,
+                                "feature_index": null,
+                                "threshold": null,
+                                "num_samples": 76,
+                                "removed_features": [],
+                                "left": null,
+                                "right": null,
+                                "output": 4,
+                                "depth": 6
+                            },
+                            "right": {
+                                "node_id": 9,
+                                "feature_index": null,
+                                "threshold": null,
+                                "num_samples": 88,
+                                "removed_features": [],
+                                "left": null,
+                                "right": null,
+                                "output": 0,
+                                "depth": 6
+                            },
+                            "output": null,
+                            "depth": 5
+                        },
+                        "output": null,
+                        "depth": 4
+                    },
+                    "output": null,
+                    "depth": 3
+                },
+                "right": {
+                    "node_id": 10,
+                    "feature_index": null,
+                    "threshold": null,
+                    "num_samples": 800,
+                    "removed_features": [],
+                    "left": null,
+                    "right": null,
+                    "output": 6,
+                    "depth": 3
+                },
+                "output": null,
+                "depth": 2
+            },
+            "right": {
+                "node_id": 11,
+                "feature_index": null,
+                "threshold": null,
+                "num_samples": 801,
+                "removed_features": [],
+                "left": null,
+                "right": null,
+                "output": 3,
+                "depth": 2
+            },
+            "output": null,
+            "depth": 1
+        },
+        "right": {
+            "node_id": 12,
+            "feature_index": null,
+            "threshold": null,
+            "num_samples": 802,
+            "removed_features": [],
+            "left": null,
+            "right": null,
+            "output": 5,
+            "depth": 1
+        },
+        "output": null,
+        "depth": 0
+    },
+    "max_depth": null,
+    "id_counter": 13,
+    "feature_names": [
+        "1. Event = <PAD>",
+        "1. Event = accept request",
+        "1. Event = casual background check",
+        "1. Event = end",
+        "1. Event = exhaustive background check",
+        "1. Event = reject request",
+        "1. Event = start",
+        "1. Event = talk to applicant",
+        "2. Event = <PAD>",
+        "2. Event = accept request",
+        "2. Event = casual background check",
+        "2. Event = end",
+        "2. Event = exhaustive background check",
+        "2. Event = reject request",
+        "2. Event = start",
+        "2. Event = talk to applicant",
+        "3. Event = <PAD>",
+        "3. Event = accept request",
+        "3. Event = casual background check",
+        "3. Event = end",
+        "3. Event = exhaustive background check",
+        "3. Event = reject request",
+        "3. Event = start",
+        "3. Event = talk to applicant",
+        "Attribute gender = diverse",
+        "Attribute gender = female",
+        "Attribute gender = male",
+        "Attribute age = middle aged",
+        "Attribute age = old",
+        "Attribute age = young"
+    ],
+    "feature_indices": {
+        "gender": [
+            24,
+            25,
+            26
+        ],
+        "age": [
+            27,
+            28,
+            29
+        ]
+    },
+    "class_names": [
+        "accept request",
+        "casual background check",
+        "end",
+        "exhaustive background check",
+        "reject request",
+        "start",
+        "talk to applicant"
+    ]
+}

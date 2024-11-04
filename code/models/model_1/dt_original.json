@@ -1,0 +1,128 @@
+{
+    "root": {
+        "node_id": 0,
+        "feature_index": 5,
+        "threshold": 0.5,
+        "num_samples": 2400,
+        "removed_features": [],
+        "left": {
+            "node_id": 1,
+            "feature_index": null,
+            "threshold": null,
+            "num_samples": 811,
+            "removed_features": [],
+            "left": null,
+            "right": null,
+            "output": 1,
+            "depth": 1
+        },
+        "right": {
+            "node_id": 2,
+            "feature_index": 10,
+            "threshold": 0.5,
+            "num_samples": 1589,
+            "removed_features": [],
+            "left": {
+                "node_id": 3,
+                "feature_index": 17,
+                "threshold": 0.5,
+                "num_samples": 782,
+                "removed_features": [],
+                "left": {
+                    "node_id": 4,
+                    "feature_index": 15,
+                    "threshold": 0.5,
+                    "num_samples": 431,
+                    "removed_features": [],
+                    "left": {
+                        "node_id": 5,
+                        "feature_index": null,
+                        "threshold": null,
+                        "num_samples": 346,
+                        "removed_features": [],
+                        "left": null,
+                        "right": null,
+                        "output": 2,
+                        "depth": 4
+                    },
+                    "right": {
+                        "node_id": 6,
+                        "feature_index": null,
+                        "threshold": null,
+                        "num_samples": 85,
+                        "removed_features": [],
+                        "left": null,
+                        "right": null,
+                        "output": 2,
+                        "depth": 4
+                    },
+                    "output": null,
+                    "depth": 3
+                },
+                "right": {
+                    "node_id": 7,
+                    "feature_index": null,
+                    "threshold": null,
+                    "num_samples": 351,
+                    "removed_features": [],
+                    "left": null,
+                    "right": null,
+                    "output": 0,
+                    "depth": 3
+                },
+                "output": null,
+                "depth": 2
+            },
+            "right": {
+                "node_id": 8,
+                "feature_index": null,
+                "threshold": null,
+                "num_samples": 807,
+                "removed_features": [],
+                "left": null,
+                "right": null,
+                "output": 3,
+                "depth": 2
+            },
+            "output": null,
+            "depth": 1
+        },
+        "output": null,
+        "depth": 0
+    },
+    "max_depth": null,
+    "id_counter": 9,
+    "feature_names": [
+        "1. Event = <PAD>",
+        "1. Event = casual background check",
+        "1. Event = end",
+        "1. Event = exhaustive background check",
+        "1. Event = start",
+        "2. Event = <PAD>",
+        "2. Event = casual background check",
+        "2. Event = end",
+        "2. Event = exhaustive background check",
+        "2. Event = start",
+        "3. Event = <PAD>",
+        "3. Event = casual background check",
+        "3. Event = end",
+        "3. Event = exhaustive background check",
+        "3. Event = start",
+        "Attribute gender = diverse",
+        "Attribute gender = female",
+        "Attribute gender = male"
+    ],
+    "feature_indices": {
+        "gender": [
+            15,
+            16,
+            17
+        ]
+    },
+    "class_names": [
+        "casual background check",
+        "end",
+        "exhaustive background check",
+        "start"
+    ]
+}
