@@ -365,6 +365,7 @@ def main():
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
     parser.add_argument('--no-save', dest='save', action='store_false', 
                         help='Disable saving the results (default: results will be saved)')
+    parser.add_argument("node_ids", type=int, nargs="*", help="List of node_ids")
     args = parser.parse_args()
     
     # Check which mode is selected and run the corresponding function
@@ -386,4 +387,3 @@ def main():
 if __name__ == "__main__":
     main()
     print("Done and dusted!")
-    print("new commit")

@@ -1,38 +1,118 @@
 {
     "root": {
         "node_id": 0,
-        "feature_index": 5,
+        "feature_index": 9,
         "threshold": 0.5,
-        "num_samples": 2400,
+        "num_samples": 2423,
         "removed_features": [],
         "left": {
             "node_id": 1,
-            "feature_index": null,
-            "threshold": null,
-            "num_samples": 811,
-            "removed_features": [],
-            "left": null,
-            "right": null,
-            "output": 1,
-            "depth": 1
-        },
-        "right": {
-            "node_id": 2,
-            "feature_index": 10,
+            "feature_index": 14,
             "threshold": 0.5,
-            "num_samples": 1589,
+            "num_samples": 1603,
             "removed_features": [],
             "left": {
-                "node_id": 3,
-                "feature_index": 17,
+                "node_id": 2,
+                "feature_index": 0,
                 "threshold": 0.5,
-                "num_samples": 782,
+                "num_samples": 817,
                 "removed_features": [],
                 "left": {
-                    "node_id": 4,
+                    "node_id": 3,
+                    "feature_index": 12,
+                    "threshold": 0.5,
+                    "num_samples": 16,
+                    "removed_features": [],
+                    "left": {
+                        "node_id": 4,
+                        "feature_index": null,
+                        "threshold": null,
+                        "num_samples": 7,
+                        "removed_features": [],
+                        "left": null,
+                        "right": null,
+                        "output": 1,
+                        "depth": 4
+                    },
+                    "right": {
+                        "node_id": 5,
+                        "feature_index": 6,
+                        "threshold": 0.5,
+                        "num_samples": 9,
+                        "removed_features": [],
+                        "left": {
+                            "node_id": 6,
+                            "feature_index": 15,
+                            "threshold": 0.5,
+                            "num_samples": 2,
+                            "removed_features": [],
+                            "left": {
+                                "node_id": 7,
+                                "feature_index": null,
+                                "threshold": null,
+                                "num_samples": 1,
+                                "removed_features": [],
+                                "left": null,
+                                "right": null,
+                                "output": 1,
+                                "depth": 6
+                            },
+                            "right": {
+                                "node_id": 8,
+                                "feature_index": null,
+                                "threshold": null,
+                                "num_samples": 1,
+                                "removed_features": [],
+                                "left": null,
+                                "right": null,
+                                "output": 2,
+                                "depth": 6
+                            },
+                            "output": null,
+                            "depth": 5
+                        },
+                        "right": {
+                            "node_id": 9,
+                            "feature_index": null,
+                            "threshold": null,
+                            "num_samples": 7,
+                            "removed_features": [],
+                            "left": null,
+                            "right": null,
+                            "output": 3,
+                            "depth": 5
+                        },
+                        "output": null,
+                        "depth": 4
+                    },
+                    "output": null,
+                    "depth": 3
+                },
+                "right": {
+                    "node_id": 10,
                     "feature_index": null,
                     "threshold": null,
-                    "num_samples": 431,
+                    "num_samples": 801,
+                    "removed_features": [],
+                    "left": null,
+                    "right": null,
+                    "output": 3,
+                    "depth": 3
+                },
+                "output": null,
+                "depth": 2
+            },
+            "right": {
+                "node_id": 11,
+                "feature_index": 17,
+                "threshold": 0.5,
+                "num_samples": 786,
+                "removed_features": [],
+                "left": {
+                    "node_id": 12,
+                    "feature_index": null,
+                    "threshold": null,
+                    "num_samples": 405,
                     "removed_features": [],
                     "left": null,
                     "right": null,
@@ -40,10 +120,10 @@
                     "depth": 3
                 },
                 "right": {
-                    "node_id": 5,
+                    "node_id": 13,
                     "feature_index": null,
                     "threshold": null,
-                    "num_samples": 351,
+                    "num_samples": 381,
                     "removed_features": [],
                     "left": null,
                     "right": null,
@@ -53,15 +133,55 @@
                 "output": null,
                 "depth": 2
             },
-            "right": {
-                "node_id": 6,
+            "output": null,
+            "depth": 1
+        },
+        "right": {
+            "node_id": 14,
+            "feature_index": 14,
+            "threshold": 0.5,
+            "num_samples": 820,
+            "removed_features": [],
+            "left": {
+                "node_id": 15,
                 "feature_index": null,
                 "threshold": null,
-                "num_samples": 807,
+                "num_samples": 818,
                 "removed_features": [],
                 "left": null,
                 "right": null,
-                "output": 3,
+                "output": 1,
+                "depth": 2
+            },
+            "right": {
+                "node_id": 16,
+                "feature_index": 16,
+                "threshold": 0.5,
+                "num_samples": 2,
+                "removed_features": [],
+                "left": {
+                    "node_id": 17,
+                    "feature_index": null,
+                    "threshold": null,
+                    "num_samples": 1,
+                    "removed_features": [],
+                    "left": null,
+                    "right": null,
+                    "output": 0,
+                    "depth": 3
+                },
+                "right": {
+                    "node_id": 18,
+                    "feature_index": null,
+                    "threshold": null,
+                    "num_samples": 1,
+                    "removed_features": [],
+                    "left": null,
+                    "right": null,
+                    "output": 2,
+                    "depth": 3
+                },
+                "output": null,
                 "depth": 2
             },
             "output": null,
@@ -71,7 +191,7 @@
         "depth": 0
     },
     "max_depth": null,
-    "id_counter": 7,
+    "id_counter": 19,
     "feature_names": [
         "1. Event = <PAD>",
         "1. Event = casual background check",

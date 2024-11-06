@@ -467,14 +467,23 @@ def get_metrics(X, y, feature_index, possible_events, class_names, feature_names
         event_index = class_names.index(event)
         y_binary = np.zeros_like(y)
         y_binary[y == event_index] = 1
+        amount = np.count_nonzero(y_binary == 1)
 
         metric_frame = MetricFrame(metrics=selection_rate, y_true=y_binary, y_pred=y_binary, sensitive_features=protected_attribute)
         selection_rate_unprivileged = metric_frame.by_group[0]
         selection_rate_privileged = metric_frame.by_group[1]
         #print(f"priviledged selection rate: {selection_rate_privileged}, unpriviledged selection rate: {selection_rate_unprivileged}")
-        disp_impact = selection_rate_unprivileged / selection_rate_privileged
+        if selection_rate_privileged == 0:
+            if selection_rate_unprivileged == 0:
+                disp_impact = 0
+            elif selection_rate_unprivileged < 0:
+                disp_impact = float(-"inf")
+            else:
+                disp_impact = float("inf")
+        else:
+            disp_impact = selection_rate_unprivileged / selection_rate_privileged
         stat_parity = selection_rate_unprivileged - selection_rate_privileged
 
-        output_string = f"Feature: {feature_name}, Event: {event} | stat. parity: {stat_parity}, disp. impact: {disp_impact}"
+        output_string = f"Feature: {feature_name}, Event: {event} | stat. parity: {stat_parity}, disp. impact: {disp_impact}, amount: {amount} |"
         output.append(output_string)
     return output

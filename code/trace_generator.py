@@ -1,5 +1,4 @@
 import random
-random.seed(0)
 import string
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -35,7 +34,7 @@ class ProcessModel:
             self.start_activity = activity
 
     # Add a transition between two activities with specific probabilities based on case attribute values
-    def add_transition(self, from_activity: str, to_activity: str, conditions: Dict[Tuple[str, Any], float]):
+    def add_transition(self, from_activity: str, to_activity: str, conditions: Dict[Tuple[str, Any], float] = field(default_factory=dict)):
         if from_activity in self.activities and to_activity in self.activities:
             self.transitions[from_activity].append((to_activity, conditions))
 
@@ -78,10 +77,13 @@ class TraceGenerator:
     current_case_id: int = 0
 
     # generate event traces 
-    def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 10) -> List[Event]:
+    def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 10,
+                        noise_transition: float = 0.00, noise_event: float = 0.00, noise_time: float = 0.00, 
+                        noise_attribute: float = 0.00) -> List[Case]:
+        random.seed(0)
         cases = []
         for _ in tqdm(range(num_cases), desc="generating data"):
-            case = self.generate_case()
+            case = self.generate_case(noise_attribute=noise_attribute)
             current_activity = self.process_model.start_activity
             current_time = start_time
 
@@ -89,23 +91,37 @@ class TraceGenerator:
                 if not current_activity:
                     break
 
-                # Generate event
-                event = Event(activity=current_activity, timestamp=current_time)
+                # Determine event name with noise_event probability
+                if random.random() < noise_event:
+                    event_name = ''.join(random.choices(string.ascii_letters, k=10))
+                else:
+                    event_name = current_activity
+
+                # Create event with either original or randomized activity name
+                event = Event(activity=event_name, timestamp=current_time)
                 case.events.append(event)
 
-                # Get next activity
-                current_activity = self.process_model.get_next_activity(current_activity, case.attributes)
+                # Choose next activity with noise_transition probability
+                if random.random() < noise_transition:
+                    current_activity = random.choice(self.process_model.activities)  # Randomly pick an activity
+                else:
+                    current_activity = self.process_model.get_next_activity(current_activity, case.attributes)
 
-                # Increment time (arbitrary 1-10 minute increments)
-                current_time += timedelta(minutes=random.randint(1, 10))
-            
+                # Increment time, with noise_time probability adding random offset
+                if random.random() < noise_time:
+                    # Random offset of up to ±2 days and ±30 minutes
+                    time_offset = timedelta(days=random.randint(-2, 2), minutes=random.randint(-30, 30))
+                    current_time += time_offset
+                else:
+                    current_time += timedelta(minutes=random.randint(1, 10))  # Normal increment
+
             cases.append(case)
-            start_time += timedelta(minutes=random.randint(1, 10))
+            start_time += timedelta(minutes=random.randint(1, 10))  # Increment start time for the next case
 
         return cases
     
     #Generate case with attributes based on provided distributions
-    def generate_case(self, noise_attribute: float = 0.01) -> Case:
+    def generate_case(self, noise_attribute: float = 0.00) -> Case:
         case_id = self.current_case_id
         self.current_case_id += 1
 
@@ -235,6 +251,62 @@ def build_process_model(model_name) -> ProcessModel:
         })
         process_model.add_transition("accept request", "end", conditions={})
         process_model.add_transition("reject request", "end", conditions={})
+
+    elif model_name == "cc":
+        process_model.add_attribute("gender", [("male", 0.5),("female", 0.5)])
+        process_model.add_attribute("problems", [("true", 0.5),("false", 0.5)])
+        process_model.add_activity("start",start_activity=True)
+        process_model.add_activity("register")
+        process_model.add_activity("asses eligibility")
+        process_model.add_activity("collect history")
+        process_model.add_activity("prostate screening")
+        process_model.add_activity("mammary screening")
+        process_model.add_activity("explain diagnosis")
+        process_model.add_activity("discuss options")
+        process_model.add_activity("inform prevention")
+        process_model.add_activity("bill patient")
+        process_model.add_activity("refuse screening")
+        process_model.add_activity("end")
+        process_model.add_transition("start", "register", conditions={})
+        process_model.add_transition("register", "asses eligibility", conditions={})
+        process_model.add_transition("asses eligibility", "collect history", conditions={
+            ("gender", "male"): 0.7,
+            ("gender", "female"): 0.3,  
+        })
+        process_model.add_transition("asses eligibility", "refuse screening", conditions={
+            ("gender", "male"): 0.3,
+            ("gender", "female"): 0.7,  
+        })
+        process_model.add_transition("collect history", "prostate screening", conditions={
+            ("gender", "male"): 1,
+            ("gender", "female"): 0,  
+        })
+        process_model.add_transition("collect history", "mammary screening", conditions={
+            ("gender", "male"): 0,
+            ("gender", "female"): 1,  
+        })
+        process_model.add_transition("prostate screening", "explain diagnosis", conditions={
+            ("problems", "true"): 1,
+            ("problems", "false"): 0,  
+        })
+        process_model.add_transition("prostate screening", "inform prevention", conditions={
+            ("problems", "true"): 0,
+            ("problems", "false"): 1,  
+        })
+        process_model.add_transition("mammary screening", "explain diagnosis", conditions={
+            ("problems", "true"): 1,
+            ("problems", "false"): 0,  
+        })
+        process_model.add_transition("mammary screening", "inform prevention", conditions={
+            ("problems", "true"): 0,
+            ("problems", "false"): 1,  
+        })
+        process_model.add_transition("explain diagnosis", "discuss options", conditions={})
+        process_model.add_transition("discuss options", "bill patient", conditions={})
+        process_model.add_transition("inform prevention", "bill patient", conditions={})
+        process_model.add_transition("bill patient", "end", conditions={})
+        process_model.add_transition("refuse screening", "end", conditions={})
+
     print(process_model)
     print("--------------------------------------------------------------------------------------------------")
     return process_model
