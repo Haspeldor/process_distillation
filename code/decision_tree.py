@@ -242,9 +242,10 @@ class DecisionTreeClassifier:
                 print(f"Metrics for node {node.node_id}:")
                 for metric in metrics:
                     print(metric)
+                print("")
 
-        self.print_tree_metrics(X, y, node.left)
         self.print_tree_metrics(X, y, node.right)
+        self.print_tree_metrics(X, y, node.left)
     
     def collect_events(self, node_id):
         """Collect all unique events in the subtree rooted at the node with node_id."""
@@ -259,8 +260,8 @@ class DecisionTreeClassifier:
             if node.output is not None:
                 unique_classes.add(node.output)
                 return
-            _collect_events_recursive(node.left)
             _collect_events_recursive(node.right)
+            _collect_events_recursive(node.left)
         
         # start the recursion from the node
         _collect_events_recursive(node)
@@ -301,7 +302,7 @@ class DecisionTreeClassifier:
         if node.output is None:
             left_result = self.collect_node_ids(node=node.left)
             right_result = self.collect_node_ids(node=node.right)
-            output = output + left_result + right_result
+            output = output + right_result + left_result
         return output
 
     # Collect data for the subtree rooted at the node
@@ -366,6 +367,41 @@ class DecisionTreeClassifier:
                 filtered_nodes.append(node_id)
 
         return filtered_nodes
+
+    def find_nodes_to_remove(self, critical_decisions, exhaustive=True, node=None):
+        if node is None:
+            node = self.root
+
+        output = []
+        # removes if a decision with the attribute exists, unless coherent with to_remove=False
+        if exhaustive:
+            for decision in critical_decisions:
+                if decision.to_remove:
+                    continue
+                for attribute in decision.attributes:
+                    if node.feature_index in self.feature_indices[attribute]:
+                        possible_events = self.collect_events(node_id=node.node_id)
+                        if not set(possible_events) & set(decision.possible_events):
+                            output = [node.node_id]
+                            break
+        
+        # removes only the nodes coherent with the to_remove=True
+        else:
+            for decision in critical_decisions:
+                for attribute in decision.attributes:
+                    if node.feature_index in self.feature_indices[attribute]:
+                        possible_events = self.collect_events(node_id=node.node_id)
+                        if set(possible_events) & set(decision.possible_events):
+                            output = [node.node_id]
+                            break
+
+        if node.output is None:
+            left_result = self.find_nodes_to_remove(critical_decisions, node=node.left)
+            right_result = self.find_nodes_to_remove(critical_decisions, node=node.right)
+            output = output + right_result + left_result
+
+        return output
+
         
 
 def save_tree_to_json(tree, file_path):

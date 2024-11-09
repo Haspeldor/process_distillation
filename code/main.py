@@ -20,8 +20,8 @@ from decision_tree import DecisionTreeClassifier, save_tree_to_json, load_tree_f
 def generate_data(num_cases, model_name, n_gram, save=True):
     process_model = build_process_model(model_name)
     folder_name = model_name if save else None
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = generate_processed_data(process_model, num_cases, n_gram, folder_name=folder_name)
-    return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_processed_data(process_model, num_cases, n_gram, folder_name=folder_name)
+    return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions
 
 # define neural network architecture
 def build_nn(input_dim, output_dim):
@@ -40,10 +40,9 @@ def build_nn(input_dim, output_dim):
 def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
     input_dim = X_train.shape[1]  # Number of input features (attributes + events)
     output_dim = y_train.shape[1]  # Number of possible events (classes)
+    print("training neural network:")
     print(f"input dimension: {input_dim}")
     print(f"output dimension: {output_dim}")
-    print("--------------------------------------------------------------------------------------------------")
-    print("training neural network:")
     model = build_nn(input_dim, output_dim)
     model.fit(X_train, y_train, epochs=10, batch_size=32)
     print("--------------------------------------------------------------------------------------------------")
@@ -52,7 +51,7 @@ def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
     return model
 
 def train_dt(X_train, y_train, folder_name=None, model_name=None, feature_names=None, feature_indices=None, class_names=None):
-    print("training decision tree...")
+    print("training decision tree:")
     dt = DecisionTreeClassifier(class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     dt.fit(X_train, y_train)
     if model_name:
@@ -61,21 +60,20 @@ def train_dt(X_train, y_train, folder_name=None, model_name=None, feature_names=
     return dt
 
 def save_nn(model, folder_name, file_name):
-    print(f"saving {file_name}...")
+    #print(f"saving {file_name}...")
     full_path = os.path.join('models', folder_name)
     os.makedirs(full_path, exist_ok=True)
     file_path = os.path.join(full_path, file_name)
     model.save(file_path)
 
 def load_nn(folder_name, file_name):
-    print(f"loading {file_name}...")
+    #print(f"loading {file_name}...")
     file_name = os.path.join('models', folder_name, file_name)
     model = load_model(file_name)
-    print("--------------------------------------------------------------------------------------------------")
     return model
     
 def save_dt(dt, folder_name, file_name):
-    print(f"saving {file_name}...")
+    #print(f"saving {file_name}...")
     full_path = os.path.join('models', folder_name)
     os.makedirs(full_path, exist_ok=True)
     file_path = os.path.join(full_path, file_name)
@@ -83,9 +81,8 @@ def save_dt(dt, folder_name, file_name):
 
 
 def load_dt(folder_name, file_name):
-    print(f"loading {file_name}...")
+    #print(f"loading {file_name}...")
     file_path = os.path.join('models', folder_name, file_name)
-    print("--------------------------------------------------------------------------------------------------")
     return load_tree_from_json(file_path)
 
 def evaluate_nn(model, X_test, y_test):
@@ -110,7 +107,7 @@ def print_metrics_nn(nn, dt, X, node_ids):
         print(isinstance(y, np.ndarray))
 
         metrics = get_metrics(X, y, feature_index, possible_events, class_names, feature_names)
-        print(f"metrics for modified node {node_id}:")
+        print(f"Metrics for modified node {node_id}:")
         for metric in metrics:
             print(metric)
 
@@ -121,11 +118,10 @@ def calculate_fairness(nn, X, critical_decisions, feature_indices, class_names, 
             for feature_index in feature_indices[attribute]:
                 possible_events = decision.possible_events
                 metrics = get_metrics(X, y, feature_index, possible_events, class_names, feature_names)
-                print(f"metrics for {feature_names[feature_index]}, {possible_events}:")
+                print(f"Metrics for {feature_names[feature_index]}, {possible_events}:")
                 for metric in metrics:
                     print(metric)
                 print("")
-            print("")
 
 def evaluate_dt(dt, X_test, y_test):
     print("testing dt:")
@@ -183,24 +179,50 @@ def find_missing_ids(dt_distilled, dt_modified):
     missing_ids = [item for item in distilled_node_ids if item not in modified_node_ids]
     return missing_ids
 
-# executes the complete pipeline for the prerequisites
-def run_preprocessing(model_name, n_gram=2, num_cases=1000, save=True):
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = generate_data(num_cases, model_name, n_gram, save=save)
+# executes the prerequisites
+def run_preprocessing(model_name, n_gram=2, num_cases=1000, save=True, console_output=True):
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram, save=save)
     folder_name = model_name if save else None
     nn = train_nn(X_train, y_train, folder_name=folder_name)
 
     y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
-    dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_distilled.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+    dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
 
+    if console_output:
+        evaluate_nn(nn, X_test, y_test)
+        evaluate_dt(dt_distilled, X_test, y_test)
+
+# executes the complete pipeline
+def run_complete(model_name, n_gram=2, num_cases=1000, save=True, preprocessing=False):
+    if preprocessing:
+        run_preprocessing(model_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
+
+    folder_name = model_name
+    nn = load_nn(folder_name, "nn.keras")
+    X_test  = load_data(folder_name, "X_test.pkl")
+    y_test  = load_data(folder_name, "y_test.pkl")
+    dt_distilled = load_dt(folder_name, "dt.json")
+    critical_decisions = load_data(folder_name, "critical_decisions.pkl")
+
+    print("Base model:")
     evaluate_nn(nn, X_test, y_test)
     evaluate_dt(dt_distilled, X_test, y_test)
+    print(f"Critical Decisions: {critical_decisions}")
+    nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+    print(f"Nodes to remove accordingly: {nodes_to_remove}")
+    print("--------------------------------------------------------------------------------------------------")
+
+    run_modify(folder_name=model_name, node_ids=nodes_to_remove, console_output=False)
+    run_finetuning(folder_name=model_name, console_output=False)
+    print("Pipeline done, running analysis...")
+    print("--------------------------------------------------------------------------------------------------")
+    run_analysis(folder_name=model_name)
+
 
 # runs analysis on finished models
 def run_analysis(folder_name):
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
-    dt_distilled = load_dt(folder_name, "dt_distilled.json")
-    dt_modified = load_dt(folder_name, "dt_modified.json")
     class_names = load_data(folder_name, "class_names.pkl")
     feature_names = load_data(folder_name, "feature_names.pkl")
     feature_indices = load_data(folder_name, "feature_indices.pkl")
@@ -213,8 +235,8 @@ def run_analysis(folder_name):
             print(f"Analyzing model: {file_name}")
             nn = load_nn(folder_name, file_name)
             evaluate_nn(nn, X_test, y_test)
+            print("")
             calculate_fairness(nn, X_test, critical_decisions, feature_indices, class_names, feature_names)
-            #print_metrics_nn(nn, dt_distilled, X_test, node_ids=modified_nodes)
 
     # analyze all decision trees
     for file_name in os.listdir(folder_path):
@@ -225,14 +247,14 @@ def run_analysis(folder_name):
 
 
 # runs finetuning for modified base data
-def run_finetuning(folder_name="model_1", epochs=5, batch_size=32, learning_rate=1e-3, weight=5):
+def run_finetuning(folder_name="model_1", epochs=5, batch_size=32, learning_rate=1e-3, weight=5, console_output=True):
     X_train  = load_data(folder_name, "X_train.pkl")
     y_train  = load_data(folder_name, "y_train.pkl")
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
     y_modified = load_data(folder_name, "y_modified.pkl")
     y_distilled = load_data(folder_name, "y_distilled.pkl")
-    dt_distilled = load_dt(folder_name, "dt_distilled.json")
+    dt_distilled = load_dt(folder_name, "dt.json")
     dt_modified = load_dt(folder_name, "dt_modified.json")
     class_names = load_data(folder_name, "class_names.pkl")
     feature_names = load_data(folder_name, "feature_names.pkl")
@@ -244,61 +266,63 @@ def run_finetuning(folder_name="model_1", epochs=5, batch_size=32, learning_rate
     nn_simple = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="simple", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
     save_nn(nn_simple, folder_name, "nn_simple.keras")
     y_distilled = distill_nn(nn_simple, X_train, folder_name=folder_name)
-    dt_simple = train_dt(X_train, y_distilled, folder_name=folder_name, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+    dt_simple = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_weighted.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     print("finetuning mode: changed")
     nn = load_nn(folder_name, "nn.keras")
     nn_changed = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="changed", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
     save_nn(nn_simple, folder_name, "nn_changed.keras")
     y_distilled = distill_nn(nn_changed, X_train, folder_name=folder_name)
-    dt_changed = train_dt(X_train, y_distilled, folder_name=folder_name, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+    dt_changed = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_changed.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     print("finetuning mode: weighted")
     nn = load_nn(folder_name, "nn.keras")
     nn_weighted = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="weighted", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
     save_nn(nn_simple, folder_name, "nn_weighted.keras")
     y_distilled = distill_nn(nn_weighted, X_train, folder_name=folder_name)
-    dt_weighted = train_dt(X_train, y_distilled, folder_name=folder_name, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+    dt_weighted = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_weighted.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
 
-    nn = load_nn(folder_name, "nn.keras")
-    print("evaluating base nn:")
-    evaluate_nn(nn, X_test, y_test)
-    print("evaluating distilled dt:")
-    evaluate_dt(dt_distilled, X_test, y_test)
-    print("evaluating modified dt:")
-    evaluate_dt(dt_modified, X_test, y_test)
-    print("evaluating mode: simple")
-    evaluate_nn(nn_simple, X_test, y_test)
-    evaluate_dt(dt_simple, X_test, y_test)
-    print("evaluating mode: changed")
-    evaluate_nn(nn_changed, X_test, y_test)
-    evaluate_dt(dt_changed, X_test, y_test)
-    print("evaluating mode: weighted")
-    evaluate_nn(nn_weighted, X_test, y_test)
-    evaluate_dt(dt_weighted, X_test, y_test)
+    if console_output:
+        nn = load_nn(folder_name, "nn.keras")
+        print("evaluating base nn:")
+        evaluate_nn(nn, X_test, y_test)
+        print("evaluating distilled dt:")
+        evaluate_dt(dt_distilled, X_test, y_test)
+        print("evaluating modified dt:")
+        evaluate_dt(dt_modified, X_test, y_test)
+        print("evaluating mode: simple")
+        evaluate_nn(nn_simple, X_test, y_test)
+        evaluate_dt(dt_simple, X_test, y_test)
+        print("evaluating mode: changed")
+        evaluate_nn(nn_changed, X_test, y_test)
+        evaluate_dt(dt_changed, X_test, y_test)
+        print("evaluating mode: weighted")
+        evaluate_nn(nn_weighted, X_test, y_test)
+        evaluate_dt(dt_weighted, X_test, y_test)
 
-    y_modified = dt_modified.predict(X_test)
-    y_modified = to_categorical(y_modified, num_classes=len(dt_modified.class_names))
-    print("evaluating unfair:")
-    changed_indices = np.where(y_test != y_modified)[0]
-    X = X_test[changed_indices]
-    y = y_test[changed_indices]
-    evaluate_nn(nn_weighted, X, y)
-    print("evaluating fair:")
-    changed_indices = np.where(y_test == y_modified)[0]
-    X = X_test[changed_indices]
-    y = y_test[changed_indices]
-    evaluate_nn(nn_weighted, X, y)
+        y_modified = dt_modified.predict(X_test)
+        y_modified = to_categorical(y_modified, num_classes=len(dt_modified.class_names))
+        print("evaluating unfair:")
+        changed_indices = np.where(y_test != y_modified)[0]
+        X = X_test[changed_indices]
+        y = y_test[changed_indices]
+        evaluate_nn(nn_weighted, X, y)
+        print("evaluating fair:")
+        changed_indices = np.where(y_test == y_modified)[0]
+        X = X_test[changed_indices]
+        y = y_test[changed_indices]
+        evaluate_nn(nn_weighted, X, y)
 
 
-def run_modify(folder_name="model_1", node_ids=[], save=True):
+def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=True):
     X_train  = load_data(folder_name, "X_train.pkl")
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
-    dt_distilled = load_dt(folder_name, "dt_distilled.json")
+    dt_distilled = load_dt(folder_name, "dt.json")
 
     for node_id in node_ids:
         dt_distilled.delete_branch(node_id)
     save_dt(dt_distilled, folder_name, "dt_modified.json")
-    evaluate_dt(dt_distilled, X_test, y_test)
+    if console_output:
+        evaluate_dt(dt_distilled, X_test, y_test)
 
     y_modified = dt_distilled.predict(X_train)
     y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
@@ -312,7 +336,7 @@ def run_demo(folder_name="model_1", n_gram=2, num_cases=1000, save=False):
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
     nn = load_nn(folder_name, "nn.keras")
-    dt_distilled = load_dt(folder_name, "dt_distilled.json")
+    dt_distilled = load_dt(folder_name, "dt.json")
 
     evaluate_nn(nn, X_test, y_test)
     evaluate_dt(dt_distilled, X_test, y_test)
@@ -368,6 +392,8 @@ def main():
     # Check which mode is selected and run the corresponding function
     if args.mode == 'a':
         run_analysis(folder_name=args.model_name)
+    elif args.mode == 'c':
+        run_complete(model_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
     elif args.mode == 'd':
         run_demo(folder_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
     elif args.mode == 'f':

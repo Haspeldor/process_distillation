@@ -122,14 +122,14 @@ class DataProcessor:
         return X_train, X_test, y_train, y_test
 
 def load_data(folder_name, file_name):
-    print(f"loading {file_name}...")
+    #print(f"loading {file_name}...")
     file_path = os.path.join('processed_data', folder_name, file_name)
     with open(file_path, 'rb') as file:
         loaded_data = pickle.load(file)
     return loaded_data
 
 def save_data(data, folder_name, file_name):
-    print(f"saving {file_name}...")
+    #print(f"saving {file_name}...")
     full_path = os.path.join('processed_data', folder_name)
     os.makedirs(full_path, exist_ok=True)
     file_path = os.path.join(full_path, file_name)
@@ -168,4 +168,4 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
         save_data(data_processor.feature_indices, folder_name, "feature_indices.pkl")
         save_data(process_model.critical_decisions, folder_name, "critical_decisions.pkl")
 
-    return X_train, X_test, y_train, y_test, data_processor.class_names, data_processor.feature_names, data_processor.feature_indices
+    return X_train, X_test, y_train, y_test, data_processor.class_names, data_processor.feature_names, data_processor.feature_indices, process_model.critical_decisions

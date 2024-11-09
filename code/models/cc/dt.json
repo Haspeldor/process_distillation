@@ -97,15 +97,35 @@
                                                     "depth": 11
                                                 },
                                                 "right": {
-                                                    "node_id": 37,
-                                                    "feature_index": null,
-                                                    "threshold": null,
-                                                    "num_samples": 1,
+                                                    "node_id": 35,
+                                                    "feature_index": 39,
+                                                    "threshold": 0.5,
+                                                    "num_samples": 2,
                                                     "removed_features": [],
-                                                    "left": null,
-                                                    "right": null,
-                                                    "output": 5,
-                                                    "depth": 12
+                                                    "left": {
+                                                        "node_id": 37,
+                                                        "feature_index": null,
+                                                        "threshold": null,
+                                                        "num_samples": 1,
+                                                        "removed_features": [],
+                                                        "left": null,
+                                                        "right": null,
+                                                        "output": 5,
+                                                        "depth": 12
+                                                    },
+                                                    "right": {
+                                                        "node_id": 36,
+                                                        "feature_index": null,
+                                                        "threshold": null,
+                                                        "num_samples": 1,
+                                                        "removed_features": [],
+                                                        "left": null,
+                                                        "right": null,
+                                                        "output": 6,
+                                                        "depth": 12
+                                                    },
+                                                    "output": null,
+                                                    "depth": 11
                                                 },
                                                 "output": null,
                                                 "depth": 10
@@ -295,35 +315,55 @@
                         "depth": 4
                     },
                     "right": {
-                        "node_id": 8,
-                        "feature_index": 11,
+                        "node_id": 7,
+                        "feature_index": 39,
                         "threshold": 0.5,
-                        "num_samples": 413,
+                        "num_samples": 791,
                         "removed_features": [],
                         "left": {
-                            "node_id": 10,
+                            "node_id": 11,
                             "feature_index": null,
                             "threshold": null,
-                            "num_samples": 412,
-                            "removed_features": [],
-                            "left": null,
-                            "right": null,
-                            "output": 9,
-                            "depth": 6
-                        },
-                        "right": {
-                            "node_id": 9,
-                            "feature_index": null,
-                            "threshold": null,
-                            "num_samples": 1,
+                            "num_samples": 378,
                             "removed_features": [],
                             "left": null,
                             "right": null,
                             "output": 2,
-                            "depth": 6
+                            "depth": 5
+                        },
+                        "right": {
+                            "node_id": 8,
+                            "feature_index": 11,
+                            "threshold": 0.5,
+                            "num_samples": 413,
+                            "removed_features": [],
+                            "left": {
+                                "node_id": 10,
+                                "feature_index": null,
+                                "threshold": null,
+                                "num_samples": 412,
+                                "removed_features": [],
+                                "left": null,
+                                "right": null,
+                                "output": 9,
+                                "depth": 6
+                            },
+                            "right": {
+                                "node_id": 9,
+                                "feature_index": null,
+                                "threshold": null,
+                                "num_samples": 1,
+                                "removed_features": [],
+                                "left": null,
+                                "right": null,
+                                "output": 2,
+                                "depth": 6
+                            },
+                            "output": null,
+                            "depth": 5
                         },
                         "output": null,
-                        "depth": 5
+                        "depth": 4
                     },
                     "output": null,
                     "depth": 3

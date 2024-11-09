@@ -60,19 +60,19 @@
                                             "num_samples": 791,
                                             "removed_features": [],
                                             "left": {
-                                                "node_id": 30,
+                                                "node_id": 32,
                                                 "feature_index": 34,
                                                 "threshold": 0.5,
                                                 "num_samples": 788,
                                                 "removed_features": [],
                                                 "left": {
-                                                    "node_id": 34,
+                                                    "node_id": 36,
                                                     "feature_index": 35,
                                                     "threshold": 0.5,
                                                     "num_samples": 786,
                                                     "removed_features": [],
                                                     "left": {
-                                                        "node_id": 36,
+                                                        "node_id": 38,
                                                         "feature_index": null,
                                                         "threshold": null,
                                                         "num_samples": 785,
@@ -83,7 +83,7 @@
                                                         "depth": 12
                                                     },
                                                     "right": {
-                                                        "node_id": 35,
+                                                        "node_id": 37,
                                                         "feature_index": null,
                                                         "threshold": null,
                                                         "num_samples": 1,
@@ -97,13 +97,13 @@
                                                     "depth": 11
                                                 },
                                                 "right": {
-                                                    "node_id": 31,
+                                                    "node_id": 33,
                                                     "feature_index": 39,
                                                     "threshold": 0.5,
                                                     "num_samples": 2,
                                                     "removed_features": [],
                                                     "left": {
-                                                        "node_id": 33,
+                                                        "node_id": 35,
                                                         "feature_index": null,
                                                         "threshold": null,
                                                         "num_samples": 1,
@@ -114,7 +114,7 @@
                                                         "depth": 12
                                                     },
                                                     "right": {
-                                                        "node_id": 32,
+                                                        "node_id": 34,
                                                         "feature_index": null,
                                                         "threshold": null,
                                                         "num_samples": 1,
@@ -132,13 +132,33 @@
                                             },
                                             "right": {
                                                 "node_id": 29,
-                                                "feature_index": null,
-                                                "threshold": null,
+                                                "feature_index": 1,
+                                                "threshold": 0.5,
                                                 "num_samples": 3,
                                                 "removed_features": [],
-                                                "left": null,
-                                                "right": null,
-                                                "output": 10,
+                                                "left": {
+                                                    "node_id": 31,
+                                                    "feature_index": null,
+                                                    "threshold": null,
+                                                    "num_samples": 1,
+                                                    "removed_features": [],
+                                                    "left": null,
+                                                    "right": null,
+                                                    "output": 10,
+                                                    "depth": 11
+                                                },
+                                                "right": {
+                                                    "node_id": 30,
+                                                    "feature_index": null,
+                                                    "threshold": null,
+                                                    "num_samples": 2,
+                                                    "removed_features": [],
+                                                    "left": null,
+                                                    "right": null,
+                                                    "output": 3,
+                                                    "depth": 11
+                                                },
+                                                "output": null,
                                                 "depth": 10
                                             },
                                             "output": null,
@@ -371,7 +391,7 @@
         "depth": 0
     },
     "max_depth": null,
-    "id_counter": 37,
+    "id_counter": 39,
     "feature_names": [
         "-3. Event = <PAD>",
         "-3. Event = asses eligibility",

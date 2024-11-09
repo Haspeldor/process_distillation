@@ -20,7 +20,7 @@ class Case:
 class Decision:
     attributes: List[str]
     possible_events: List[str]
-    to_remove: bool
+    to_remove: bool = True
 
 
 @dataclass
