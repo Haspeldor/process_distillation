@@ -17,14 +17,25 @@ class Case:
     events: List[Event] = field(default_factory=list)
 
 @dataclass
+class Decision:
+    attributes: List[str]
+    possible_events: List[str]
+    to_remove: bool
+
+
+@dataclass
 class ProcessModel:
     start_activity: str = None
     activities: List[str] = field(default_factory=list)
     transitions: Dict[str, List[Tuple[str, Dict[Tuple[str, Any], float]]]] = field(default_factory=dict)
     case_attribute_distribution: Dict[str, List[Tuple[Any, float]]] = field(default_factory=dict)
+    critical_decisions: List[Decision] = field(default_factory=list)
 
     def add_attribute(self, attribute_name: str, value_probabilites: List[Tuple[Any, float]]):
         self.case_attribute_distribution[attribute_name] = value_probabilites
+    
+    def add_critical_decision(self, attributes, possible_events, to_remove):
+        self.critical_decisions.append(Decision(attributes=attributes, possible_events=possible_events, to_remove=to_remove))
 
     def add_activity(self, activity: str, start_activity=False):
         if activity not in self.activities:
@@ -78,7 +89,7 @@ class TraceGenerator:
 
     # generate event traces 
     def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 10,
-                        noise_transition: float = 0.00, noise_event: float = 0.00, noise_time: float = 0.00, 
+                        noise_transition: float = 0.005, noise_event: float = 0.00, noise_time: float = 0.00, 
                         noise_attribute: float = 0.00) -> List[Case]:
         random.seed(0)
         cases = []
@@ -306,6 +317,8 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_transition("inform prevention", "bill patient", conditions={})
         process_model.add_transition("bill patient", "end", conditions={})
         process_model.add_transition("refuse screening", "end", conditions={})
+        process_model.add_critical_decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False)
+        process_model.add_critical_decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True)
 
     print(process_model)
     print("--------------------------------------------------------------------------------------------------")

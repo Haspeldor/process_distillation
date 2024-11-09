@@ -114,6 +114,18 @@ def print_metrics_nn(nn, dt, X, node_ids):
         for metric in metrics:
             print(metric)
 
+def calculate_fairness(nn, X, critical_decisions, feature_indices, class_names, feature_names):
+    y = nn.predict(X)
+    for decision in critical_decisions:
+        for attribute in decision.attributes:
+            for feature_index in feature_indices[attribute]:
+                possible_events = decision.possible_events
+                metrics = get_metrics(X, y, feature_index, possible_events, class_names, feature_names)
+                print(f"metrics for {feature_names[feature_index]}, {possible_events}:")
+                for metric in metrics:
+                    print(metric)
+                print("")
+            print("")
 
 def evaluate_dt(dt, X_test, y_test):
     print("testing dt:")
@@ -172,7 +184,7 @@ def find_missing_ids(dt_distilled, dt_modified):
     return missing_ids
 
 # executes the complete pipeline for the prerequisites
-def run_complete(model_name, n_gram=2, num_cases=1000, save=True):
+def run_preprocessing(model_name, n_gram=2, num_cases=1000, save=True):
     X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = generate_data(num_cases, model_name, n_gram, save=save)
     folder_name = model_name if save else None
     nn = train_nn(X_train, y_train, folder_name=folder_name)
@@ -183,33 +195,17 @@ def run_complete(model_name, n_gram=2, num_cases=1000, save=True):
     evaluate_nn(nn, X_test, y_test)
     evaluate_dt(dt_distilled, X_test, y_test)
 
-
-# executes the pipeline with preprocessed data and an already trained nn
-def run_preprocessed(folder_name):
-    X_train  = load_data(folder_name, "X_train.pkl")
-    X_test  = load_data(folder_name, "X_test.pkl")
-    y_test  = load_data(folder_name, "y_test.pkl")
-    y_train  = load_data(folder_name, "y_train.pkl")
-    y_distilled  = load_data(folder_name, "y_distilled.pkl")
-    class_names = load_data(folder_name, "class_names.pkl")
-    feature_names = load_data(folder_name, "feature_names.pkl")
-    feature_indices = load_data(folder_name, "feature_indices.pkl")
-    nn = load_nn(folder_name, "nn.keras")
-
-    dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_distilled.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
-
-    evaluate_nn(nn, X_test, y_test)
-    evaluate_dt(dt_distilled, X_test, y_test)
-
-
 # runs analysis on finished models
 def run_analysis(folder_name):
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
     dt_distilled = load_dt(folder_name, "dt_distilled.json")
     dt_modified = load_dt(folder_name, "dt_modified.json")
+    class_names = load_data(folder_name, "class_names.pkl")
+    feature_names = load_data(folder_name, "feature_names.pkl")
+    feature_indices = load_data(folder_name, "feature_indices.pkl")
+    critical_decisions = load_data(folder_name, "critical_decisions.pkl")
     folder_path = os.path.join('models', folder_name)
-    modified_nodes = get_deleted_nodes(dt_distilled, dt_modified)
 
     # analyze all neural networks trees
     for file_name in os.listdir(folder_path):
@@ -217,6 +213,7 @@ def run_analysis(folder_name):
             print(f"Analyzing model: {file_name}")
             nn = load_nn(folder_name, file_name)
             evaluate_nn(nn, X_test, y_test)
+            calculate_fairness(nn, X_test, critical_decisions, feature_indices, class_names, feature_names)
             #print_metrics_nn(nn, dt_distilled, X_test, node_ids=modified_nodes)
 
     # analyze all decision trees
@@ -371,8 +368,6 @@ def main():
     # Check which mode is selected and run the corresponding function
     if args.mode == 'a':
         run_analysis(folder_name=args.model_name)
-    elif args.mode == 'c':
-        run_complete(model_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
     elif args.mode == 'd':
         run_demo(folder_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
     elif args.mode == 'f':
@@ -382,7 +377,7 @@ def main():
     elif args.mode == 'm':
         run_modify(folder_name=args.model_name, node_ids=args.node_ids)
     elif args.mode == 'p':
-        run_preprocessed(folder_name=args.model_name)
+        run_preprocessing(model_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
 
 if __name__ == "__main__":
     main()

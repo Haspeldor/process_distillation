@@ -65,12 +65,12 @@ class DecisionTreeClassifier:
             print(f"{indent}|--- [{node.node_id}] class: {class_name}")
         else:
             feature_name = self.feature_names[node.feature_index] if self.feature_names is not None else f"Feature {node.feature_index}"
-            # Print the current decision rule for the left child (<= threshold)
-            print(f"{indent}|--- [{node.node_id}] ({feature_name}) <= {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
-            self._print_sub_tree(node.left, depth + 1, indent + "|   ")
             # Print the current decision rule for the right child (> threshold)
             print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
             self._print_sub_tree(node.right, depth + 1, indent + "|   ")
+            # Print the current decision rule for the left child (<= threshold)
+            print(f"{indent}|--- [{node.node_id}] ({feature_name}) <= {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
+            self._print_sub_tree(node.left, depth + 1, indent + "|   ")
 
     def _grow_tree(self, X, y, depth=0, removed_features=[], recursive_removal=False):
         """Recursively grows the decision tree."""
@@ -92,8 +92,8 @@ class DecisionTreeClassifier:
         removed_features = removed_features if recursive_removal else []
         left_indices = X[:, best_feature] < best_threshold
         right_indices = X[:, best_feature] >= best_threshold
-        left_subtree = self._grow_tree(X[left_indices], y[left_indices], depth=depth+1, removed_features=removed_features)
         right_subtree = self._grow_tree(X[right_indices], y[right_indices], depth=depth+1, removed_features=removed_features)
+        left_subtree = self._grow_tree(X[left_indices], y[left_indices], depth=depth+1, removed_features=removed_features)
 
         return Node(node_id, num_samples=num_samples, feature_index=best_feature, threshold=best_threshold, left=left_subtree, right=right_subtree, depth=depth, removed_features=removed_features)
 
@@ -446,7 +446,6 @@ def load_tree_from_json(file_path):
     
     # Reconstruct the root node from the dictionary
     tree.root = dict_to_node(tree_dict['root'])
-    
     return tree
 
 def get_deleted_nodes(dt_original, dt_modified):
@@ -457,18 +456,28 @@ def get_deleted_nodes(dt_original, dt_modified):
 
 def get_metrics(X, y, feature_index, possible_events, class_names, feature_names):
     output = []
+    feature_name = feature_names[feature_index]
+    protected_attribute = X[:, feature_index]
+    if y.ndim == 2:
+        y = np.argmax(y, axis=1)
 
     for event in possible_events:
-        feature_name = feature_names[feature_index]
-        protected_attribute = X[:, feature_index]
-
         if event not in class_names:
             raise ValueError(f"Event '{event}' not found in class_names.")
-        event_index = class_names.index(event)
+        if isinstance(class_names, list):
+            event_index = class_names.index(event)
+        elif isinstance(class_names, np.ndarray):
+            event_index = np.where(class_names == event)[0][0]
         y_binary = np.zeros_like(y)
         y_binary[y == event_index] = 1
-        amount = np.count_nonzero(y_binary == 1)
+        amount = np.sum((y_binary == 1) & (protected_attribute == 1))
+        total_amount = np.sum(y_binary == 1)
+        if len(y_binary) == 0:
+            output_string = f"Feature: {feature_name}, Event: {event} | NO DATA"
+            output.append(output_string)
+            continue
 
+        #print(f"metric for {feature_name} and {event} with length {len(y_binary)}")
         metric_frame = MetricFrame(metrics=selection_rate, y_true=y_binary, y_pred=y_binary, sensitive_features=protected_attribute)
         selection_rate_unprivileged = metric_frame.by_group[0]
         selection_rate_privileged = metric_frame.by_group[1]
@@ -484,6 +493,6 @@ def get_metrics(X, y, feature_index, possible_events, class_names, feature_names
             disp_impact = selection_rate_unprivileged / selection_rate_privileged
         stat_parity = selection_rate_unprivileged - selection_rate_privileged
 
-        output_string = f"Feature: {feature_name}, Event: {event} | stat. parity: {stat_parity}, disp. impact: {disp_impact}, amount: {amount} |"
+        output_string = f"Feature: {feature_name}, Event: {event} | stat. parity: {stat_parity}, disp. impact: {disp_impact}, amount: {amount} out of {total_amount}"
         output.append(output_string)
     return output

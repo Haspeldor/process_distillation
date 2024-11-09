@@ -37,9 +37,9 @@ class DataProcessor:
         attribute_pools = self.trace_generator.get_case_attribute_pools()
         feature_names = []
 
-        for index in range(1, n+1):
+        for index in range(n, 0, -1):
             for event in event_pool:
-                feature_names.append(f"{index}. Event = {event}")
+                feature_names.append(f"-{index}. Event = {event}")
         for attribute_name, possible_values in attribute_pools.items():
             for value in possible_values:
                 feature_names.append(f"Attribute {attribute_name} = {value}")
@@ -166,5 +166,6 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
         save_data(data_processor.class_names, folder_name, "class_names.pkl")
         save_data(data_processor.feature_names, folder_name, "feature_names.pkl")
         save_data(data_processor.feature_indices, folder_name, "feature_indices.pkl")
+        save_data(process_model.critical_decisions, folder_name, "critical_decisions.pkl")
 
     return X_train, X_test, y_train, y_test, data_processor.class_names, data_processor.feature_names, data_processor.feature_indices

@@ -13,12 +13,9 @@ todo:
         - case attributes
 
     - updated fairness
-        - dt centered
-            - find all "root" deleted nodes
-            - print metrics for all such nodes before and after using the nns
-        - nn centered
-            - save a priori problematic attributes/outcomes
-            - evaluate each combination before and afterwards
+        - evaluate each combination before and afterwards
+        - calculate_fairness(nn, X, critical_decisions, attribute_pools, class_names, feature_names)
+
 
     - automated finetuning
 
