@@ -508,21 +508,27 @@ def get_metrics(X, y, feature_index, possible_events, class_names, feature_names
         y_binary[y == event_index] = 1
         amount = np.sum((y_binary == 1) & (protected_attribute == 1))
         total_amount = np.sum(y_binary == 1)
-        if len(y_binary) == 0:
-            output_string = f"Feature: {feature_name}, Event: {event} | NO DATA"
+        #print(len(y_binary))
+        if total_amount < 1:
+            output_string = f"Feature: {feature_name}, Event: {event} | INSUFFICIENT DATA"
             output.append(output_string)
             continue
 
         #print(f"metric for {feature_name} and {event} with length {len(y_binary)}")
-        metric_frame = MetricFrame(metrics=selection_rate, y_true=y_binary, y_pred=y_binary, sensitive_features=protected_attribute)
-        selection_rate_unprivileged = metric_frame.by_group[0]
-        selection_rate_privileged = metric_frame.by_group[1]
+        unprivileged_mask = protected_attribute == 0
+        privileged_mask = protected_attribute == 1
+        if np.any(unprivileged_mask):
+            selection_rate_unprivileged = np.mean(y_binary[unprivileged_mask])
+        else:
+            selection_rate_unprivileged = 0
+        if np.any(privileged_mask):
+            selection_rate_privileged = np.mean(y_binary[privileged_mask])
+        else:
+            selection_rate_privileged = 0
         #print(f"priviledged selection rate: {selection_rate_privileged}, unpriviledged selection rate: {selection_rate_unprivileged}")
         if selection_rate_privileged == 0:
             if selection_rate_unprivileged == 0:
                 disp_impact = 0
-            elif selection_rate_unprivileged < 0:
-                disp_impact = float(-"inf")
             else:
                 disp_impact = float("inf")
         else:

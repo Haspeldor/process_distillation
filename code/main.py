@@ -180,9 +180,8 @@ def find_missing_ids(dt_distilled, dt_modified):
     return missing_ids
 
 # executes the prerequisites
-def run_preprocessing(model_name, n_gram=2, num_cases=1000, save=True, console_output=True):
+def run_preprocessing(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, console_output=True):
     X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram, save=save)
-    folder_name = model_name if save else None
     nn = train_nn(X_train, y_train, folder_name=folder_name)
 
     y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
@@ -193,9 +192,9 @@ def run_preprocessing(model_name, n_gram=2, num_cases=1000, save=True, console_o
         evaluate_dt(dt_distilled, X_test, y_test)
 
 # executes the complete pipeline
-def run_complete(model_name, n_gram=2, num_cases=1000, save=True, preprocessing=False):
+def run_complete(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, preprocessing=False):
     if preprocessing:
-        run_preprocessing(model_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
+        run_preprocessing(model_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
 
     folder_name = model_name
     nn = load_nn(folder_name, "nn.keras")
@@ -380,20 +379,25 @@ def run_interactive():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name', type=str, default='model_1', help='Name of the model to use (default: model_1)')
+    parser.add_argument('--folder_name', type=str, default=None, help='Name of the folder to use (default: same as model_name)')
     parser.add_argument('--mode', choices=['a', 'c', 'd', 'f', 'i', 'm', 'p'], default='c',
                         help="Choose 'complete' to run full pipeline or 'preprocessed' to use preprocessed data (default: complete)")
     parser.add_argument('--n_gram', type=int, default=3, help='Value for n-gram (default: 3)')
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
     parser.add_argument('--no-save', dest='save', action='store_false', 
                         help='Disable saving the results (default: results will be saved)')
+    parser.add_argument('--p', dest='preprocessing', action='store_true', 
+                        help='Generate new data')
     parser.add_argument("node_ids", type=int, nargs="*", help="List of node_ids")
     args = parser.parse_args()
+    if args.folder_name is None:
+        args.folder_name = args.model_name
     
     # Check which mode is selected and run the corresponding function
     if args.mode == 'a':
         run_analysis(folder_name=args.model_name)
     elif args.mode == 'c':
-        run_complete(model_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
+        run_complete(model_name=args.model_name, folder_name=args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save, preprocessing=args.preprocessing)
     elif args.mode == 'd':
         run_demo(folder_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
     elif args.mode == 'f':
@@ -403,7 +407,7 @@ def main():
     elif args.mode == 'm':
         run_modify(folder_name=args.model_name, node_ids=args.node_ids)
     elif args.mode == 'p':
-        run_preprocessing(model_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
+        run_preprocessing(model_name=args.model_name, folder_name=args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
 
 if __name__ == "__main__":
     main()

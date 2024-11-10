@@ -86,15 +86,17 @@ class ProcessModel:
 class TraceGenerator:
     process_model: ProcessModel
     current_case_id: int = 0
+    noise_transition: float = 0.01
+    noise_event: float = 0.00
+    noise_time: float = 0.00 
+    noise_attribute: float = 0.00
 
     # generate event traces 
-    def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 10,
-                        noise_transition: float = 0.005, noise_event: float = 0.00, noise_time: float = 0.00, 
-                        noise_attribute: float = 0.00) -> List[Case]:
+    def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 100) -> List[Case]:
         random.seed(0)
         cases = []
         for _ in tqdm(range(num_cases), desc="generating data"):
-            case = self.generate_case(noise_attribute=noise_attribute)
+            case = self.generate_case()
             current_activity = self.process_model.start_activity
             current_time = start_time
 
@@ -103,7 +105,7 @@ class TraceGenerator:
                     break
 
                 # Determine event name with noise_event probability
-                if random.random() < noise_event:
+                if random.random() < self.noise_event:
                     event_name = ''.join(random.choices(string.ascii_letters, k=10))
                 else:
                     event_name = current_activity
@@ -113,13 +115,13 @@ class TraceGenerator:
                 case.events.append(event)
 
                 # Choose next activity with noise_transition probability
-                if random.random() < noise_transition:
+                if random.random() < self.noise_transition:
                     current_activity = random.choice(self.process_model.activities)  # Randomly pick an activity
                 else:
                     current_activity = self.process_model.get_next_activity(current_activity, case.attributes)
 
                 # Increment time, with noise_time probability adding random offset
-                if random.random() < noise_time:
+                if random.random() < self.noise_time:
                     # Random offset of up to ±2 days and ±30 minutes
                     time_offset = timedelta(days=random.randint(-2, 2), minutes=random.randint(-30, 30))
                     current_time += time_offset
@@ -132,7 +134,7 @@ class TraceGenerator:
         return cases
     
     #Generate case with attributes based on provided distributions
-    def generate_case(self, noise_attribute: float = 0.00) -> Case:
+    def generate_case(self) -> Case:
         case_id = self.current_case_id
         self.current_case_id += 1
 
@@ -141,7 +143,7 @@ class TraceGenerator:
         for attr, value_probs in self.process_model.case_attribute_distribution.items():
             values, probabilities = zip(*value_probs)
             chosen_value = random.choices(values, probabilities)[0]
-            if random.random() < noise_attribute:
+            if random.random() < self.noise_attribute:
                 random_attr_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
                 generated_attributes[attr] = random_attr_value
             else:
