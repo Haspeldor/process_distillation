@@ -180,6 +180,15 @@ def find_missing_ids(dt_distilled, dt_modified):
     missing_ids = [item for item in distilled_node_ids if item not in modified_node_ids]
     return missing_ids
 
+def print_samples(X, feature_names):
+    if len(feature_names) != X.shape[1]:
+        raise ValueError("The length of feature_names must match the number of columns in X.")
+    
+    for i, sample in enumerate(X):
+        active_indices = np.where(sample == 1)[0]  # Get indices of ones in the sample
+        active_features = [feature_names[idx] for idx in active_indices]
+        print(f"Sample {i}: {', '.join(active_features)}")
+
 # executes the prerequisites
 def run_preprocessing(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, console_output=True):
     X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram, save=save)
@@ -335,9 +344,21 @@ def run_demo(folder_name="model_1", n_gram=2, num_cases=1000, save=False):
     print(df)
     process_model = build_process_model("cc")
     trace_generator = TraceGenerator(process_model=process_model)
-    cases = trace_generator.generate_traces(num_cases=num_cases)
+    cases = trace_generator.generate_traces(num_cases=10)
     df = cases_to_dataframe(cases)
     print(df)
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender","problems"])
+    print(class_names)
+    print(feature_names)
+    print(feature_indices)
+    print(len(X_train))
+    print_samples(X_train, feature_names)
+    print(len(X_test))
+    print_samples(X_test, feature_names)
+    print(len(y_train))
+    print(y_train)
+    print(len(y_test))
+    print(y_test)
 
 
 
