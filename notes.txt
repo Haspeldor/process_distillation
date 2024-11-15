@@ -6,23 +6,18 @@ regularisierer aus white box
 
 todo:
     - noise in process modell
-        - transitions
         - neue activitäten
-        - sequenzen von activitäen -> retrace
         - timestamps 
         - case attributes
 
-    - updated fairness
-        - evaluate each combination before and afterwards
-        - calculate_fairness(nn, X, critical_decisions, attribute_pools, class_names, feature_names)
-
-
-    - automated finetuning
-
-    - gegebenes modell nachbauen
-    
     - state of the art per ssh
     
-    - trace zu pandas df zu XES?
-    
     - better shell for interactive mode
+
+    - df to np
+        - save class_names
+        - save attribute_pools
+        - save feature_names
+        - save feature_indices
+        - add padding
+        - 

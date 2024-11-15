@@ -1,7 +1,9 @@
 import os
 import pickle
-from typing import List, Dict
 import numpy as np
+import pandas as pd
+
+from typing import List, Dict
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from trace_generator import Event, Case, TraceGenerator
@@ -169,3 +171,87 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
         save_data(process_model.critical_decisions, folder_name, "critical_decisions.pkl")
 
     return X_train, X_test, y_train, y_test, data_processor.class_names, data_processor.feature_names, data_processor.feature_indices, process_model.critical_decisions
+
+def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
+    """
+    Converts a list of Case objects into a pandas DataFrame with columns:
+    'case_id', 'activity', and one column for each case attribute
+    """
+    rows = []
+    for case in cases:
+        for event in case.events:
+            row = {
+                'case_id': case.case_id,
+                'activity': event.activity,
+            }
+            row.update(case.attributes)
+            rows.append(row)
+    
+    df = pd.DataFrame(rows)
+    return df
+
+
+def csv_to_df(file_name):
+    file_path = os.path.join('raw_data', file_name)
+    return pd.read_csv(file_path)
+    
+
+def process_csv_for_nn(df, case_attributes, n_gram=3, folder_name=None, num_cases=1000, test_size=0.2):
+    """Processes dataframe data for neural network training"""
+    # Keep only specified attributes
+    standard_attributes = ['case_id', 'activity']
+    attributes_to_include = standard_attributes + case_attributes
+    df = df[attributes_to_include]
+    
+    case_attribute_encoders = {}
+    encoded_case_attributes = {}
+
+    for attr in case_attributes:
+        if attr in df.columns:
+            encoder = OneHotEncoder(sparse=False)
+            encoded_case_attributes[attr] = encoder.fit_transform(df[[attr]])
+            case_attribute_encoders[attr] = encoder
+
+    # Event encoding (OneHotEncoder for activity column)
+    event_encoder = OneHotEncoder(sparse=False)
+    event_encoded = event_encoder.fit_transform(df[['activity']])
+
+    # Prepare data storage
+    X, y = [], []
+
+    # Generate n-grams for each case
+    case_ids = df['case_id'].unique()
+    for case_id in case_ids:
+        case_data = df[df['case_id'] == case_id]
+        
+        # Get case-level attribute encoding
+        encoded_case_attributes_combined = []
+        for attr in case_attributes:
+            if attr in encoded_case_attributes:
+                encoded_case_attributes_combined.extend(encoded_case_attributes[attr][case_data.index[0]])
+
+        # Get n-grams and output labels
+        events = case_data['activity'].tolist()
+
+        for i in range(len(events) - n_gram):
+            # Encode n-gram of events
+            n_gram_events = events[i:i + n_gram]
+            n_gram_encoded = np.array([event_encoder.transform([[activity]])[0] for activity in n_gram_events]).flatten()
+            
+            # Combine n-gram encoding with case attributes
+            encoded_sample = np.concatenate([n_gram_encoded, encoded_case_attributes_combined])
+            X.append(encoded_sample)
+
+            # Encode the next event as the target
+            next_event = events[i + n_gram]
+            encoded_target = event_encoder.transform([[next_event]])[0]
+            y.append(encoded_target)
+
+    # Convert to numpy arrays
+    X = np.array(X)
+    y = np.array(y)
+
+    # Split into train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
+
+    return X_train, X_test, y_train, y_test

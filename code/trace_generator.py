@@ -86,7 +86,7 @@ class ProcessModel:
 class TraceGenerator:
     process_model: ProcessModel
     current_case_id: int = 0
-    noise_transition: float = 0.01
+    noise_transition: float = 0.00
     noise_event: float = 0.00
     noise_time: float = 0.00 
     noise_attribute: float = 0.00

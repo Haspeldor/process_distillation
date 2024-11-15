@@ -13,7 +13,8 @@ from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import accuracy_score
 
 from trace_generator import build_process_model
-from data_processing import generate_processed_data, load_data, save_data
+#from data_processing import generate_processed_data, load_data, save_data, *
+from data_processing import *
 from decision_tree import DecisionTreeClassifier, save_tree_to_json, load_tree_from_json, get_deleted_nodes, get_metrics
 
 
@@ -330,22 +331,15 @@ def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=Tru
 
 
 def run_demo(folder_name="model_1", n_gram=2, num_cases=1000, save=False):
-    X_train  = load_data(folder_name, "X_train.pkl")
-    y_train  = load_data(folder_name, "y_train.pkl")
-    X_test  = load_data(folder_name, "X_test.pkl")
-    y_test  = load_data(folder_name, "y_test.pkl")
-    nn = load_nn(folder_name, "nn.keras")
-    dt_distilled = load_dt(folder_name, "dt.json")
+    df = csv_to_df("gpt.csv")
+    print(df)
+    process_model = build_process_model("cc")
+    trace_generator = TraceGenerator(process_model=process_model)
+    cases = trace_generator.generate_traces(num_cases=num_cases)
+    df = cases_to_dataframe(cases)
+    print(df)
 
-    evaluate_nn(nn, X_test, y_test)
-    evaluate_dt(dt_distilled, X_test, y_test)
 
-    dt_distilled.delete_branch(9)
-    save_dt(dt_distilled, folder_name, "dt_modified.json")
-    y_modified = dt_distilled.predict(X_train)
-    y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
-    save_data(y_encoded, folder_name, "y_modified.pkl")
-    evaluate_dt(dt_distilled, X_test, y_test)
 
 
 def run_interactive():
