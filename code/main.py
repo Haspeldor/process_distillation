@@ -180,14 +180,15 @@ def find_missing_ids(dt_distilled, dt_modified):
     missing_ids = [item for item in distilled_node_ids if item not in modified_node_ids]
     return missing_ids
 
-def print_samples(X, feature_names):
+def print_samples(X, y, class_names, feature_names):
     if len(feature_names) != X.shape[1]:
         raise ValueError("The length of feature_names must match the number of columns in X.")
     
     for i, sample in enumerate(X):
-        active_indices = np.where(sample == 1)[0]  # Get indices of ones in the sample
+        active_indices = np.where(sample == 1)[0]
         active_features = [feature_names[idx] for idx in active_indices]
-        print(f"Sample {i}: {', '.join(active_features)}")
+        target_activity = class_names[np.argmax(y[i])]
+        print(f"Sample {i}: Features: {', '.join(active_features)}, Target: {target_activity}")
 
 # executes the prerequisites
 def run_preprocessing(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, console_output=True):
@@ -195,6 +196,8 @@ def run_preprocessing(model_name, folder_name=None, n_gram=2, num_cases=1000, sa
     nn = train_nn(X_train, y_train, folder_name=folder_name)
 
     y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
+    print("y_distilled")
+    print(y_distilled.shape)
     dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
 
     if console_output:
@@ -203,10 +206,10 @@ def run_preprocessing(model_name, folder_name=None, n_gram=2, num_cases=1000, sa
 
 # executes the complete pipeline
 def run_complete(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, preprocessing=False):
+    if folder_name is None:
+        folder_name = model_name
     if preprocessing:
         run_preprocessing(model_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
-
-    folder_name = model_name
     nn = load_nn(folder_name, "nn.keras")
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
@@ -339,28 +342,30 @@ def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=Tru
         save_data(y_encoded, folder_name, "y_modified.pkl")
 
 
-def run_demo(folder_name="model_1", n_gram=2, num_cases=1000, save=False):
-    df = csv_to_df("gpt.csv")
-    print(df)
+def run_demo(folder_name="model_1", n_gram=2, num_cases=10, save=False):
     process_model = build_process_model("cc")
     trace_generator = TraceGenerator(process_model=process_model)
-    cases = trace_generator.generate_traces(num_cases=10)
+    cases = trace_generator.generate_traces(num_cases=num_cases)
     df = cases_to_dataframe(cases)
     print(df)
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender","problems"])
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender","problems"], folder_name="cc")
+    """
+    print(X_train.shape)
+    print(X_test.shape)
+    print(y_train.shape)
+    print(y_test.shape)
     print(class_names)
     print(feature_names)
     print(feature_indices)
     print(len(X_train))
-    print_samples(X_train, feature_names)
+    print_samples(X_train, y_train, class_names, feature_names)
     print(len(X_test))
-    print_samples(X_test, feature_names)
+    print_samples(X_test, y_test, class_names, feature_names)
     print(len(y_train))
     print(y_train)
     print(len(y_test))
     print(y_test)
-
-
+    """
 
 
 def run_interactive():

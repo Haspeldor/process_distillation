@@ -5,19 +5,6 @@ eigene loss funktion
 regularisierer aus white box
 
 todo:
-    - noise in process modell
-        - neue activitäten
-        - timestamps 
-        - case attributes
-
     - state of the art per ssh
     
     - better shell for interactive mode
-
-    - df to np
-        - save class_names
-        - save attribute_pools
-        - save feature_names
-        - save feature_indices
-        - add padding
-        - 

@@ -152,8 +152,9 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
     print("--------------------------------------------------------------------------------------------------")
 
     print("processing nn data:")
-    data_processor = DataProcessor(trace_generator=trace_generator, n_gram=n_gram)
-    X_train, X_test, y_train, y_test = data_processor.process_data(cases)
+    #data_processor = DataProcessor(trace_generator=trace_generator, n_gram=n_gram)
+    df = cases_to_dataframe(cases)
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender", "problems"], n_gram=n_gram, folder_name=folder_name)
     print("example nn input:")
     print(X_train[:1])
     print("example nn output:")
@@ -166,41 +167,43 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
         save_data(y_test, folder_name, 'y_test.pkl')
         y_encoded = np.argmax(y_train, axis=1)
         save_data(y_encoded, folder_name, 'y_encoded.pkl')
-        save_data(data_processor.class_names, folder_name, "class_names.pkl")
-        save_data(data_processor.feature_names, folder_name, "feature_names.pkl")
-        save_data(data_processor.feature_indices, folder_name, "feature_indices.pkl")
+        save_data(class_names, folder_name, "class_names.pkl")
+        save_data(feature_names, folder_name, "feature_names.pkl")
+        save_data(feature_indices, folder_name, "feature_indices.pkl")
         save_data(process_model.critical_decisions, folder_name, "critical_decisions.pkl")
 
-    return X_train, X_test, y_train, y_test, data_processor.class_names, data_processor.feature_names, data_processor.feature_indices, process_model.critical_decisions
+    return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, process_model.critical_decisions
 
 def create_feature_names(event_pool, attribute_pools, n_gram):
     feature_names = []
+    # Add event features for each n-gram step
     for index in range(n_gram, 0, -1):
-        for event in event_pool:
+        for event in sorted(event_pool):  # Ensure consistent order
             feature_names.append(f"-{index}. Event = {event}")
-    for attribute_name, possible_values in attribute_pools.items():
-        for value in possible_values:
+    # Add attribute features
+    for attribute_name, possible_values in sorted(attribute_pools.items()):
+        for value in sorted(possible_values):  # Ensure consistent order
             feature_names.append(f"Attribute {attribute_name} = {value}")
     return feature_names
 
 def create_feature_indices(event_pool, attribute_pools, n_gram):
-    num_events = len(event_pool)
+    num_events = len(sorted(event_pool))  # Sorted event pool
     feature_indices = {}
-    index = num_events * n_gram
-    for attribute_name, possible_values in attribute_pools.items():
-        num_values = len(possible_values)
+    index = num_events * n_gram  # Offset after all event features
+    for attribute_name, possible_values in sorted(attribute_pools.items()):
+        num_values = len(sorted(possible_values))  # Sorted attribute pool
         feature_indices[attribute_name] = list(range(index, index + num_values))
         index += num_values
     return feature_indices
-
+    
 def create_attribute_pools(df, case_attributes):
     attribute_pools = {}
     for attr in case_attributes:
         if attr in df.columns:
-            attribute_pools[attr] = df[attr].dropna().unique().tolist()
+            attribute_pools[attr] = sorted(df[attr].dropna().unique().tolist())  # Ensure sorted order
         else:
             raise KeyError(f"Attribute '{attr}' is not in the DataFrame.")
-    return attribute_pools
+    return attribute_pools 
 
 def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
     """
@@ -231,27 +234,30 @@ def process_df(df, case_attributes, n_gram=3, folder_name=None, test_size=0.2):
     # keep only specified attributes
     standard_attributes = ['case_id', 'activity']
     attributes_to_include = standard_attributes + case_attributes
+    print(attributes_to_include)
     df = df[attributes_to_include]
 
+    # create the meta-information
+    class_names = sorted(df["activity"].unique().tolist() + ["<PAD>"])
+    attribute_pools = create_attribute_pools(df, case_attributes)
+    feature_names = create_feature_names(class_names, attribute_pools, n_gram)
+    feature_indices = create_feature_indices(class_names, attribute_pools, n_gram)
+
     # one-hot encode activities
-    unique_activities = df["activity"].unique().tolist() + ["<PAD>"]
-    activity_encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore", categories=[unique_activities])
+    activity_encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore", categories=[class_names])
     activity_ohe = activity_encoder.fit_transform(df[['activity']])
+    pad_activity_idx = activity_encoder.categories_[0].tolist().index("<PAD>")
     
     # one-hot encode case attributes dynamically
     attribute_encoders = {}
     attributes_ohe_dict = {}
 
     for attr in case_attributes:
-        encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+        print(attr)
+        print(attribute_pools[attr])
+        encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore", categories=[attribute_pools[attr]])
         attributes_ohe_dict[attr] = encoder.fit_transform(df[[attr]])
         attribute_encoders[attr] = encoder
-
-    # create the meta-information
-    attribute_pools = create_attribute_pools(df, case_attributes)
-    class_names = activity_encoder.categories_[0]
-    feature_names = create_feature_names(class_names, attribute_pools, n_gram)
-    feature_indices = create_feature_indices(class_names, attribute_pools, n_gram)
 
     # group by case_id and create sequences
     grouped = df.groupby('case_id')
@@ -269,24 +275,25 @@ def process_df(df, case_attributes, n_gram=3, folder_name=None, test_size=0.2):
 
     for activities, attributes in cases:
         # Pad activities
-        padded_activities = np.vstack([pad_activity] * (n_gram - 1) + [activities])
+        padded_activities = np.vstack([pad_activity] * n_gram + [activities])
         
         # Pad attributes
-        padded_attributes = {attr: np.vstack([pad_attributes[attr]] * (n_gram - 1) + [attributes[attr]])
-                            for attr in attributes}
+        padded_attributes = {attr: np.vstack([pad_attributes[attr]] * n_gram + [attributes[attr]])
+                            for attr in sorted(attributes)}
 
-        for i in range(len(activities)):
+        for i in range(len(activities)):  # Start from 0 and include all real activities
             x_activities = padded_activities[i:i + n_gram]
             x_attributes = np.hstack([padded_attributes[attr][i + n_gram - 1] for attr in case_attributes])
+            x_attributes = np.hstack([attributes[attr][i - n_gram + 1] for attr in case_attributes])
             x_combined = np.hstack([x_activities.flatten(), x_attributes])  # Combine activities and attributes
-            y_next_activity = activities[i]  # Target is the next activity
-
+            
+            y_next_activity = activities[i]  # Predict the actual next activity
             X.append(x_combined)
             y.append(y_next_activity)
-
     # Convert to numpy arrays
     X = np.array(X)
     y = np.array(y)
+    #print_samples(X, y, class_names, feature_names)
 
     # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
@@ -301,13 +308,5 @@ def process_df(df, case_attributes, n_gram=3, folder_name=None, test_size=0.2):
         save_data(class_names, folder_name, "class_names.pkl")
         save_data(feature_names, folder_name, "feature_names.pkl")
         save_data(feature_indices, folder_name, "feature_indices.pkl")
-
-    print(class_names)
-    print(feature_names)
-    print(feature_indices)
-    print(len(X))
-    print_samples(X, feature_names)
-    print(len(y))
-    print(y)
 
     return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices
