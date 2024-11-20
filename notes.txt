@@ -5,6 +5,18 @@ eigene loss funktion
 regularisierer aus white box
 
 todo:
-    - state of the art per ssh
+    - decision tree effizienter generieren
     
+    - hospital datensatz
+        - in df einlesen
+        - attribute auswählen
+        - laufen lassen
+
+    - numerische attribute
+        - beim auslesen dict verwenden, für korrekte codierung
+
+    - transformer model verwenden anstatt MLP
+
+    - state of the art per ssh
+
     - better shell for interactive mode

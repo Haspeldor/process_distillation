@@ -87,9 +87,9 @@ class TraceGenerator:
     process_model: ProcessModel
     current_case_id: int = 0
     noise_transition: float = 0.010
-    noise_event: float = 0.01
+    noise_event: float = 0.000
     noise_time: float = 0.00 
-    noise_attribute: float = 0.001
+    noise_attribute: float = 0.000
 
     # generate event traces 
     def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 100) -> List[Case]:

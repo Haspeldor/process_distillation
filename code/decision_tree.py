@@ -3,6 +3,7 @@ import numpy as np
 import json
 from collections import Counter
 from sklearn.metrics import accuracy_score
+from sklearn.tree import _tree
 from fairlearn.metrics import selection_rate, MetricFrame
 
 @dataclass
@@ -21,7 +22,7 @@ class Node:
 
 class DecisionTreeClassifier:
     
-    def __init__(self, id_counter=0, max_depth=None, feature_names=None, feature_indices=None, class_names=None):
+    def __init__(self, id_counter=0, max_depth=10, feature_names=None, feature_indices=None, class_names=None):
         self.id_counter = id_counter
         self.max_depth = max_depth
         self.root = None
@@ -65,12 +66,12 @@ class DecisionTreeClassifier:
             print(f"{indent}|--- [{node.node_id}] class: {class_name}")
         else:
             feature_name = self.feature_names[node.feature_index] if self.feature_names is not None else f"Feature {node.feature_index}"
-            # Print the current decision rule for the right child (> threshold)
-            print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
-            self._print_sub_tree(node.right, depth + 1, indent + "|   ")
             # Print the current decision rule for the left child (<= threshold)
             print(f"{indent}|--- [{node.node_id}] ({feature_name}) <= {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
             self._print_sub_tree(node.left, depth + 1, indent + "|   ")
+            # Print the current decision rule for the right child (> threshold)
+            print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
+            self._print_sub_tree(node.right, depth + 1, indent + "|   ")
 
     def _grow_tree(self, X, y, depth=0, removed_features=[], recursive_removal=False):
         """Recursively grows the decision tree."""
@@ -538,3 +539,61 @@ def get_metrics(X, y, feature_index, possible_events, class_names, feature_names
         output_string = f"Feature: {feature_name}, Event: {event} | stat. parity: {stat_parity}, disp. impact: {disp_impact}, amount: {amount} out of {total_amount}"
         output.append(output_string)
     return output
+
+
+def sklearn_to_custom_tree(sklearn_tree, feature_names=None, class_names=None, feature_indices=None):
+    """Converts an sklearn decision tree to a custom DecisionTreeClassifier"""
+    tree_ = sklearn_tree.tree_
+
+    def build_node(node_id, depth):
+        """
+        Recursively builds a custom Node from an sklearn tree node.
+        """
+        # Extract information from the sklearn tree
+        feature_index = sklearn_tree.tree_.feature[node_id]
+        threshold = sklearn_tree.tree_.threshold[node_id]
+        num_samples = sklearn_tree.tree_.n_node_samples[node_id]
+        value = sklearn_tree.tree_.value[node_id]
+        left_child = sklearn_tree.tree_.children_left[node_id]
+        right_child = sklearn_tree.tree_.children_right[node_id]
+        
+        # Check if it's a leaf node
+        if left_child == -1 and right_child == -1:
+            # Get the output class for leaf
+            index = np.argmax(value) if value.ndim > 1 else value[0]
+            output = sklearn_tree.classes_[index]
+            #print(output)
+            return Node(
+                node_id=node_id,
+                num_samples=num_samples,
+                output=output,
+                depth=depth
+            )
+        
+        # Build the current node
+        node = Node(
+            node_id=node_id,
+            feature_index=feature_index,
+            threshold=threshold,
+            num_samples=num_samples,
+            depth=depth
+        )
+        
+        # Recursively build left and right children
+        node.left = build_node(left_child, depth + 1)
+        node.right = build_node(right_child, depth + 1)
+        
+        return node
+
+    # Initialize the custom decision tree
+    custom_tree = DecisionTreeClassifier(
+        max_depth=sklearn_tree.get_depth(),
+        feature_names=feature_names,
+        class_names=class_names,
+        feature_indices=feature_indices
+    )
+    
+    # Build the root node
+    custom_tree.root = build_node(0,0)
+    
+    return custom_tree

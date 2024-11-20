@@ -2,20 +2,24 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import numpy as np
+import time
 import argparse
 
-import tensorflow as tf
+from tensorflow.keras import Input, Model
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.layers import Dense, Input, Reshape
+from tensorflow.keras.layers import LayerNormalization, Dropout, MultiHeadAttention, GlobalAveragePooling1D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 
 from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier as SklearnDecisionTreeClassifier
+from sklearn.tree import export_text
 
 from trace_generator import build_process_model
 #from data_processing import generate_processed_data, load_data, save_data, *
 from data_processing import *
-from decision_tree import DecisionTreeClassifier, save_tree_to_json, load_tree_from_json, get_deleted_nodes, get_metrics
+from decision_tree import DecisionTreeClassifier, save_tree_to_json, load_tree_from_json, get_deleted_nodes, get_metrics, sklearn_to_custom_tree
 
 
 def generate_data(num_cases, model_name, n_gram, save=True):
@@ -37,6 +41,60 @@ def build_nn(input_dim, output_dim):
                   metrics=['accuracy'])
     return model
 
+def build_transformer_nn(input_dim, output_dim, n_heads=4, d_model=128, ff_dim=256, num_layers=2, dropout_rate=0.1):
+    """
+    Build a transformer-based model for next activity prediction without embedding layers.
+    
+    Args:
+    - input_dim (int): Dimension of the input features (flattened input).
+    - output_dim (int): Number of output classes.
+    - n_heads (int): Number of attention heads in the multi-head attention layer.
+    - d_model (int): Dimensionality of the transformer model.
+    - ff_dim (int): Dimensionality of the feed-forward network within the transformer block.
+    - num_layers (int): Number of transformer layers.
+    - dropout_rate (float): Dropout rate for regularization.
+    
+    Returns:
+    - model (Model): A compiled transformer-based Keras model.
+    """
+    
+    # Input layer
+    inputs = Input(shape=(input_dim,))
+    
+    # Reshape input to have sequence-like dimensions: (batch_size, sequence_length, feature_dim)
+    # Here, we assume `input_dim` is split into sequence_length * feature_dim for simplicity.
+    # For example, if `input_dim = 100`, you could set sequence_length=10, feature_dim=10.
+    sequence_length = 10  # Define based on your data
+    feature_dim = input_dim // sequence_length
+    x = Reshape((sequence_length, feature_dim))(inputs)
+    
+    # Add transformer layers
+    for _ in range(num_layers):
+        # Multi-head self-attention
+        attn_output = MultiHeadAttention(num_heads=n_heads, key_dim=feature_dim)(x, x)
+        attn_output = Dropout(dropout_rate)(attn_output)
+        attn_output = LayerNormalization(epsilon=1e-6)(x + attn_output)
+        
+        # Feed-forward network
+        ff_output = Dense(ff_dim, activation='relu')(attn_output)
+        ff_output = Dropout(dropout_rate)(ff_output)
+        ff_output = Dense(feature_dim)(ff_output)
+        x = LayerNormalization(epsilon=1e-6)(attn_output + ff_output)
+    
+    # Global average pooling (to reduce sequence dimension)
+    x = GlobalAveragePooling1D()(x)
+    
+    # Output layer
+    outputs = Dense(output_dim, activation='softmax')(x)
+    
+    # Compile the model
+    model = Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer=Adam(), 
+                  loss='categorical_crossentropy', 
+                  metrics=['accuracy'])
+    
+    return model
+
 # train and save neural network
 def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
     input_dim = X_train.shape[1]  # Number of input features (attributes + events)
@@ -51,7 +109,22 @@ def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
         save_nn(model, folder_name, model_name)
     return model
 
+def train_sklearn_dt(X_train, y_train):
+    print("training decision tree:")
+    dt = SklearnDecisionTreeClassifier(max_depth=10, min_samples_leaf=5, ccp_alpha=0.01)
+    dt.fit(X_train, y_train)
+    print("--------------------------------------------------------------------------------------------------")
+    return dt
+
 def train_dt(X_train, y_train, folder_name=None, model_name=None, feature_names=None, feature_indices=None, class_names=None):
+    dt = train_sklearn_dt(X_train, y_train)
+    dt = sklearn_to_custom_tree(dt, feature_names=feature_names, class_names=class_names, feature_indices=feature_indices)
+    if model_name:
+        save_dt(dt, folder_name, model_name)
+    print("--------------------------------------------------------------------------------------------------")
+    return dt
+
+def train_custom_dt(X_train, y_train, folder_name=None, model_name=None, feature_names=None, feature_indices=None, class_names=None):
     print("training decision tree:")
     dt = DecisionTreeClassifier(class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     dt.fit(X_train, y_train)
@@ -126,15 +199,27 @@ def calculate_fairness(nn, X, critical_decisions, feature_indices, class_names, 
 
 def evaluate_dt(dt, X_test, y_test):
     print("testing dt:")
-    y_test = np.argmax(y_test, axis=1)
-    y_pred = dt.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
+    y_argmax = np.argmax(y_test, axis=1)
+    accuracy = dt.score(X_test, y_argmax)
     print(f"Accuracy: {accuracy:.2f}")
     print("")
     dt.visualize()
     print("")
     dt.print_tree_metrics(X_test, y_test, dt.root)
     print("--------------------------------------------------------------------------------------------------")
+
+def evaluate_sklearn_dt(dt, X_test, y_test, y_distilled, class_names=None, feature_names=None):
+    print("testing dt:")
+    y_argmax = np.argmax(y_test, axis=1)
+    accuracy = dt.score(X_test, y_argmax)
+    seen = set()
+    sklearn_class_names = [
+        class_names[i] for i in y_distilled if i < len(class_names) and not (i in seen or seen.add(i))
+    ]
+    sklearn_class_names.sort()
+    print(f"Test set accuracy: {accuracy:.2f}")
+    tree_text = export_text(dt, class_names=sklearn_class_names, feature_names=feature_names)
+    print(tree_text)
 
 def distill_nn(nn, X, folder_name=None):
     print("distilling nn:")
@@ -342,30 +427,40 @@ def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=Tru
         save_data(y_encoded, folder_name, "y_modified.pkl")
 
 
-def run_demo(folder_name="model_1", n_gram=2, num_cases=10, save=False):
-    process_model = build_process_model("cc")
-    trace_generator = TraceGenerator(process_model=process_model)
-    cases = trace_generator.generate_traces(num_cases=num_cases)
-    df = cases_to_dataframe(cases)
-    print(df)
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender","problems"], folder_name="cc")
-    """
-    print(X_train.shape)
-    print(X_test.shape)
-    print(y_train.shape)
-    print(y_test.shape)
-    print(class_names)
-    print(feature_names)
-    print(feature_indices)
-    print(len(X_train))
-    print_samples(X_train, y_train, class_names, feature_names)
-    print(len(X_test))
-    print_samples(X_test, y_test, class_names, feature_names)
-    print(len(y_train))
-    print(y_train)
-    print(len(y_test))
-    print(y_test)
-    """
+def run_demo(folder_name="cc", n_gram=2, num_cases=10, save=False, preprocessing=False):
+    if preprocessing:
+        run_preprocessing(folder_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
+    nn = load_nn(folder_name, "nn.keras")
+    X_train  = load_data(folder_name, "X_train.pkl")
+    X_test  = load_data(folder_name, "X_test.pkl")
+    y_test  = load_data(folder_name, "y_test.pkl")
+    class_names = load_data(folder_name, "class_names.pkl")
+    feature_names = load_data(folder_name, "feature_names.pkl")
+    feature_indices = load_data(folder_name, "feature_indices.pkl")
+
+    y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
+    start_time = time.time()
+    dt_sklearn = train_sklearn_dt(X_train, y_distilled)
+    end_time = time.time()
+    print(f"Training time for sklearn decision tree: {end_time - start_time:.2f} seconds")
+    start_time = time.time()
+    dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_distilled.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+    end_time = time.time()
+    print(f"Training time for distilled decision tree: {end_time - start_time:.2f} seconds")
+    start_time = time.time()
+    dt_transformed = sklearn_to_custom_tree(dt_sklearn, feature_names=feature_names, class_names=class_names, feature_indices=feature_indices)
+    end_time = time.time()
+    print(f"Training time for transformed decision tree: {end_time - start_time:.2f} seconds")
+
+    print("Base NN:")
+    evaluate_nn(nn, X_test, y_test)
+    print("Directly distilled DT:")
+    evaluate_dt(dt_distilled, X_test, y_test)
+    print("Sklearn distilled DT:")
+    evaluate_sklearn_dt(dt_sklearn, X_test, y_test, y_distilled, class_names=class_names, feature_names=feature_names)
+
+    print("Transformed distilled DT:")
+    evaluate_dt(dt_transformed, X_test, y_test)
 
 
 def run_interactive():
@@ -419,7 +514,7 @@ def main():
     elif args.mode == 'c':
         run_complete(model_name=args.model_name, folder_name=args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save, preprocessing=args.preprocessing)
     elif args.mode == 'd':
-        run_demo(folder_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
+        run_demo(folder_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save, preprocessing=args.preprocessing)
     elif args.mode == 'f':
         run_finetuning(folder_name=args.model_name)
     elif args.mode == 'i':
