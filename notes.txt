@@ -5,15 +5,17 @@ eigene loss funktion
 regularisierer aus white box
 
 todo:
-    - decision tree effizienter generieren
-    
+    - numerische attribute
+        - generator anpassen
+        - attribute_pools
+        - feature_names
+        - feature_indices
+        - kleines beispiel testen
+        
     - hospital datensatz
         - in df einlesen
         - attribute auswählen
         - laufen lassen
-
-    - numerische attribute
-        - beim auslesen dict verwenden, für korrekte codierung
 
     - transformer model verwenden anstatt MLP
 

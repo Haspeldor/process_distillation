@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import numpy as np
 import time
+from datetime import datetime
 import argparse
 
 from tensorflow.keras import Input, Model
@@ -153,7 +154,6 @@ def save_dt(dt, folder_name, file_name):
     file_path = os.path.join(full_path, file_name)
     save_tree_to_json(dt, file_path)
 
-
 def load_dt(folder_name, file_name):
     #print(f"loading {file_name}...")
     file_path = os.path.join('models', folder_name, file_name)
@@ -295,9 +295,9 @@ def run_complete(model_name, folder_name=None, n_gram=2, num_cases=1000, save=Tr
         folder_name = model_name
     if preprocessing:
         run_preprocessing(model_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
-    nn = load_nn(folder_name, "nn.keras")
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
+    nn = load_nn(folder_name, "nn.keras")
     dt_distilled = load_dt(folder_name, "dt.json")
     critical_decisions = load_data(folder_name, "critical_decisions.pkl")
 
@@ -427,7 +427,26 @@ def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=Tru
         save_data(y_encoded, folder_name, "y_modified.pkl")
 
 
-def run_demo(folder_name="cc", n_gram=2, num_cases=10, save=False, preprocessing=False):
+def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, save=False, preprocessing=False):
+    process_model = build_process_model(folder_name)
+    trace_generator = TraceGenerator(process_model=process_model)
+    generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=num_cases)
+    df = cases_to_dataframe(generated_cases)
+    print(df.head(50))
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender"], ["age"], folder_name="cc_n")
+    print("Class names:")
+    print(class_names)
+    print("Feature names:")
+    print(feature_names)
+    print("Feature indices:")
+    print(feature_indices)
+    print("First 20 samples of X:")
+    print(X_train[:20])  # Show first 20 samples of X_train
+    print("First 20 samples of y:")
+    print(y_train[:20])  # Show first 20 labels (y_train)
+    
+
+def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, save=False, preprocessing=False):
     if preprocessing:
         run_preprocessing(folder_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
     nn = load_nn(folder_name, "nn.keras")
