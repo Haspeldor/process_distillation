@@ -5,13 +5,6 @@ eigene loss funktion
 regularisierer aus white box
 
 todo:
-    - numerische attribute
-        - generator anpassen
-        - attribute_pools
-        - feature_names
-        - feature_indices
-        - kleines beispiel testen
-        
     - hospital datensatz
         - in df einlesen
         - attribute auswählen

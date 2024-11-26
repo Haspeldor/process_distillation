@@ -273,20 +273,20 @@ def build_process_model(model_name) -> ProcessModel:
             ("gender", "female"): 1,  
         })
         process_model.add_transition("prostate screening", "explain diagnosis", conditions={
-            ("problems", "true"): 1,
-            ("problems", "false"): 0,  
+            ("problems", "true"): 0.7,
+            ("problems", "false"): 0.3,  
         })
         process_model.add_transition("prostate screening", "inform prevention", conditions={
-            ("problems", "true"): 0,
-            ("problems", "false"): 1,  
+            ("problems", "true"): 0.7,
+            ("problems", "false"): 0.3,  
         })
         process_model.add_transition("mammary screening", "explain diagnosis", conditions={
-            ("problems", "true"): 1,
-            ("problems", "false"): 0,  
+            ("problems", "true"): 0.7,
+            ("problems", "false"): 0.3,  
         })
         process_model.add_transition("mammary screening", "inform prevention", conditions={
-            ("problems", "true"): 0,
-            ("problems", "false"): 1,  
+            ("problems", "true"): 0.3,
+            ("problems", "false"): 0.7,  
         })
         process_model.add_transition("explain diagnosis", "discuss options", conditions={})
         process_model.add_transition("discuss options", "bill patient", conditions={})

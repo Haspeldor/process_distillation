@@ -5,7 +5,8 @@ import pandas as pd
 import pm4py
 
 from typing import List, Dict
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, LabelEncoder
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 from trace_generator import Event, Case, TraceGenerator
 from tqdm import tqdm 
@@ -31,6 +32,8 @@ def load_csv_to_df(file_name):
 def load_xes_to_df(file_name):
     file_path = os.path.join("raw_data", file_name)
     df = pm4py.read_xes(file_path)
+    pickle_file_name = file_name.replace(".xes", ".pkl") if file_name.endswith(".xes") else f"{file_name}.pkl"
+    df.to_pickle(os.path.join("raw_data", pickle_file_name))
     return df
 
 def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
@@ -47,6 +50,7 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
     #data_processor = DataProcessor(trace_generator=trace_generator, n_gram=n_gram)
     df = cases_to_dataframe(cases)
     X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender"], ["age"], n_gram=n_gram, folder_name=folder_name)
+    #X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender", "problems"], [], n_gram=n_gram, folder_name=folder_name)
     print("example nn input:")
     print(X_train[:1])
     print("example nn output:")
@@ -126,6 +130,65 @@ def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     return df
 
+def process_data_padded(df, categorical_attributes, numerical_attributes, max_seq_len=None):
+    """
+    Transforms a dataframe into sequences for transformer model training.
+
+    Args:
+        df (pd.DataFrame): DataFrame with columns case_id, activity, timestamp, and attributes.
+        categorical_attributes (list): List of categorical attribute column names.
+        numerical_attributes (list): List of numerical attribute column names.
+        max_seq_len (int, optional): Max sequence length for padding. Default is max sequence length in the data.
+
+    Returns:
+        tuple: Processed input sequences, target sequences, categorical, and numerical metadata.
+    """
+    #df = df.sort_values(by=["case_id", "timestamp"])
+    padding_value = 0
+    le_activity = LabelEncoder()
+    df.loc[:, 'activity_encoded'] = le_activity.fit_transform(df['activity']) + 1
+
+    grouped = df.groupby("case_id")
+    activity_sequences = grouped["activity_encoded"].apply(list).tolist()
+    
+    # Prepare input and target sequences
+    input_sequences = [seq[:-1] for seq in activity_sequences]
+    target_sequences = [seq[1:] for seq in activity_sequences]
+
+    if max_seq_len is None:
+        max_seq_len = max(len(seq) for seq in input_sequences)
+
+    if padding_value is None:
+        padding_value = max_seq_len
+
+    input_sequences = pad_sequences(input_sequences, maxlen=max_seq_len, padding='pre', value=padding_value)
+    target_sequences = pad_sequences(target_sequences, maxlen=max_seq_len, padding='pre', value=padding_value)
+
+    # Encode categorical attributes
+    categorical_data = []
+    if len(categorical_attributes) > 0:
+        for attr in categorical_attributes:
+            le = LabelEncoder()
+            df.loc[:, attr] = le.fit_transform(df[attr])
+            grouped_attr = grouped[attr].apply(list)
+            categorical_data.append(
+                pad_sequences(grouped_attr.apply(lambda x: x[:max_seq_len]), maxlen=max_seq_len, padding='pre', value=padding_value)
+            )
+
+    # Scale numerical attributes
+    numerical_data = []
+    if len(numerical_attributes) > 0:
+        scaler = MinMaxScaler()
+        df.loc[:, numerical_attributes] = scaler.fit_transform(df[numerical_attributes])
+        for attr in numerical_attributes:
+            grouped_attr = grouped[attr].apply(list)
+            numerical_data.append(
+                pad_sequences(grouped_attr.apply(lambda x: x[:max_seq_len]), maxlen=max_seq_len, padding='pre', value=padding_value, dtype='float32')
+            )
+
+    return input_sequences, target_sequences, categorical_data, numerical_data
+
+
 #TODO: leaking test info for minmax
 def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folder_name=None, test_size=0.2):
     """Processes dataframe data for neural network training"""
@@ -168,7 +231,7 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     grouped = df.groupby('case_id')
     cases = []
 
-    for case_id, group in grouped:
+    for case_id, group in tqdm(grouped, desc="preparing cases"):
         activities = activity_encoder.transform(group[['activity']])
         attributes = {attr: attribute_encoders[attr].transform(group[[attr]]) for attr in categorical_attributes}
 
@@ -184,7 +247,7 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     pad_attributes = {attr: np.zeros((1, attributes_ohe_dict[attr].shape[1])) for attr in categorical_attributes}
     pad_numerical = np.zeros((1, len(numerical_attributes)))  # Padding for numerical features
 
-    for activities, attributes, numerical in cases:
+    for activities, attributes, numerical in tqdm(cases, desc="encoding cases"):
         # Pad activities
         padded_activities = np.vstack([pad_activity] * n_gram + [activities])
         
@@ -197,8 +260,18 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
 
         for i in range(len(activities)):  # Start from 0 and include all real activities
             x_activities = padded_activities[i:i + n_gram]
-            x_attributes = np.hstack([padded_attributes[attr][i + n_gram - 1] for attr in categorical_attributes])
-            x_numerical = padded_numerical[i + n_gram - 1]  # Use the most recent numerical value
+            if categorical_attributes:
+                x_attributes = np.hstack([
+                    padded_attributes[attr][i + n_gram - 1] 
+                    for attr in categorical_attributes
+                ])
+            else:
+                x_attributes = np.array([])
+
+            if numerical_attributes:
+                x_numerical = padded_numerical[i + n_gram - 1]
+            else:
+                x_numerical = np.array([])
 
             x_combined = np.hstack([x_activities.flatten(), x_attributes, x_numerical])  # Combine activities, attributes, and numerical features
             

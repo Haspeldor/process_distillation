@@ -6,10 +6,11 @@ import time
 from datetime import datetime
 import argparse
 
+import tensorflow as tf
 from tensorflow.keras import Input, Model
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Input, Reshape
-from tensorflow.keras.layers import LayerNormalization, Dropout, MultiHeadAttention, GlobalAveragePooling1D
+from tensorflow.keras.layers import Dense, Input, Reshape, Flatten, Concatenate
+from tensorflow.keras.layers import LayerNormalization, Dropout, MultiHeadAttention, GlobalAveragePooling1D, Embedding, Masking
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 
@@ -42,58 +43,67 @@ def build_nn(input_dim, output_dim):
                   metrics=['accuracy'])
     return model
 
-def build_transformer_nn(input_dim, output_dim, n_heads=4, d_model=128, ff_dim=256, num_layers=2, dropout_rate=0.1):
+def create_transformer_model(vocab_size, max_seq_len, padding_value, num_categorical=0, num_numerical=0, embed_dim=32, num_heads=2, ff_dim=64, dropout_rate=0.1):
     """
-    Build a transformer-based model for next activity prediction without embedding layers.
-    
+    Creates a transformer model for next activity prediction.
+
     Args:
-    - input_dim (int): Dimension of the input features (flattened input).
-    - output_dim (int): Number of output classes.
-    - n_heads (int): Number of attention heads in the multi-head attention layer.
-    - d_model (int): Dimensionality of the transformer model.
-    - ff_dim (int): Dimensionality of the feed-forward network within the transformer block.
-    - num_layers (int): Number of transformer layers.
-    - dropout_rate (float): Dropout rate for regularization.
-    
+        vocab_size (int): Number of unique activities.
+        max_seq_len (int): Maximum sequence length.
+        num_categorical (int): Number of categorical features.
+        num_numerical (int): Number of numerical features.
+        embed_dim (int): Embedding dimension for activities.
+        num_heads (int): Number of attention heads.
+        ff_dim (int): Feed-forward network dimension.
+        dropout_rate (float): Dropout rate.
+
     Returns:
-    - model (Model): A compiled transformer-based Keras model.
+        tf.keras.Model: Compiled transformer model.
     """
+    activity_input = Input(shape=(max_seq_len,), name="activity_input")
+    masked_input = Masking(mask_value=padding_value)(activity_input)
+    activity_embedding = Embedding(input_dim=vocab_size, output_dim=embed_dim, mask_zero=True)(masked_input)
     
-    # Input layer
-    inputs = Input(shape=(input_dim,))
-    
-    # Reshape input to have sequence-like dimensions: (batch_size, sequence_length, feature_dim)
-    # Here, we assume `input_dim` is split into sequence_length * feature_dim for simplicity.
-    # For example, if `input_dim = 100`, you could set sequence_length=10, feature_dim=10.
-    sequence_length = 10  # Define based on your data
-    feature_dim = input_dim // sequence_length
-    x = Reshape((sequence_length, feature_dim))(inputs)
-    
-    # Add transformer layers
-    for _ in range(num_layers):
-        # Multi-head self-attention
-        attn_output = MultiHeadAttention(num_heads=n_heads, key_dim=feature_dim)(x, x)
-        attn_output = Dropout(dropout_rate)(attn_output)
-        attn_output = LayerNormalization(epsilon=1e-6)(x + attn_output)
-        
-        # Feed-forward network
-        ff_output = Dense(ff_dim, activation='relu')(attn_output)
-        ff_output = Dropout(dropout_rate)(ff_output)
-        ff_output = Dense(feature_dim)(ff_output)
-        x = LayerNormalization(epsilon=1e-6)(attn_output + ff_output)
-    
-    # Global average pooling (to reduce sequence dimension)
-    x = GlobalAveragePooling1D()(x)
-    
+    # Positional Encoding
+    position_input = tf.range(start=0, limit=max_seq_len, delta=1)
+    position_embedding = Embedding(input_dim=max_seq_len, output_dim=embed_dim)(position_input)
+    x = activity_embedding + position_embedding
+
+    # Transformer Encoder Block
+    attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(x, x)
+    attn_output = Dropout(dropout_rate)(attn_output)
+    attn_output = LayerNormalization(epsilon=1e-6)(x + attn_output)
+
+    ff_output = Dense(ff_dim, activation='relu')(attn_output)
+    ff_output = Dropout(dropout_rate)(ff_output)
+    ff_output = Dense(embed_dim)(ff_output)
+    x = LayerNormalization(epsilon=1e-6)(attn_output + ff_output)
+
+    # Concatenate additional features
+    categorical_inputs, numerical_inputs = [], []
+    if num_categorical > 0:
+        # Create inputs and embeddings for categorical features
+        cat_inputs = [Input(shape=(max_seq_len,), name=f"cat_input_{i}") for i in range(num_categorical)]
+        cat_embeddings = [Embedding(100, embed_dim)(cat_input) for cat_input in cat_inputs]
+        x = Concatenate(axis=-1)([x] + cat_embeddings)  # Concatenate along feature axis
+        categorical_inputs.extend(cat_inputs)
+
+    # Handle numerical inputs
+    if num_numerical > 0:
+        # Create inputs with shape (max_seq_len, 1) to include time dimension
+        num_inputs = [Input(shape=(max_seq_len, 1), name=f"num_input_{i}") for i in range(num_numerical)]
+        num_dense = [Dense(embed_dim)(num_input) for num_input in num_inputs]  # Directly compatible
+        x = Concatenate(axis=-1)([x] + num_dense)  # Concatenate along feature axis
+        numerical_inputs.extend(num_inputs)
+
     # Output layer
-    outputs = Dense(output_dim, activation='softmax')(x)
-    
-    # Compile the model
-    model = Model(inputs=inputs, outputs=outputs)
-    model.compile(optimizer=Adam(), 
-                  loss='categorical_crossentropy', 
-                  metrics=['accuracy'])
-    
+    output = Dense(vocab_size, activation='softmax', name='output')(x)
+
+    # Define model
+    inputs = [activity_input] + categorical_inputs + numerical_inputs
+    model = Model(inputs=inputs, outputs=output)
+    model.compile(optimizer='adam', loss=masked_loss, metrics=[masked_accuracy])
+
     return model
 
 # train and save neural network
@@ -229,6 +239,21 @@ def distill_nn(nn, X, folder_name=None):
         save_data(y, folder_name, "y_distilled.pkl")
     print("--------------------------------------------------------------------------------------------------")
     return y
+
+def masked_loss(y_true, y_pred):
+    mask = tf.cast(tf.not_equal(y_true, 0), dtype=tf.float32)
+    loss = tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred)
+    loss *= mask  # Only consider non-padding tokens
+    return tf.reduce_sum(loss) / tf.reduce_sum(mask)
+
+def masked_accuracy(y_true, y_pred):
+    mask = tf.cast(tf.not_equal(y_true, 0), dtype=tf.float32)
+    correct_predictions = tf.cast(
+        tf.equal(tf.argmax(y_pred, axis=-1), tf.cast(y_true, tf.int64)), dtype=tf.float32
+    )
+    correct_predictions *= mask  # Only consider non-padding tokens
+    return tf.reduce_sum(correct_predictions) / tf.reduce_sum(mask)
+
 
 def finetune_nn(nn, X, y_modified, y_train=[], epochs=5, batch_size=32, learning_rate=1e-5, weight=5, mode="simple"):
     # if mode is simple, just train with y_modified
@@ -428,11 +453,38 @@ def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=Tru
 
 
 def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, save=False, preprocessing=False):
-    process_model = build_process_model(folder_name)
-    trace_generator = TraceGenerator(process_model=process_model)
-    generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=num_cases)
-    df = cases_to_dataframe(generated_cases)
-    print(df.head(50))
+    #run_data_analysis()
+    #run_transformer()
+    #df = load_xes_to_df("hospital_billing")
+    #process_model = build_process_model(folder_name)
+    #trace_generator = TraceGenerator(process_model=process_model)
+    #generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=num_cases)
+    #df = cases_to_dataframe(generated_cases)
+    df = load_data("hb", "df.pkl")
+    print(df.head(20))
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, [], [], folder_name="hb")
+    nn = train_nn(X_train, y_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
+    print("y_distilled")
+    print(y_distilled.shape)
+    dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+    print("Base model:")
+    evaluate_nn(nn, X_test, y_test)
+    evaluate_dt(dt_distilled, X_test, y_test)
+
+def run_data_analysis():
+    #process_model = build_process_model("cc_n")
+    #trace_generator = TraceGenerator(process_model=process_model)
+    #generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=1000)
+    #df = cases_to_dataframe(generated_cases)
+    df = load_xes_to_df("hospital_billing")
+    #df = load_data("hb", "df.pkl")
+    df.rename(columns={'case:concept:name': 'case_id', 'concept:name': 'activity'}, inplace=True)
+    columns = ['case_id', 'activity'] + [col for col in df.columns if col not in ['case_id', 'activity']]
+    df = df[columns]
+    save_data(df, "hb", "df.pkl")
+    pd.set_option('display.max_columns', None)  # Display all columns
+    print(df.head(20))
     X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender"], ["age"], folder_name="cc_n")
     print("Class names:")
     print(class_names)
@@ -444,6 +496,85 @@ def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, save=False, preproces
     print(X_train[:20])  # Show first 20 samples of X_train
     print("First 20 samples of y:")
     print(y_train[:20])  # Show first 20 labels (y_train)
+
+
+def run_transformer(folder_name="hb", num_cases=1000):
+    #df = load_xes_to_df("hospital_billing")
+    #process_model = build_process_model(folder_name)
+    #trace_generator = TraceGenerator(process_model=process_model)
+    #generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=num_cases)
+    #df = cases_to_dataframe(generated_cases)
+    #df = load_data(folder_name, "df.pkl")
+    #print(df.head(20))
+    df = load_data(folder_name, "df.pkl")
+    print(df.head(20))
+    padding_value = len(set(df['activity']))
+    vocab_size = padding_value + 1
+    categorical_attributes = []
+    numerical_attributes = []
+    # Split the DataFrame by case_id to ensure no case is split between train and test
+    unique_case_ids = df['case_id'].unique()
+    train_case_ids, test_case_ids = train_test_split(unique_case_ids, test_size=0.2, random_state=42)
+
+    # Create train and test DataFrames
+    train_df = df[df['case_id'].isin(train_case_ids)]
+    test_df = df[df['case_id'].isin(test_case_ids)]
+
+    # Process the training data
+    input_sequences_train, target_sequences_train, categorical_data_train, numerical_data_train = process_data_padded(
+        train_df, categorical_attributes, numerical_attributes
+    )
+    max_seq_len = input_sequences_train.shape[1]
+    print(f"Max length: {max_seq_len}")
+
+    print("First 20 input sequences:")
+    print(input_sequences_train[:20])
+
+    print("\nFirst 20 target sequences:")
+    print(target_sequences_train[:20])
+
+    print("\nFirst 20 categorical data entries:")
+    for i, cat_data in enumerate(categorical_data_train[:20]):
+        print(f"Categorical attribute {i}: {cat_data}")
+
+    print("\nFirst 20 numerical data entries:")
+    for i, num_data in enumerate(numerical_data_train[:20]):
+        print(f"Numerical attribute {i}: {num_data}")
+
+    # Process the test data
+    input_sequences_test, target_sequences_test, categorical_data_test, numerical_data_test = process_data_padded(
+        test_df, categorical_attributes, numerical_attributes, max_seq_len=max_seq_len
+    )
+
+    # Create the transformer model
+    model = create_transformer_model(
+        vocab_size=vocab_size,
+        max_seq_len=max_seq_len,
+        padding_value=padding_value,
+        num_categorical=len(categorical_attributes),
+        num_numerical=len(numerical_attributes),
+        embed_dim=32,
+        num_heads=2,
+        ff_dim=64
+    )
+
+    # Train the model
+    history = model.fit(
+        [input_sequences_train] + categorical_data_train + numerical_data_train,
+        target_sequences_train,
+        batch_size=32,
+        epochs=10,
+        validation_split=0.2
+    )
+
+    # Evaluate the model
+    results = model.evaluate(
+        [input_sequences_test] + categorical_data_test + numerical_data_test,
+        target_sequences_test
+    )
+
+    # Calculate and print accuracy
+    print(f"Test Accuracy: {results[1] * 100:.2f}%")
     
 
 def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, save=False, preprocessing=False):
