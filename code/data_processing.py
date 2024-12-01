@@ -10,6 +10,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 from trace_generator import Event, Case, TraceGenerator
 from tqdm import tqdm 
+
 from main import print_samples
 
 def load_data(folder_name, file_name):
@@ -29,14 +30,21 @@ def load_csv_to_df(file_name):
     file_path = os.path.join('raw_data', file_name)
     return pd.read_csv(file_path)
 
-def load_xes_to_df(file_name):
+def load_xes_to_df(file_name, folder_name=None):
     file_path = os.path.join("raw_data", file_name)
     df = pm4py.read_xes(file_path)
-    pickle_file_name = file_name.replace(".xes", ".pkl") if file_name.endswith(".xes") else f"{file_name}.pkl"
-    df.to_pickle(os.path.join("raw_data", pickle_file_name))
+    df.rename(columns={'case:concept:name': 'case_id', 'concept:name': 'activity'}, inplace=True)
+    columns = ['case_id', 'activity'] + [col for col in df.columns if col not in ['case_id', 'activity']]
+    df = df[columns]
+    df = df.loc[:, ~df.columns.duplicated()]
+    df = process_df_timestamps(df)
+    if folder_name:
+        save_data(df, folder_name, "df.pkl")
+    pd.set_option('display.max_columns', None)  # Display all columns
+    print(df.head(20))
     return df
 
-def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
+def generate_processed_data(process_model, categorical_attributes=[], numerical_attributes=[], num_cases=1000, n_gram=3, folder_name=None):
     print("generating event traces:")
     trace_generator = TraceGenerator(process_model=process_model)
     cases = trace_generator.generate_traces(num_cases=num_cases)
@@ -47,14 +55,8 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
     print("--------------------------------------------------------------------------------------------------")
 
     print("processing nn data:")
-    #data_processor = DataProcessor(trace_generator=trace_generator, n_gram=n_gram)
     df = cases_to_dataframe(cases)
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender"], ["age"], n_gram=n_gram, folder_name=folder_name)
-    #X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender", "problems"], [], n_gram=n_gram, folder_name=folder_name)
-    print("example nn input:")
-    print(X_train[:1])
-    print("example nn output:")
-    print(y_train[:1])
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram, folder_name=folder_name)
     print("--------------------------------------------------------------------------------------------------")
     if folder_name:
         save_data(X_train, folder_name, 'X_train.pkl')
@@ -66,6 +68,7 @@ def generate_processed_data(process_model, num_cases, n_gram, folder_name=None):
         save_data(class_names, folder_name, "class_names.pkl")
         save_data(feature_names, folder_name, "feature_names.pkl")
         save_data(feature_indices, folder_name, "feature_indices.pkl")
+        save_data(df, folder_name, "df.pkl")
         save_data(process_model.critical_decisions, folder_name, "critical_decisions.pkl")
 
     return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, process_model.critical_decisions
@@ -79,10 +82,10 @@ def create_feature_names(event_pool, attribute_pools, numerical_attributes, n_gr
     # Add categorical attribute features
     for attribute_name, possible_values in sorted(attribute_pools.items()):
         for value in sorted(possible_values):
-            feature_names.append(f"Attribute {attribute_name} = {value}")
+            feature_names.append(f"{attribute_name} = {value}")
     # Add numerical attribute features
     for numerical_attr in sorted(numerical_attributes):
-        feature_names.append(f"Attribute {numerical_attr}")
+        feature_names.append(numerical_attr)
     return feature_names
 
 def create_feature_indices(event_pool, attribute_pools, numerical_attributes, n_gram):
@@ -110,6 +113,15 @@ def create_attribute_pools(df, case_attributes):
             raise KeyError(f"Attribute '{attr}' is not in the DataFrame.")
     return attribute_pools 
 
+def process_df_timestamps(df):
+    df['time'] = pd.to_datetime(df['time'])
+    df = df.sort_values(by=['case_id', 'time']).reset_index(drop=True)
+    df['time_delta'] = df.groupby('case_id')['time'].diff().dt.total_seconds()
+    df['time_delta'] = df['time_delta'].fillna(0)  # Set time_delta to 0 for the first event in each case
+    df['time_of_day'] = df['time'].dt.hour / 24 + df['time'].dt.minute / 1440 + df['time'].dt.second / 86400
+    df['day_of_week'] = df['time'].dt.dayofweek  # Monday=0, Sunday=6
+    return df
+
 def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
     """
     Converts a list of Case objects into a pandas DataFrame with columns:
@@ -121,13 +133,14 @@ def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
             row = {
                 'case_id': case.case_id,
                 'activity': event.activity,
+                'time': event.timestamp
             }
-            # Combine both categorical and numerical attributes
             row.update(case.categorical_attributes)
             row.update(case.numerical_attributes)
             rows.append(row)
     
     df = pd.DataFrame(rows)
+    df = process_df_timestamps(df)
     return df
 
 def process_data_padded(df, categorical_attributes, numerical_attributes, max_seq_len=None):
@@ -194,6 +207,8 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     """Processes dataframe data for neural network training"""
     # keep only specified attributes
     standard_attributes = ['case_id', 'activity']
+    categorical_attributes.sort()
+    numerical_attributes.sort()
     attributes_to_include = standard_attributes + categorical_attributes + numerical_attributes 
     print(attributes_to_include)
     df = df[attributes_to_include]
@@ -203,6 +218,11 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     attribute_pools = create_attribute_pools(df, categorical_attributes)
     feature_names = create_feature_names(class_names, attribute_pools, numerical_attributes, n_gram)
     feature_indices = create_feature_indices(class_names, attribute_pools, numerical_attributes, n_gram)
+    print(f"class_names: {class_names}")
+    print(f"amount of classes = {len(class_names)}, ngram = {n_gram}")
+    print(f"attribute_pools: {attribute_pools}")
+    print(f"feature_names: {feature_names}")
+    print(f"feature_indices: {feature_indices}")
 
     # one-hot encode activities
     activity_encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore", categories=[class_names])
@@ -212,7 +232,6 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     # one-hot encode categorical case attributes dynamically
     attribute_encoders = {}
     attributes_ohe_dict = {}
-
     for attr in categorical_attributes:
         print(attr)
         print(attribute_pools[attr])
@@ -230,16 +249,15 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     # group by case_id and create sequences
     grouped = df.groupby('case_id')
     cases = []
-
     for case_id, group in tqdm(grouped, desc="preparing cases"):
         activities = activity_encoder.transform(group[['activity']])
         attributes = {attr: attribute_encoders[attr].transform(group[[attr]]) for attr in categorical_attributes}
-
         # Scale numerical attributes within the group
         for attr in numerical_attributes:
             group[attr] = numerical_scalers[attr].transform(group[[attr]])
-
         cases.append((activities, attributes, group[numerical_attributes].values))
+    pd.set_option('display.max_columns', None)  # Display all columns
+    print(grouped.head(20))
 
     # Generate n-grams with padding
     X, y = [], []
@@ -262,14 +280,14 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
             x_activities = padded_activities[i:i + n_gram]
             if categorical_attributes:
                 x_attributes = np.hstack([
-                    padded_attributes[attr][i + n_gram - 1] 
+                    padded_attributes[attr][i + n_gram] 
                     for attr in categorical_attributes
                 ])
             else:
                 x_attributes = np.array([])
 
             if numerical_attributes:
-                x_numerical = padded_numerical[i + n_gram - 1]
+                x_numerical = padded_numerical[i + n_gram]
             else:
                 x_numerical = np.array([])
 
@@ -283,18 +301,14 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     X = np.array(X)
     y = np.array(y)
 
+    n = 10
+    print("example nn inputs:")
+    print(X[:n])
+    print_samples(n, X, y, class_names, feature_names, numerical_attributes)
+    print("example nn outputs:")
+    print(y[:n])
+
     # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
-
-    if folder_name:
-        save_data(X_train, folder_name, 'X_train.pkl')
-        save_data(X_test, folder_name, 'X_test.pkl')
-        save_data(y_train, folder_name, 'y_train.pkl')
-        save_data(y_test, folder_name, 'y_test.pkl')
-        y_encoded = np.argmax(y_train, axis=1)
-        save_data(y_encoded, folder_name, 'y_encoded.pkl')
-        save_data(class_names, folder_name, "class_names.pkl")
-        save_data(feature_names, folder_name, "feature_names.pkl")
-        save_data(feature_indices, folder_name, "feature_indices.pkl")
 
     return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices

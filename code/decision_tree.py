@@ -373,7 +373,13 @@ class DecisionTreeClassifier:
         if node is None:
             node = self.root
 
-        output = []
+        if node.output is not None:
+            return []
+        
+        left_result = self.find_nodes_to_remove(critical_decisions, node=node.left)
+        right_result = self.find_nodes_to_remove(critical_decisions, node=node.right)
+
+        output = left_result + right_result
         # removes if a decision with the attribute exists, unless coherent with to_remove=False
         if exhaustive:
             for decision in critical_decisions:
@@ -383,23 +389,20 @@ class DecisionTreeClassifier:
                     if node.feature_index in self.feature_indices[attribute]:
                         possible_events = self.collect_events(node_id=node.node_id)
                         if not set(possible_events) & set(decision.possible_events):
-                            output = [node.node_id]
-                            break
+                            output.append(node.node_id)
+                            return output
         
         # removes only the nodes coherent with the to_remove=True
         else:
             for decision in critical_decisions:
+                if not decision.to_remove:
+                    continue
                 for attribute in decision.attributes:
                     if node.feature_index in self.feature_indices[attribute]:
                         possible_events = self.collect_events(node_id=node.node_id)
                         if set(possible_events) & set(decision.possible_events):
-                            output = [node.node_id]
-                            break
-
-        if node.output is None:
-            left_result = self.find_nodes_to_remove(critical_decisions, node=node.left)
-            right_result = self.find_nodes_to_remove(critical_decisions, node=node.right)
-            output = output + right_result + left_result
+                            output.append(node.node_id)
+                            return output
 
         return output
 

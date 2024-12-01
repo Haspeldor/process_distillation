@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import numpy as np
 import time
+import sys
 from datetime import datetime
 import argparse
 
@@ -18,22 +19,23 @@ from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier as SklearnDecisionTreeClassifier
 from sklearn.tree import export_text
 
-from trace_generator import build_process_model
-#from data_processing import generate_processed_data, load_data, save_data, *
+from trace_generator import *
 from data_processing import *
-from decision_tree import DecisionTreeClassifier, save_tree_to_json, load_tree_from_json, get_deleted_nodes, get_metrics, sklearn_to_custom_tree
+from decision_tree import *
 
 
-def generate_data(num_cases, model_name, n_gram, save=True):
+def generate_data(num_cases, model_name, n_gram):
     process_model = build_process_model(model_name)
-    folder_name = model_name if save else None
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_processed_data(process_model, num_cases, n_gram, folder_name=folder_name)
+    folder_name = model_name
+    categorical_attributes, numerical_attributes = get_attributes(folder_name)
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_processed_data(process_model, categorical_attributes=categorical_attributes, numerical_attributes=numerical_attributes, num_cases=num_cases, n_gram=n_gram, folder_name=folder_name)
     return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions
 
 # define neural network architecture
 def build_nn(input_dim, output_dim):
     model = Sequential()
     model.add(Input(shape=(input_dim,)))
+    model.add(Dense(256, activation='relu'))
     model.add(Dense(128, activation='relu'))
     model.add(Dense(64, activation='relu'))
     model.add(Dense(output_dim, activation='softmax'))
@@ -43,7 +45,7 @@ def build_nn(input_dim, output_dim):
                   metrics=['accuracy'])
     return model
 
-def create_transformer_model(vocab_size, max_seq_len, padding_value, num_categorical=0, num_numerical=0, embed_dim=32, num_heads=2, ff_dim=64, dropout_rate=0.1):
+def build_transformer_model(vocab_size, max_seq_len, padding_value, num_categorical=0, num_numerical=0, embed_dim=32, num_heads=2, ff_dim=64, dropout_rate=0.1):
     """
     Creates a transformer model for next activity prediction.
 
@@ -63,44 +65,31 @@ def create_transformer_model(vocab_size, max_seq_len, padding_value, num_categor
     activity_input = Input(shape=(max_seq_len,), name="activity_input")
     masked_input = Masking(mask_value=padding_value)(activity_input)
     activity_embedding = Embedding(input_dim=vocab_size, output_dim=embed_dim, mask_zero=True)(masked_input)
-    
+
     # Positional Encoding
     position_input = tf.range(start=0, limit=max_seq_len, delta=1)
     position_embedding = Embedding(input_dim=max_seq_len, output_dim=embed_dim)(position_input)
     x = activity_embedding + position_embedding
 
-    # Transformer Encoder Block
-    attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(x, x)
+    # Transformer Encoder Block with Mask
+    attention_mask = tf.cast(tf.not_equal(activity_input, padding_value), tf.float32)
+    attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(
+    x, x, attention_mask=attention_mask
+    )
     attn_output = Dropout(dropout_rate)(attn_output)
     attn_output = LayerNormalization(epsilon=1e-6)(x + attn_output)
 
+    # Fully Connected Layers
     ff_output = Dense(ff_dim, activation='relu')(attn_output)
     ff_output = Dropout(dropout_rate)(ff_output)
     ff_output = Dense(embed_dim)(ff_output)
     x = LayerNormalization(epsilon=1e-6)(attn_output + ff_output)
 
-    # Concatenate additional features
-    categorical_inputs, numerical_inputs = [], []
-    if num_categorical > 0:
-        # Create inputs and embeddings for categorical features
-        cat_inputs = [Input(shape=(max_seq_len,), name=f"cat_input_{i}") for i in range(num_categorical)]
-        cat_embeddings = [Embedding(100, embed_dim)(cat_input) for cat_input in cat_inputs]
-        x = Concatenate(axis=-1)([x] + cat_embeddings)  # Concatenate along feature axis
-        categorical_inputs.extend(cat_inputs)
-
-    # Handle numerical inputs
-    if num_numerical > 0:
-        # Create inputs with shape (max_seq_len, 1) to include time dimension
-        num_inputs = [Input(shape=(max_seq_len, 1), name=f"num_input_{i}") for i in range(num_numerical)]
-        num_dense = [Dense(embed_dim)(num_input) for num_input in num_inputs]  # Directly compatible
-        x = Concatenate(axis=-1)([x] + num_dense)  # Concatenate along feature axis
-        numerical_inputs.extend(num_inputs)
-
     # Output layer
     output = Dense(vocab_size, activation='softmax', name='output')(x)
 
-    # Define model
-    inputs = [activity_input] + categorical_inputs + numerical_inputs
+    # Compile Model
+    inputs = [activity_input]  # Add other categorical/numerical inputs if needed
     model = Model(inputs=inputs, outputs=output)
     model.compile(optimizer='adam', loss=masked_loss, metrics=[masked_accuracy])
 
@@ -122,7 +111,8 @@ def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
 
 def train_sklearn_dt(X_train, y_train):
     print("training decision tree:")
-    dt = SklearnDecisionTreeClassifier(max_depth=10, min_samples_leaf=5, ccp_alpha=0.01)
+    #dt = SklearnDecisionTreeClassifier(max_depth=15, min_samples_leaf=5)
+    dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5, ccp_alpha=0.01)
     dt.fit(X_train, y_train)
     print("--------------------------------------------------------------------------------------------------")
     return dt
@@ -231,12 +221,10 @@ def evaluate_sklearn_dt(dt, X_test, y_test, y_distilled, class_names=None, featu
     tree_text = export_text(dt, class_names=sklearn_class_names, feature_names=feature_names)
     print(tree_text)
 
-def distill_nn(nn, X, folder_name=None):
+def distill_nn(nn, X):
     print("distilling nn:")
     softmax_predictions = nn.predict(X)
     y = np.argmax(softmax_predictions, axis=1)
-    if folder_name:
-        save_data(y, folder_name, "y_distilled.pkl")
     print("--------------------------------------------------------------------------------------------------")
     return y
 
@@ -284,47 +272,146 @@ def finetune_nn(nn, X, y_modified, y_train=[], epochs=5, batch_size=32, learning
 
     return nn
 
+
 def find_missing_ids(dt_distilled, dt_modified):
     modified_node_ids = dt_distilled.collect_node_ids()
     distilled_node_ids = dt_modified.collect_node_ids()
     missing_ids = [item for item in distilled_node_ids if item not in modified_node_ids]
     return missing_ids
 
-def print_samples(X, y, class_names, feature_names):
+
+def print_samples(n, X, y, class_names, feature_names, numerical_attributes):
     if len(feature_names) != X.shape[1]:
         raise ValueError("The length of feature_names must match the number of columns in X.")
     
-    for i, sample in enumerate(X):
-        active_indices = np.where(sample == 1)[0]
-        active_features = [feature_names[idx] for idx in active_indices]
+    for i, sample in enumerate(X[:n]):
+        active_indices = np.where(sample != 0)[0]
+        active_features = []
+        for idx in active_indices:
+            feature_name = feature_names[idx]
+            if feature_name in numerical_attributes:
+                active_features.append(f"{feature_name}={sample[idx]:.2f}")
+            else:
+                active_features.append(feature_name)
         target_activity = class_names[np.argmax(y[i])]
         print(f"Sample {i}: Features: {', '.join(active_features)}, Target: {target_activity}")
 
-# executes the prerequisites
-def run_preprocessing(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, console_output=True):
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram, save=save)
-    nn = train_nn(X_train, y_train, folder_name=folder_name)
 
-    y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
-    print("y_distilled")
-    print(y_distilled.shape)
+def get_attributes(folder_name):
+    categorical_attributes = ["day_of_week"]
+    numerical_attributes = ["time_delta", "time_of_day"]
+
+    if "hiring" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
+        numerical_attributes += ["case:age", "case:yearsOfEducation"]
+    elif "hospital" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:private_insurance", "case:underlying_condition"]
+        numerical_attributes += ["case:age"]
+    elif "lending" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
+        numerical_attributes += ["case:age", "case:yearsOfEducation", "case:CreditScore"]
+    elif "renting" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:married"]
+        numerical_attributes += ["case:age", "case:yearsOfEducation"]
+    elif "cc_n"  in folder_name:
+        categorical_attributes += ["gender"]
+        numerical_attributes += ["age"]
+
+    return categorical_attributes, numerical_attributes
+
+
+def get_critical_decisions(folder_name):
+    critical_decisions = []
+    if "hiring" in folder_name:
+        critical_decisions.append(Decision(attributes=["case:age", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Application Rejected"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["case:yearsOfEducation"], possible_events=["Application Rejected"], to_remove=False))
+    elif "hospital" in folder_name:
+        critical_decisions.append(Decision(attributes=["case:private_insurance", "case:underlying_condition", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Expert Examination"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["case:age"], possible_events=["Expert Examination"], to_remove=False))
+    elif "cc_n" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
+    
+    return critical_decisions
+
+
+# generates and or processes the data
+def run_preprocessing(folder_name, file_name=None, model_name=None, n_gram=3, num_cases=1000):
+    if model_name:
+        X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram)
+    elif file_name:
+        df = load_xes_to_df(file_name, folder_name=folder_name)
+        categorical_attributes, numerical_attributes = get_attributes(folder_name)
+        X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+    else:
+        df = load_data(folder_name, "df.pkl")
+        categorical_attributes, numerical_attributes = get_attributes(folder_name)
+        X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+
+    if folder_name:
+        save_data(X_train, folder_name, 'X_train.pkl')
+        save_data(X_test, folder_name, 'X_test.pkl')
+        save_data(y_train, folder_name, 'y_train.pkl')
+        save_data(y_test, folder_name, 'y_test.pkl')
+        y_encoded = np.argmax(y_train, axis=1)
+        save_data(y_encoded, folder_name, 'y_encoded.pkl')
+        save_data(class_names, folder_name, "class_names.pkl")
+        save_data(feature_names, folder_name, "feature_names.pkl")
+        save_data(feature_indices, folder_name, "feature_indices.pkl")
+
+
+def run_train_base(folder_name, console_output=True):
+    X_train  = load_data(folder_name, "X_train.pkl")
+    y_train  = load_data(folder_name, "y_train.pkl")
+    X_test  = load_data(folder_name, "X_test.pkl")
+    y_test  = load_data(folder_name, "y_test.pkl")
+    class_names = load_data(folder_name, "class_names.pkl")
+    feature_names = load_data(folder_name, "feature_names.pkl")
+    feature_indices = load_data(folder_name, "feature_indices.pkl")
+
+    nn = train_nn(X_train, y_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn, X_train)
+    save_data(y_distilled, folder_name, "y_distilled.pkl")
     dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
 
     if console_output:
         evaluate_nn(nn, X_test, y_test)
         evaluate_dt(dt_distilled, X_test, y_test)
 
+
+def run_unfair_data_preset():
+    domains = ["hospital", "renting", "lending", "hiring"]
+    degrees = ["low", "medium", "high"]
+
+    #"""
+    for domain in domains:
+        for degree in degrees:
+            folder_name = f"{domain}_{degree}"
+            file_name = f"{domain}_log_{degree}.xes"
+            print(f"Loading XES data for: {folder_name}")
+            load_xes_to_df(file_name, folder_name=folder_name)
+            print(f"Processing data for: {folder_name}")
+            run_preprocessing(folder_name=folder_name, file_name=file_name)
+    #"""
+
+    for domain in domains:
+        for degree in degrees:
+            folder_name = f"{domain}_{degree}"
+            file_name = f"{domain}_log_{degree}.xes"
+            print(f"Training for: {folder_name}")
+            run_train_base(folder_name)
+
+
 # executes the complete pipeline
-def run_complete(model_name, folder_name=None, n_gram=2, num_cases=1000, save=True, preprocessing=False):
-    if folder_name is None:
-        folder_name = model_name
+def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cases=1000, preprocessing=False):
     if preprocessing:
-        run_preprocessing(model_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
+        run_preprocessing(folder_name, model_name=model_name, file_name=file_name, n_gram=n_gram, num_cases=num_cases)
+        run_train_base(folder_name=folder_name, console_output=False)
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
     nn = load_nn(folder_name, "nn.keras")
     dt_distilled = load_dt(folder_name, "dt.json")
-    critical_decisions = load_data(folder_name, "critical_decisions.pkl")
+    critical_decisions = get_critical_decisions(folder_name)
 
     print("Base model:")
     evaluate_nn(nn, X_test, y_test)
@@ -333,12 +420,11 @@ def run_complete(model_name, folder_name=None, n_gram=2, num_cases=1000, save=Tr
     nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
     print(f"Nodes to remove accordingly: {nodes_to_remove}")
     print("--------------------------------------------------------------------------------------------------")
-
-    run_modify(folder_name=model_name, node_ids=nodes_to_remove, console_output=False)
-    run_finetuning(folder_name=model_name, console_output=False)
+    run_modify(folder_name, node_ids=nodes_to_remove, console_output=False)
+    run_finetuning(folder_name, console_output=False)
     print("Pipeline done, running analysis...")
     print("--------------------------------------------------------------------------------------------------")
-    run_analysis(folder_name=model_name)
+    run_analysis(folder_name)
 
 
 # runs analysis on finished models
@@ -348,7 +434,7 @@ def run_analysis(folder_name):
     class_names = load_data(folder_name, "class_names.pkl")
     feature_names = load_data(folder_name, "feature_names.pkl")
     feature_indices = load_data(folder_name, "feature_indices.pkl")
-    critical_decisions = load_data(folder_name, "critical_decisions.pkl")
+    critical_decisions = get_critical_decisions(folder_name)
     folder_path = os.path.join('models', folder_name)
 
     # analyze all neural networks trees
@@ -369,7 +455,7 @@ def run_analysis(folder_name):
 
 
 # runs finetuning for modified base data
-def run_finetuning(folder_name="model_1", epochs=5, batch_size=32, learning_rate=1e-3, weight=5, console_output=True):
+def run_finetuning(folder_name, epochs=5, batch_size=32, learning_rate=1e-3, weight=5, console_output=True):
     X_train  = load_data(folder_name, "X_train.pkl")
     y_train  = load_data(folder_name, "y_train.pkl")
     X_test  = load_data(folder_name, "X_test.pkl")
@@ -387,19 +473,19 @@ def run_finetuning(folder_name="model_1", epochs=5, batch_size=32, learning_rate
     y_train = nn.predict(X_train)
     nn_simple = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="simple", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
     save_nn(nn_simple, folder_name, "nn_simple.keras")
-    y_distilled = distill_nn(nn_simple, X_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn_simple, X_train)
     dt_simple = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_weighted.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     print("finetuning mode: changed")
     nn = load_nn(folder_name, "nn.keras")
     nn_changed = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="changed", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
     save_nn(nn_simple, folder_name, "nn_changed.keras")
-    y_distilled = distill_nn(nn_changed, X_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn_changed, X_train)
     dt_changed = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_changed.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     print("finetuning mode: weighted")
     nn = load_nn(folder_name, "nn.keras")
     nn_weighted = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="weighted", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
     save_nn(nn_simple, folder_name, "nn_weighted.keras")
-    y_distilled = distill_nn(nn_weighted, X_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn_weighted, X_train)
     dt_weighted = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_weighted.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
 
     if console_output:
@@ -434,7 +520,7 @@ def run_finetuning(folder_name="model_1", epochs=5, batch_size=32, learning_rate
         evaluate_nn(nn_weighted, X, y)
 
 
-def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=True):
+def run_modify(folder_name, node_ids=[], console_output=True):
     X_train  = load_data(folder_name, "X_train.pkl")
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
@@ -448,23 +534,26 @@ def run_modify(folder_name="model_1", node_ids=[], save=True, console_output=Tru
 
     y_modified = dt_distilled.predict(X_train)
     y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
-    if save:
-        save_data(y_encoded, folder_name, "y_modified.pkl")
+    save_data(y_encoded, folder_name, "y_modified.pkl")
 
 
-def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, save=False, preprocessing=False):
-    #run_data_analysis()
+def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, preprocessing=False):
     #run_transformer()
+    run_unfair_data_preset()
+    sys.exit()
     #df = load_xes_to_df("hospital_billing")
     #process_model = build_process_model(folder_name)
     #trace_generator = TraceGenerator(process_model=process_model)
     #generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=num_cases)
     #df = cases_to_dataframe(generated_cases)
-    df = load_data("hb", "df.pkl")
+    folder_name = "hb_high"
+    file_name = "hospital_log_high.xes"
+    run_xes_preprocessing(file_name, folder_name=folder_name)
+    df = load_data(folder_name, "df.pkl")
     print(df.head(20))
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, [], [], folder_name="hb")
+    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["case:gender", "case:citizen", "case:private_insurance", "case:german speaking"], ["case:age"], folder_name="hb_high")
     nn = train_nn(X_train, y_train, folder_name=folder_name)
-    y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn, X_train)
     print("y_distilled")
     print(y_distilled.shape)
     dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
@@ -472,33 +561,7 @@ def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, save=False, preproces
     evaluate_nn(nn, X_test, y_test)
     evaluate_dt(dt_distilled, X_test, y_test)
 
-def run_data_analysis():
-    #process_model = build_process_model("cc_n")
-    #trace_generator = TraceGenerator(process_model=process_model)
-    #generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=1000)
-    #df = cases_to_dataframe(generated_cases)
-    df = load_xes_to_df("hospital_billing")
-    #df = load_data("hb", "df.pkl")
-    df.rename(columns={'case:concept:name': 'case_id', 'concept:name': 'activity'}, inplace=True)
-    columns = ['case_id', 'activity'] + [col for col in df.columns if col not in ['case_id', 'activity']]
-    df = df[columns]
-    save_data(df, "hb", "df.pkl")
-    pd.set_option('display.max_columns', None)  # Display all columns
-    print(df.head(20))
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["gender"], ["age"], folder_name="cc_n")
-    print("Class names:")
-    print(class_names)
-    print("Feature names:")
-    print(feature_names)
-    print("Feature indices:")
-    print(feature_indices)
-    print("First 20 samples of X:")
-    print(X_train[:20])  # Show first 20 samples of X_train
-    print("First 20 samples of y:")
-    print(y_train[:20])  # Show first 20 labels (y_train)
-
-
-def run_transformer(folder_name="hb", num_cases=1000):
+def run_transformer(folder_name):
     #df = load_xes_to_df("hospital_billing")
     #process_model = build_process_model(folder_name)
     #trace_generator = TraceGenerator(process_model=process_model)
@@ -547,7 +610,7 @@ def run_transformer(folder_name="hb", num_cases=1000):
     )
 
     # Create the transformer model
-    model = create_transformer_model(
+    model = build_transformer_model(
         vocab_size=vocab_size,
         max_seq_len=max_seq_len,
         padding_value=padding_value,
@@ -577,9 +640,9 @@ def run_transformer(folder_name="hb", num_cases=1000):
     print(f"Test Accuracy: {results[1] * 100:.2f}%")
     
 
-def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, save=False, preprocessing=False):
+def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, preprocessing=False):
     if preprocessing:
-        run_preprocessing(folder_name, folder_name=folder_name, n_gram=n_gram, num_cases=num_cases, save=save, console_output=False)
+        run_preprocessing(folder_name, n_gram=n_gram, num_cases=num_cases, console_output=False)
     nn = load_nn(folder_name, "nn.keras")
     X_train  = load_data(folder_name, "X_train.pkl")
     X_test  = load_data(folder_name, "X_test.pkl")
@@ -588,7 +651,7 @@ def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, save=False, prepr
     feature_names = load_data(folder_name, "feature_names.pkl")
     feature_indices = load_data(folder_name, "feature_indices.pkl")
 
-    y_distilled = distill_nn(nn, X_train, folder_name=folder_name)
+    y_distilled = distill_nn(nn, X_train)
     start_time = time.time()
     dt_sklearn = train_sklearn_dt(X_train, y_distilled)
     end_time = time.time()
@@ -643,9 +706,10 @@ def run_interactive():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', type=str, default='model_1', help='Name of the model to use (default: model_1)')
+    parser.add_argument('--model_name', type=str, default=None, help='Name of the model to use (default: None)')
+    parser.add_argument('--file_name', type=str, default=None, help='Name of the file to use (default: None)')
     parser.add_argument('--folder_name', type=str, default=None, help='Name of the folder to use (default: same as model_name)')
-    parser.add_argument('--mode', choices=['a', 'c', 'd', 'f', 'i', 'm', 'p'], default='c',
+    parser.add_argument('--mode', choices=['a', 'c', 'd', 'f', 'i', 'm', 'p', 't'], default='c',
                         help="Choose 'complete' to run full pipeline or 'preprocessed' to use preprocessed data (default: complete)")
     parser.add_argument('--n_gram', type=int, default=3, help='Value for n-gram (default: 3)')
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
@@ -660,19 +724,21 @@ def main():
     
     # Check which mode is selected and run the corresponding function
     if args.mode == 'a':
-        run_analysis(folder_name=args.model_name)
+        run_analysis(args.folder_name)
     elif args.mode == 'c':
-        run_complete(model_name=args.model_name, folder_name=args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save, preprocessing=args.preprocessing)
+        run_complete(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing)
     elif args.mode == 'd':
-        run_demo(folder_name=args.model_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save, preprocessing=args.preprocessing)
+        run_demo(args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing)
     elif args.mode == 'f':
-        run_finetuning(folder_name=args.model_name)
+        run_finetuning(args.folder_name)
     elif args.mode == 'i':
         run_interactive()
     elif args.mode == 'm':
-        run_modify(folder_name=args.model_name, node_ids=args.node_ids)
+        run_modify(args.folder_name, node_ids=args.node_ids)
     elif args.mode == 'p':
-        run_preprocessing(model_name=args.model_name, folder_name=args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, save=args.save)
+        run_preprocessing(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases)
+    elif args.mode == 't':
+        run_train_base(args.folder_name)
 
 if __name__ == "__main__":
     main()
