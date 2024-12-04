@@ -1,0 +1,228 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{anyt/global//global/global}
+  \entry{Apple:keynote:2010}{book}{}
+    \name{author}{1}{}{%
+      {{hash=A}{%
+         family={{Apple Inc.}},
+         familyi={A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{Apple Inc.}}%
+    }
+    \strng{namehash}{A1}
+    \strng{fullhash}{A1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{{App}10}
+    \field{extraalpha}{1}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{title}{Keynote '09 User Guide}
+    \field{year}{2010}
+  \endentry
+
+  \entry{Apple:numbers:2010}{book}{}
+    \name{author}{1}{}{%
+      {{hash=A}{%
+         family={{Apple Inc.}},
+         familyi={A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{Apple Inc.}}%
+    }
+    \strng{namehash}{A1}
+    \strng{fullhash}{A1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{{App}10}
+    \field{extraalpha}{2}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{title}{Numbers '09 User Guide}
+    \field{year}{2010}
+  \endentry
+
+  \entry{Apple:pages:2010}{book}{}
+    \name{author}{1}{}{%
+      {{hash=A}{%
+         family={{Apple Inc.}},
+         familyi={A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{Apple Inc.}}%
+    }
+    \strng{namehash}{A1}
+    \strng{fullhash}{A1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{{App}10}
+    \field{extraalpha}{3}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{title}{Pages '09 User Guide}
+    \field{year}{2010}
+  \endentry
+
+  \entry{WEB:GNU:GPL:2010}{online}{}
+    \name{author}{1}{}{%
+      {{hash=F}{%
+         family={{Free Software Foundation, Inc.}},
+         familyi={F\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{F1}
+    \strng{fullhash}{F1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{{Fre}10}
+    \field{sortinit}{F}
+    \field{sortinithash}{F}
+    \field{title}{GNU General Public License}
+    \verb{url}
+    \verb http://www.gnu.org/licenses/gpl.html
+    \endverb
+    \field{year}{2010}
+    \field{urlday}{27}
+    \field{urlmonth}{05}
+    \field{urlyear}{2011}
+  \endentry
+
+  \entry{Jurgens:2000}{book}{}
+    \name{author}{1}{}{%
+      {{hash=JM}{%
+         family={J{\"u}rgens},
+         familyi={J\bibinitperiod},
+         given={Manuela},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {FernUniversit{\"a}t Gesamthochschule in Hagen}%
+    }
+    \strng{namehash}{JM1}
+    \strng{fullhash}{JM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{J{\"u}r00}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{title}{LaTeX: eine Einf{\"u}hrung und ein bisschen mehr}
+    \field{year}{2000}
+  \endentry
+
+  \entry{Jurgens:1995}{book}{}
+    \name{author}{1}{}{%
+      {{hash=JM}{%
+         family={J{\"u}rgens},
+         familyi={J\bibinitperiod},
+         given={Manuela},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {FernUniversit{\"a}t Gesamthochschule in Hagen}%
+    }
+    \strng{namehash}{JM1}
+    \strng{fullhash}{JM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{J{\"u}r95}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{title}{LaTeX: Fortgeschrittene Anwendungen}
+    \field{year}{1995}
+  \endentry
+
+  \entry{Kohm:2011}{book}{}
+    \name{author}{2}{}{%
+      {{hash=KM}{%
+         family={Kohm},
+         familyi={K\bibinitperiod},
+         given={Markus},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=JUM}{%
+         family={Jens-Uwe-Morawski},
+         familyi={J\bibinithyphendelim U\bibinithyphendelim M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KMJUM1}
+    \strng{fullhash}{KMJUM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{KJUM11}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{title}{KOMA-Script: Die Anleitung}
+    \field{year}{2011}
+  \endentry
+
+  \entry{Miede:2011}{manual}{}
+    \name{author}{1}{}{%
+      {{hash=MA}{%
+         family={Miede},
+         familyi={M\bibinitperiod},
+         given={Andr{\'e}},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MA1}
+    \strng{fullhash}{MA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Mie11}
+    \field{extraalpha}{1}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{title}{A Classic Thesis Style: An Homage to The Elements of Typographic Style}
+    \field{year}{2011}
+  \endentry
+
+  \entry{WEB:Miede:2011}{online}{}
+    \name{author}{1}{}{%
+      {{hash=MA}{%
+         family={Miede},
+         familyi={M\bibinitperiod},
+         given={Andr{\'e}},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MA1}
+    \strng{fullhash}{MA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Mie11}
+    \field{extraalpha}{2}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{title}{A Classic Thesis Style by Andr{\'e} Miede}
+    \verb{url}
+    \verb http://www.miede.de/index.php?page=classicthesis
+    \endverb
+    \field{year}{2011}
+    \field{urlday}{27}
+    \field{urlmonth}{05}
+    \field{urlyear}{2011}
+  \endentry
+\enddatalist
+\endinput

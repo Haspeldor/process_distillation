@@ -10,6 +10,7 @@ import argparse
 import tensorflow as tf
 from tensorflow.keras import Input, Model
 from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import Layer
 from tensorflow.keras.layers import Dense, Input, Reshape, Flatten, Concatenate
 from tensorflow.keras.layers import LayerNormalization, Dropout, MultiHeadAttention, GlobalAveragePooling1D, Embedding, Masking
 from tensorflow.keras.optimizers import Adam
@@ -23,6 +24,14 @@ from trace_generator import *
 from data_processing import *
 from decision_tree import *
 
+
+class ExpandDimsLayer(Layer):
+    def __init__(self, axis, **kwargs):
+        super(ExpandDimsLayer, self).__init__(**kwargs)
+        self.axis = axis
+
+    def call(self, inputs):
+        return tf.expand_dims(inputs, axis=self.axis)
 
 def generate_data(num_cases, model_name, n_gram):
     process_model = build_process_model(model_name)
@@ -62,34 +71,56 @@ def build_transformer_model(vocab_size, max_seq_len, padding_value, num_categori
     Returns:
         tf.keras.Model: Compiled transformer model.
     """
+    # Embedding layer with mask_zero=True creates a mask
     activity_input = Input(shape=(max_seq_len,), name="activity_input")
-    masked_input = Masking(mask_value=padding_value)(activity_input)
-    activity_embedding = Embedding(input_dim=vocab_size, output_dim=embed_dim, mask_zero=True)(masked_input)
+    activity_embedding = Embedding(input_dim=vocab_size, output_dim=embed_dim, mask_zero=True)(activity_input)
+
+    # Extract the mask from the embedding layer
+    mask = activity_embedding._keras_mask  # Keras propagates this mask automatically
 
     # Positional Encoding
     position_input = tf.range(start=0, limit=max_seq_len, delta=1)
     position_embedding = Embedding(input_dim=max_seq_len, output_dim=embed_dim)(position_input)
     x = activity_embedding + position_embedding
 
-    # Transformer Encoder Block with Mask
-    attention_mask = tf.cast(tf.not_equal(activity_input, padding_value), tf.float32)
+    # Transformer Encoder Block
+    mask = ExpandDimsLayer(axis=1)(mask)  # Adjust dimensions for MultiHeadAttention
+
+    # Transformer Encoder Block
     attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(
-    x, x, attention_mask=attention_mask
+        activity_embedding, activity_embedding, attention_mask=mask
     )
     attn_output = Dropout(dropout_rate)(attn_output)
     attn_output = LayerNormalization(epsilon=1e-6)(x + attn_output)
 
-    # Fully Connected Layers
+    # Feed-forward network
     ff_output = Dense(ff_dim, activation='relu')(attn_output)
     ff_output = Dropout(dropout_rate)(ff_output)
     ff_output = Dense(embed_dim)(ff_output)
     x = LayerNormalization(epsilon=1e-6)(attn_output + ff_output)
 
+    # Concatenate additional features
+    categorical_inputs, numerical_inputs = [], []
+    if num_categorical > 0:
+        # Create inputs and embeddings for categorical features
+        cat_inputs = [Input(shape=(max_seq_len,), name=f"cat_input_{i}") for i in range(num_categorical)]
+        cat_embeddings = [Embedding(100, embed_dim)(cat_input) for cat_input in cat_inputs]
+        x = Concatenate(axis=-1)([x] + cat_embeddings)
+        categorical_inputs.extend(cat_inputs)
+
+    # Handle numerical inputs
+    if num_numerical > 0:
+        # Create inputs with shape (max_seq_len, 1) to include time dimension
+        num_inputs = [Input(shape=(max_seq_len, 1), name=f"num_input_{i}") for i in range(num_numerical)]
+        num_dense = [Dense(embed_dim)(num_input) for num_input in num_inputs]
+        x = Concatenate(axis=-1)([x] + num_dense)
+        numerical_inputs.extend(num_inputs)
+
     # Output layer
     output = Dense(vocab_size, activation='softmax', name='output')(x)
 
-    # Compile Model
-    inputs = [activity_input]  # Add other categorical/numerical inputs if needed
+    # Define model
+    inputs = [activity_input] + categorical_inputs + numerical_inputs
     model = Model(inputs=inputs, outputs=output)
     model.compile(optimizer='adam', loss=masked_loss, metrics=[masked_accuracy])
 
@@ -301,7 +332,13 @@ def get_attributes(folder_name):
     categorical_attributes = ["day_of_week"]
     numerical_attributes = ["time_delta", "time_of_day"]
 
-    if "hiring" in folder_name:
+    if folder_name == "cc_n":
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["age"]
+    elif folder_name == "hb_enriched":
+        categorical_attributes = ["gender"]
+        numerical_attributes = []
+    elif "hiring" in folder_name:
         categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
         numerical_attributes += ["case:age", "case:yearsOfEducation"]
     elif "hospital" in folder_name:
@@ -313,9 +350,6 @@ def get_attributes(folder_name):
     elif "renting" in folder_name:
         categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:married"]
         numerical_attributes += ["case:age", "case:yearsOfEducation"]
-    elif "cc_n"  in folder_name:
-        categorical_attributes += ["gender"]
-        numerical_attributes += ["age"]
 
     return categorical_attributes, numerical_attributes
 
@@ -383,7 +417,7 @@ def run_unfair_data_preset():
     domains = ["hospital", "renting", "lending", "hiring"]
     degrees = ["low", "medium", "high"]
 
-    #"""
+    """
     for domain in domains:
         for degree in degrees:
             folder_name = f"{domain}_{degree}"
@@ -392,7 +426,7 @@ def run_unfair_data_preset():
             load_xes_to_df(file_name, folder_name=folder_name)
             print(f"Processing data for: {folder_name}")
             run_preprocessing(folder_name=folder_name, file_name=file_name)
-    #"""
+    """
 
     for domain in domains:
         for degree in degrees:
@@ -538,8 +572,8 @@ def run_modify(folder_name, node_ids=[], console_output=True):
 
 
 def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, preprocessing=False):
-    #run_transformer()
-    run_unfair_data_preset()
+    run_transformer("cc_n")
+    #run_unfair_data_preset()
     sys.exit()
     #df = load_xes_to_df("hospital_billing")
     #process_model = build_process_model(folder_name)
@@ -573,8 +607,8 @@ def run_transformer(folder_name):
     print(df.head(20))
     padding_value = len(set(df['activity']))
     vocab_size = padding_value + 1
-    categorical_attributes = []
-    numerical_attributes = []
+    categorical_attributes = ["gender"]
+    numerical_attributes = ["age"]
     # Split the DataFrame by case_id to ensure no case is split between train and test
     unique_case_ids = df['case_id'].unique()
     train_case_ids, test_case_ids = train_test_split(unique_case_ids, test_size=0.2, random_state=42)

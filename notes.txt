@@ -4,14 +4,25 @@ neu labeln vs regularisierung
 eigene loss funktion
 regularisierer aus white box
 
+grundlagenkapitel: 10-20 seiten
+    - prelimenaries
+        - neural network
+        - PBPM
+        - event logs
+        - unfairness
+    - related work
+
+ansatz: vergleich mit debiasing und related work
+    - siehe auch deren referenzen
+
+event log charakteristiken:
+    - verteilung timestamps in histogram
+    - menge/häufung activities 
+    - länge traces 
+
+aknowledgements:
+    - personen und chatgpt angeben
+
 todo:
-    - hospital datensatz
-        - in df einlesen
-        - attribute auswählen
-        - laufen lassen
-
-    - transformer model verwenden anstatt MLP
-
-    - state of the art per ssh
-
-    - better shell for interactive mode
+    - transformer model maskieren
+    - tree daten aufbereiten für julian
