@@ -2,6 +2,8 @@ import os
 import pickle
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 import pm4py
 
 from typing import List, Dict
@@ -12,6 +14,9 @@ from trace_generator import Event, Case, TraceGenerator
 from tqdm import tqdm 
 
 from main import print_samples
+
+from scipy.stats import norm, truncnorm
+rng = np.random.default_rng(0)
 
 def load_data(folder_name, file_name):
     file_path = os.path.join('processed_data', folder_name, file_name)
@@ -30,12 +35,13 @@ def load_csv_to_df(file_name):
     file_path = os.path.join('raw_data', file_name)
     return pd.read_csv(file_path)
 
-def load_xes_to_df(file_name, folder_name=None):
+def load_xes_to_df(file_name, folder_name=None, num_cases=10000):
     file_path = os.path.join("raw_data", file_name)
     df = pm4py.read_xes(file_path)
     df.rename(columns={'case:concept:name': 'case_id', 'concept:name': 'activity'}, inplace=True)
     columns = ['case_id', 'activity'] + [col for col in df.columns if col not in ['case_id', 'activity']]
     df = df[columns]
+    df = df[df['case_id'].isin(df['case_id'].unique()[:num_cases])]
     df = df.loc[:, ~df.columns.duplicated()]
     df = process_df_timestamps(df)
     if folder_name:
@@ -114,12 +120,13 @@ def create_attribute_pools(df, case_attributes):
     return attribute_pools 
 
 def process_df_timestamps(df):
-    df['time'] = pd.to_datetime(df['time'])
-    df = df.sort_values(by=['case_id', 'time']).reset_index(drop=True)
-    df['time_delta'] = df.groupby('case_id')['time'].diff().dt.total_seconds()
-    df['time_delta'] = df['time_delta'].fillna(0)  # Set time_delta to 0 for the first event in each case
-    df['time_of_day'] = df['time'].dt.hour / 24 + df['time'].dt.minute / 1440 + df['time'].dt.second / 86400
-    df['day_of_week'] = df['time'].dt.dayofweek  # Monday=0, Sunday=6
+    if "time" in df.columns:
+        df['time'] = pd.to_datetime(df['time'])
+        df = df.sort_values(by=['case_id', 'time']).reset_index(drop=True)
+        df['time_delta'] = df.groupby('case_id')['time'].diff().dt.total_seconds()
+        df['time_delta'] = df['time_delta'].fillna(0)  # Set time_delta to 0 for the first event in each case
+        df['time_of_day'] = df['time'].dt.hour / 24 + df['time'].dt.minute / 1440 + df['time'].dt.second / 86400
+        df['day_of_week'] = df['time'].dt.dayofweek  # Monday=0, Sunday=6
     return df
 
 def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
@@ -313,3 +320,160 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
 
     return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices
 
+def enrich_df(df: pd.DataFrame, rules: list, folder_name: str):
+    def generate_value(distribution, rng):
+        """Generates a value based on the specified distribution."""
+        if distribution['type'] == 'discrete':
+            values, weights = zip(*distribution['values'])
+            return rng.choice(values, p=np.array(weights) / sum(weights))
+        elif distribution['type'] == 'normal':
+            mean, std = distribution['mean'], distribution['std']
+            a, b = distribution.get('min', -np.inf), distribution.get('max', np.inf)
+
+            if np.isinf(a) and np.isinf(b):
+                return norm.rvs(loc=mean, scale=std, random_state=rng)
+            else:
+                # Scale the bounds relative to the mean and standard deviation
+                a, b = (a - mean) / std, (b - mean) / std
+                return truncnorm.rvs(a, b, loc=mean, scale=std, random_state=rng)
+        else:
+            raise ValueError("Unsupported distribution type.")
+
+    rng = np.random.default_rng(0)
+
+    # Identify unique cases in the log
+    case_ids = df['case_id'].unique()
+
+    # Initialize a dictionary to hold the generated attributes for each case
+    case_attributes = {rule['attribute']: {} for rule in rules}
+
+    for case_id in tqdm(case_ids, desc="enriching cases"):
+        # Extract events for the current case
+        case_events = df[df['case_id'] == case_id]['activity'].tolist()
+
+        for rule in rules:
+            subsequence = rule['subsequence']
+            attribute = rule['attribute']
+            distribution = rule['distribution']
+
+            # Check if the subsequence is present in the case's events
+            if any(
+                case_events[i:i + len(subsequence)] == subsequence
+                for i in range(len(case_events) - len(subsequence) + 1)
+            ):
+                # Generate a value based on the distribution
+                case_attributes[attribute][case_id] = generate_value(distribution, rng)
+                #print(f"Matched: {subsequence} to {case_attributes[attribute][case_id]}")
+
+    # Add generated attributes as new columns to the DataFrame
+    for attribute, values in case_attributes.items():
+        df[attribute] = df['case_id'].map(values)
+    
+    # plot these for evaluation of the success
+    plot_attributes(df, rules, folder_name)
+
+    return df
+
+def plot_attributes(df: pd.DataFrame, rules: list, folder_name: str):
+
+    img_folder = f"img/{folder_name}"
+    os.makedirs(img_folder, exist_ok=True)
+    # Group by case_id to ensure each case is only counted once
+    grouped = df.groupby('case_id')
+
+    # Collect unique attributes and their rules
+    attribute_rules = {}
+    for rule in rules:
+        attribute = rule['attribute']
+        if attribute not in attribute_rules:
+            attribute_rules[attribute] = []
+        attribute_rules[attribute].append(rule)
+
+    for attribute, rules in attribute_rules.items():
+        # Combine data for the attribute
+        attribute_values = grouped[attribute].first().dropna()
+
+        # Start plotting
+        plt.figure(figsize=(10, 6))
+        sns.set_style("whitegrid")
+
+        # Handle discrete attributes
+        if any(rule['distribution']['type'] == 'discrete' for rule in rules):
+            # Discrete values and their labels
+            discrete_values = []
+            for rule in rules:
+                if rule['distribution']['type'] == 'discrete':
+                    values, _ = zip(*rule['distribution']['values'])
+                    discrete_values.extend(values)
+            discrete_values = list(set(discrete_values))  # Remove duplicates
+
+            # Calculate percentages
+            counts = attribute_values.value_counts(normalize=True).reindex(discrete_values, fill_value=0)
+            counts *= 100  # Convert to percentages
+
+            # Bar plot for discrete attributes
+            sns.barplot(x=counts.index, y=counts.values, palette="viridis", saturation=0.9)
+            plt.title(f"Distribution of {attribute} (Discrete, per Case)", fontsize=16, fontweight="bold")
+            plt.xlabel("Value", fontsize=14)
+            plt.ylabel("Percentage (%)", fontsize=14)
+            plt.xticks(fontsize=12)
+            plt.yticks(fontsize=12)
+            for i, v in enumerate(counts.values):
+                plt.text(i, v + 1, f"{v:.1f}%", ha='center', fontsize=10, fontweight="bold")
+        
+        # Handle continuous attributes
+        elif any(rule['distribution']['type'] == 'normal' for rule in rules):
+            # Calculate number of bins (using Sturges' rule)
+            bins = int(np.ceil(np.log2(len(attribute_values))) + 1)
+
+            # Histogram for continuous attributes
+            sns.histplot(attribute_values, bins=bins, kde=True, color='mediumvioletred', alpha=0.7)
+            plt.title(f"Distribution of {attribute} (Continuous, per Case)", fontsize=16, fontweight="bold")
+            plt.xlabel("Value", fontsize=14)
+            plt.ylabel("Percentage (%)", fontsize=14)
+            plt.xticks(fontsize=12)
+            plt.yticks(fontsize=12)
+
+            # Display percentages on the histogram bars
+            n, bin_edges = np.histogram(attribute_values, bins=bins)
+            percentages = (n / n.sum()) * 100
+            for i in range(len(n)):
+                plt.text(bin_edges[i] + (bin_edges[i+1] - bin_edges[i]) / 2, percentages[i] + 0.5, 
+                         f"{percentages[i]:.1f}%", ha='center', fontsize=10, fontweight="bold")
+
+        else:
+            print(f"Unsupported distribution type for attribute '{attribute}'. Skipping.")
+            continue
+
+        # Add final touches
+        plt.tight_layout()
+        image_path = os.path.join('img', folder_name, f"{attribute}.png")
+        plt.savefig(image_path)
+        plt.show()
+
+
+def mine_bpm(file_name, folder_name):
+    print("Mining BPM...")
+    pd.set_option('display.max_columns', None)
+    file_path = os.path.join("raw_data", file_name)
+    data_df = pm4py.read_xes(file_path)
+    output_dir = os.path.join("img", folder_name)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # the log is filtered on the top 5 variants
+    data_df = pm4py.filter_variants_top_k(data_df, 15)
+
+    # a directly - follows graph (DFG) is discovered from the log
+    dfg, start_activities, end_activities = pm4py.discover_dfg(data_df)
+
+    # a process tree is discovered using the inductive miner
+    process_tree = pm4py.discover_process_tree_inductive(data_df)
+    # the process tree is converted to an accepting Petri net
+    petri_net, initial_marking, final_marking = pm4py.convert_to_petri_net(process_tree)
+    process_tree = pm4py.discover_process_tree_inductive(data_df)
+    # the accepting Petri net is converted to a BPMN diagram
+    bpmn_diagram = pm4py.convert_to_bpmn(petri_net, initial_marking, final_marking )
+
+    pm4py.save_vis_dfg(dfg, start_activities, end_activities, os.path.join(output_dir, "dfg.png"), format='png')
+    pm4py.save_vis_bpmn(bpmn_diagram, os.path.join(output_dir, "bpmn.png"), format='png')
+    print("--------------------------------------------------------------------------------------------------")

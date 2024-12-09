@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  4 DEC 2024 12:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  5 DEC 2024 17:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1190,7 +1190,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [9] [10]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [11]) (./content/chapter-concepts.tex [12]
+ [11]) (./content/chapter-background.tex [12]
 chapter 3.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1329,7 +1329,7 @@ Package logreq Info: Writing requests to 'thesis-example.run.xml'.
  ) 
 Here is how much of TeX's memory you used:
  27787 strings out of 474166
- 507594 string characters out of 5749518
+ 507610 string characters out of 5749518
  1935542 words of memory out of 5000000
  49437 multiletter control sequences out of 15000+600000
  677779 words of font info for 200 fonts, out of 8000000 for 9000

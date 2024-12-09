@@ -142,8 +142,9 @@ def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
 
 def train_sklearn_dt(X_train, y_train):
     print("training decision tree:")
-    #dt = SklearnDecisionTreeClassifier(max_depth=15, min_samples_leaf=5)
-    dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5, ccp_alpha=0.01)
+    #dt = SklearnDecisionTreeClassifier(max_depth=10)
+    #dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5)
+    dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5, ccp_alpha=0.001)
     dt.fit(X_train, y_train)
     print("--------------------------------------------------------------------------------------------------")
     return dt
@@ -327,6 +328,134 @@ def print_samples(n, X, y, class_names, feature_names, numerical_attributes):
         target_activity = class_names[np.argmax(y[i])]
         print(f"Sample {i}: Features: {', '.join(active_features)}, Target: {target_activity}")
 
+def get_rules(folder_name):
+    rules = []
+
+    if folder_name == "hb_enriched":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 40,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 50,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 85,
+                    'std': 5,
+                    'min': 20,
+                    'max': 100
+                }
+            }
+        ]
+    if folder_name == "hb_enriched_gender":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.6995), ("female", 0.2995), ("non conforming", 0.001)]
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.295), ("female", 0.695), ("non conforming", 0.01)]
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.1), ("female", 0.1), ("non conforming", 0.8)]
+                }
+            },
+        ]
+    if folder_name == "cc_enriched":
+        rules = [
+            {
+                'subsequence': ['refuse screening'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.4), ("female", 0.6)]
+                }
+            },
+            {
+                'subsequence': ['prostate screening'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 1), ("female", 0)]
+                }
+            },
+            {
+                'subsequence': ['mammary screening'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0), ("female", 1)]
+                }
+            },
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 40,
+                    'std': 15,
+                    'min': 20,
+                    'max': 100
+                }
+            },
+            {
+                'subsequence': ['explain diagnosis'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 50,
+                    'std': 15,
+                    'min': 20,
+                    'max': 100
+                }
+            },
+            {
+                'subsequence': ['inform prevention'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 30,
+                    'std': 15,
+                    'min': 20,
+                    'max': 100
+                }
+            }
+        ]
+         
+    return rules
 
 def get_attributes(folder_name):
     categorical_attributes = ["day_of_week"]
@@ -335,9 +464,18 @@ def get_attributes(folder_name):
     if folder_name == "cc_n":
         categorical_attributes = ["gender"]
         numerical_attributes = ["age"]
+    elif folder_name == "hb":
+        categorical_attributes = []
+        numerical_attributes = []
     elif folder_name == "hb_enriched":
+        categorical_attributes = []
+        numerical_attributes = ["age"]
+    elif folder_name == "hb_enriched_gender":
         categorical_attributes = ["gender"]
         numerical_attributes = []
+    elif folder_name == "cc_enriched":
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["age"]
     elif "hiring" in folder_name:
         categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
         numerical_attributes += ["case:age", "case:yearsOfEducation"]
@@ -356,6 +494,7 @@ def get_attributes(folder_name):
 
 def get_critical_decisions(folder_name):
     critical_decisions = []
+
     if "hiring" in folder_name:
         critical_decisions.append(Decision(attributes=["case:age", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Application Rejected"], to_remove=True))
         critical_decisions.append(Decision(attributes=["case:yearsOfEducation"], possible_events=["Application Rejected"], to_remove=False))
@@ -365,33 +504,45 @@ def get_critical_decisions(folder_name):
     elif "cc_n" in folder_name:
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
+    elif "cc_enriched" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
+    elif "hb_enriched_gender" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
+    elif "hb_enriched" in folder_name:
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
     
     return critical_decisions
 
 
 # generates and or processes the data
-def run_preprocessing(folder_name, file_name=None, model_name=None, n_gram=3, num_cases=1000):
+def run_preprocessing(folder_name, file_name=None, model_name=None, n_gram=3, num_cases=10000, enrichment=False):
     if model_name:
         X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram)
     elif file_name:
-        df = load_xes_to_df(file_name, folder_name=folder_name)
+        df = load_xes_to_df(file_name, folder_name=folder_name, num_cases=num_cases)
+        if enrichment:
+            run_enrichment(folder_name)
+            df = load_data(folder_name, "df.pkl")
         categorical_attributes, numerical_attributes = get_attributes(folder_name)
         X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
     else:
+        if enrichment:
+            run_enrichment(folder_name)
         df = load_data(folder_name, "df.pkl")
         categorical_attributes, numerical_attributes = get_attributes(folder_name)
         X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
 
-    if folder_name:
-        save_data(X_train, folder_name, 'X_train.pkl')
-        save_data(X_test, folder_name, 'X_test.pkl')
-        save_data(y_train, folder_name, 'y_train.pkl')
-        save_data(y_test, folder_name, 'y_test.pkl')
-        y_encoded = np.argmax(y_train, axis=1)
-        save_data(y_encoded, folder_name, 'y_encoded.pkl')
-        save_data(class_names, folder_name, "class_names.pkl")
-        save_data(feature_names, folder_name, "feature_names.pkl")
-        save_data(feature_indices, folder_name, "feature_indices.pkl")
+    save_data(X_train, folder_name, 'X_train.pkl')
+    save_data(X_test, folder_name, 'X_test.pkl')
+    save_data(y_train, folder_name, 'y_train.pkl')
+    save_data(y_test, folder_name, 'y_test.pkl')
+    y_encoded = np.argmax(y_train, axis=1)
+    save_data(y_encoded, folder_name, 'y_encoded.pkl')
+    save_data(class_names, folder_name, "class_names.pkl")
+    save_data(feature_names, folder_name, "feature_names.pkl")
+    save_data(feature_indices, folder_name, "feature_indices.pkl")
 
 
 def run_train_base(folder_name, console_output=True):
@@ -437,9 +588,11 @@ def run_unfair_data_preset():
 
 
 # executes the complete pipeline
-def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cases=1000, preprocessing=False):
-    if preprocessing:
-        run_preprocessing(folder_name, model_name=model_name, file_name=file_name, n_gram=n_gram, num_cases=num_cases)
+def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cases=1000, preprocessing=False, train_base=False, enrichment=False):
+    if preprocessing or enrichment:
+        run_preprocessing(folder_name, model_name=model_name, file_name=file_name, n_gram=n_gram, num_cases=num_cases, enrichment=enrichment)
+        run_train_base(folder_name=folder_name, console_output=False)
+    elif train_base:
         run_train_base(folder_name=folder_name, console_output=False)
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
@@ -452,10 +605,11 @@ def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cas
     evaluate_dt(dt_distilled, X_test, y_test)
     print(f"Critical Decisions: {critical_decisions}")
     nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
-    print(f"Nodes to remove accordingly: {nodes_to_remove}")
-    print("--------------------------------------------------------------------------------------------------")
-    run_modify(folder_name, node_ids=nodes_to_remove, console_output=False)
-    run_finetuning(folder_name, console_output=False)
+    if nodes_to_remove:
+        print(f"Nodes to remove accordingly: {nodes_to_remove}")
+        print("--------------------------------------------------------------------------------------------------")
+        run_modify(folder_name, node_ids=nodes_to_remove, console_output=False)
+        run_finetuning(folder_name, console_output=False)
     print("Pipeline done, running analysis...")
     print("--------------------------------------------------------------------------------------------------")
     run_analysis(folder_name)
@@ -571,8 +725,10 @@ def run_modify(folder_name, node_ids=[], console_output=True):
     save_data(y_encoded, folder_name, "y_modified.pkl")
 
 
-def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, preprocessing=False):
-    run_transformer("cc_n")
+def run_demo(folder_name, n_gram=2, num_cases=1000, preprocessing=False):
+    #run_transformer(folder_name)
+    mine_bpm("hospital_billing", "hb_enriched")
+    #run_enrichment(folder_name)
     #run_unfair_data_preset()
     sys.exit()
     #df = load_xes_to_df("hospital_billing")
@@ -594,6 +750,14 @@ def run_demo(folder_name="cc_n", n_gram=2, num_cases=1000, preprocessing=False):
     print("Base model:")
     evaluate_nn(nn, X_test, y_test)
     evaluate_dt(dt_distilled, X_test, y_test)
+
+def run_enrichment(folder_name):
+    print("Running enrichment...")
+    df = load_data(folder_name, "df.pkl")
+    rules = get_rules(folder_name)
+    df = enrich_df(df, rules, folder_name)
+    print(df.head(20))
+    save_data(df, folder_name, "df.pkl")
 
 def run_transformer(folder_name):
     #df = load_xes_to_df("hospital_billing")
@@ -743,12 +907,16 @@ def main():
     parser.add_argument('--model_name', type=str, default=None, help='Name of the model to use (default: None)')
     parser.add_argument('--file_name', type=str, default=None, help='Name of the file to use (default: None)')
     parser.add_argument('--folder_name', type=str, default=None, help='Name of the folder to use (default: same as model_name)')
-    parser.add_argument('--mode', choices=['a', 'c', 'd', 'f', 'i', 'm', 'p', 't'], default='c',
+    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'i', 'm', 'p', 't'], default='c',
                         help="Choose 'complete' to run full pipeline or 'preprocessed' to use preprocessed data (default: complete)")
     parser.add_argument('--n_gram', type=int, default=3, help='Value for n-gram (default: 3)')
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
     parser.add_argument('--no-save', dest='save', action='store_false', 
                         help='Disable saving the results (default: results will be saved)')
+    parser.add_argument('--e', dest='enrichment', action='store_true', 
+                        help='Enrich original data')
+    parser.add_argument('--t', dest='train_base', action='store_true', 
+                        help='Enrich original data')
     parser.add_argument('--p', dest='preprocessing', action='store_true', 
                         help='Generate new data')
     parser.add_argument("node_ids", type=int, nargs="*", help="List of node_ids")
@@ -760,9 +928,11 @@ def main():
     if args.mode == 'a':
         run_analysis(args.folder_name)
     elif args.mode == 'c':
-        run_complete(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing)
+        run_complete(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing, train_base=args.train_base, enrichment=args.enrichment)
     elif args.mode == 'd':
         run_demo(args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing)
+    elif args.mode == 'e':
+        run_enrichment(args.folder_name)
     elif args.mode == 'f':
         run_finetuning(args.folder_name)
     elif args.mode == 'i':
