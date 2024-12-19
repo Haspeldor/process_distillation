@@ -15,14 +15,22 @@ grundlagenkapitel: 10-20 seiten
 ansatz: vergleich mit debiasing und related work
     - siehe auch deren referenzen
 
-event log charakteristiken:
-    - verteilung timestamps in histogram
-    - menge/häufung activities 
-    - länge traces 
-
 aknowledgements:
     - personen und chatgpt angeben
 
 todo:
     - transformer model maskieren
-    - tree daten aufbereiten für julian
+    - shapley score untersuchen
+
+besprechen:
+    - korrelierte attribute
+    - log mit mehreren entscheidungen
+    - shapley
+        - aufwwändig zu berechnen
+        - geht für geringe effekte verloren
+
+
+60 seiten richtlinie
+    - 20 methodology
+    - 10 evaluation
+    - 10 basics und related work

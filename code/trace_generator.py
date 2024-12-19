@@ -102,7 +102,6 @@ class TraceGenerator:
     noise_attribute: float = 0.000
 
     def generate_traces(self, start_time: datetime = datetime.now(), num_cases: int = 1000, max_steps: int = 100) -> List[Case]:
-        random.seed(0)
         cases = []
         for _ in tqdm(range(num_cases), desc="generating data"):
             case = self.generate_case()
@@ -385,3 +384,362 @@ def build_process_model(model_name) -> ProcessModel:
     print(process_model)
     print("--------------------------------------------------------------------------------------------------")
     return process_model
+
+def get_rules(folder_name):
+    rules = []
+
+    if folder_name == "hb_-age_-gender":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 45,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': [],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.495), ("female", 0.495), ("non conforming", 0.01)]
+                }
+            },
+        ]
+    elif folder_name == "hb_-age_+gender":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 45,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': [],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.6995), ("female", 0.2995), ("non conforming", 0.001)]
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.295), ("female", 0.695), ("non conforming", 0.01)]
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.1), ("female", 0.1), ("non conforming", 0.8)]
+                }
+            },
+        ]
+    elif folder_name == "hb_+age_-gender":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 40,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 50,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 85,
+                    'std': 5,
+                    'min': 20,
+                    'max': 100
+                }
+            },
+            {
+                'subsequence': [],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.495), ("female", 0.495), ("non conforming", 0.01)]
+                }
+            },
+        ]
+    elif folder_name == "hb_+age_+gender":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 40,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 50,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 85,
+                    'std': 5,
+                    'min': 20,
+                    'max': 100
+                }
+            },
+            {
+                'subsequence': [],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.6995), ("female", 0.2995), ("non conforming", 0.001)]
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.295), ("female", 0.695), ("non conforming", 0.01)]
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.1), ("female", 0.1), ("non conforming", 0.8)]
+                }
+            },
+        ]
+    elif folder_name == "hb_enriched":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 40,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 50,
+                    'std': 10,
+                    'min': 20,
+                    'max': 85
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 85,
+                    'std': 5,
+                    'min': 20,
+                    'max': 100
+                }
+            }
+        ]
+    elif folder_name == "hb_enriched_gender":
+        rules = [
+            {
+                'subsequence': [],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.6995), ("female", 0.2995), ("non conforming", 0.001)]
+                }
+            },
+            {
+                'subsequence': ['CHANGE DIAGN'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.295), ("female", 0.695), ("non conforming", 0.01)]
+                }
+            },
+            {
+                'subsequence': ['CODE NOK'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.1), ("female", 0.1), ("non conforming", 0.8)]
+                }
+            },
+        ]
+    elif folder_name == "cc_enriched":
+        rules = [
+            {
+                'subsequence': ['refuse screening'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.4), ("female", 0.6)]
+                }
+            },
+            {
+                'subsequence': ['prostate screening'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 1), ("female", 0)]
+                }
+            },
+            {
+                'subsequence': ['mammary screening'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0), ("female", 1)]
+                }
+            },
+            {
+                'subsequence': [],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 40,
+                    'std': 15,
+                    'min': 20,
+                    'max': 100
+                }
+            },
+            {
+                'subsequence': ['explain diagnosis'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 50,
+                    'std': 15,
+                    'min': 20,
+                    'max': 100
+                }
+            },
+            {
+                'subsequence': ['inform prevention'],
+                'attribute': 'age',
+                'distribution': {
+                    'type': 'normal',
+                    'mean': 30,
+                    'std': 15,
+                    'min': 20,
+                    'max': 100
+                }
+            }
+        ]
+         
+    return rules
+
+def get_attributes(folder_name):
+    categorical_attributes = ["day_of_week"]
+    numerical_attributes = ["time_delta", "time_of_day"]
+
+    if folder_name == "cc_n":
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["age"]
+    elif folder_name == "hb":
+        categorical_attributes = []
+        numerical_attributes = []
+    elif folder_name == "hb_enriched":
+        categorical_attributes = []
+        numerical_attributes = ["age"]
+    elif folder_name == "hb_enriched_gender":
+        categorical_attributes = ["gender"]
+        numerical_attributes = []
+    elif folder_name == "cc_enriched":
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["age"]
+    elif "hb_" in folder_name:
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["age"]
+    elif "hiring" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
+        numerical_attributes += ["case:age", "case:yearsOfEducation"]
+    elif "hospital" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:private_insurance", "case:underlying_condition"]
+        numerical_attributes += ["case:age"]
+    elif "lending" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
+        numerical_attributes += ["case:age", "case:yearsOfEducation", "case:CreditScore"]
+    elif "renting" in folder_name:
+        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:married"]
+        numerical_attributes += ["case:age", "case:yearsOfEducation"]
+
+    return categorical_attributes, numerical_attributes
+
+
+def get_critical_decisions(folder_name):
+    critical_decisions = []
+
+    if "hiring" in folder_name:
+        critical_decisions.append(Decision(attributes=["case:age", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Application Rejected"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["case:yearsOfEducation"], possible_events=["Application Rejected"], to_remove=False))
+    elif "hospital" in folder_name:
+        critical_decisions.append(Decision(attributes=["case:private_insurance", "case:underlying_condition", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Expert Examination"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["case:age"], possible_events=["Expert Examination"], to_remove=False))
+    elif "cc_n" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
+    elif "cc_enriched" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
+    elif "hb_enriched_gender" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
+    elif "hb_enriched" in folder_name:
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+    elif "hb_" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
+    
+    return critical_decisions

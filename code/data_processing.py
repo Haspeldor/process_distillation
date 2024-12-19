@@ -16,7 +16,6 @@ from tqdm import tqdm
 from main import print_samples
 
 from scipy.stats import norm, truncnorm
-rng = np.random.default_rng(0)
 
 def load_data(folder_name, file_name):
     file_path = os.path.join('processed_data', folder_name, file_name)
@@ -62,7 +61,9 @@ def generate_processed_data(process_model, categorical_attributes=[], numerical_
 
     print("processing nn data:")
     df = cases_to_dataframe(cases)
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram, folder_name=folder_name)
+    save_data(df, folder_name, "df.pkl")
+    
+    X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram, folder_name=folder_name)
     print("--------------------------------------------------------------------------------------------------")
     if folder_name:
         save_data(X_train, folder_name, 'X_train.pkl')
@@ -315,10 +316,7 @@ def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folde
     print("example nn outputs:")
     print(y[:n])
 
-    # Split into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
-
-    return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices
+    return X, y, class_names, feature_names, feature_indices
 
 def enrich_df(df: pd.DataFrame, rules: list, folder_name: str):
     def generate_value(distribution, rng):
@@ -339,7 +337,7 @@ def enrich_df(df: pd.DataFrame, rules: list, folder_name: str):
         else:
             raise ValueError("Unsupported distribution type.")
 
-    rng = np.random.default_rng(0)
+    rng = np.random.default_rng()
 
     # Identify unique cases in the log
     case_ids = df['case_id'].unique()
@@ -374,9 +372,84 @@ def enrich_df(df: pd.DataFrame, rules: list, folder_name: str):
 
     return df
 
+def plot_shapley(enriched_accuracy_values, modified_accuracy_values, folder_name, file_name):
+    img_folder = os.path.join("img", folder_name)
+    os.makedirs(img_folder, exist_ok=True)
+    
+    data = {
+        'Enriched': np.array(enriched_accuracy_values),
+        'Modified': np.array(modified_accuracy_values)
+    }
+    
+    # Calculate mean and standard deviation
+    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
+    print("Accuracy Statistics:")
+    for name, (mean, std) in stats.items():
+        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
+    for i, (name, values) in enumerate(data.items()):
+        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.2f}, σ={stats[name][1]:.3f})',
+                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
+    
+    # Add titles and labels
+    plt.title(f'Shapley Score of {folder_name}', fontsize=16, fontweight='bold')
+    plt.xlabel('Shapley', fontsize=14)
+    plt.ylabel('Density', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
+    
+    # Save the plot
+    plt.tight_layout()
+    image_path = os.path.join('img', folder_name, file_name)
+    plt.savefig(image_path)
+    plt.close()
+
+def plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name):
+    img_folder = os.path.join("img", folder_name)
+    os.makedirs(img_folder, exist_ok=True)
+    
+    data = {
+        'Base': np.array(base_accuracy_values),
+        'Enriched': np.array(enriched_accuracy_values),
+        'Modified': np.array(modified_accuracy_values)
+    }
+    
+    # Calculate mean and standard deviation
+    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
+    print("Accuracy Statistics:")
+    for name, (mean, std) in stats.items():
+        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
+    for i, (name, values) in enumerate(data.items()):
+        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.2f}, σ={stats[name][1]:.3f})',
+                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
+    
+    # Add titles and labels
+    plt.title(f'Accuracy Distribution of {folder_name}', fontsize=16, fontweight='bold')
+    plt.xlabel('Accuracy', fontsize=14)
+    plt.ylabel('Density', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
+    
+    # Save the plot
+    plt.tight_layout()
+    image_path = os.path.join('img', folder_name, f"accuracy.png")
+    plt.savefig(image_path)
+    plt.close()
+
 def plot_attributes(df: pd.DataFrame, rules: list, folder_name: str):
 
-    img_folder = f"img/{folder_name}"
+    img_folder = os.path.join("img", folder_name)
     os.makedirs(img_folder, exist_ok=True)
     # Group by case_id to ensure each case is only counted once
     grouped = df.groupby('case_id')
@@ -449,7 +522,7 @@ def plot_attributes(df: pd.DataFrame, rules: list, folder_name: str):
         plt.tight_layout()
         image_path = os.path.join('img', folder_name, f"{attribute}.png")
         plt.savefig(image_path)
-        plt.show()
+        plt.close()
 
 
 def mine_bpm(file_name, folder_name):

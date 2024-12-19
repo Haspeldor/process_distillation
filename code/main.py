@@ -4,6 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import numpy as np
 import time
 import sys
+import shap
 from datetime import datetime
 import argparse
 
@@ -37,8 +38,8 @@ def generate_data(num_cases, model_name, n_gram):
     process_model = build_process_model(model_name)
     folder_name = model_name
     categorical_attributes, numerical_attributes = get_attributes(folder_name)
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_processed_data(process_model, categorical_attributes=categorical_attributes, numerical_attributes=numerical_attributes, num_cases=num_cases, n_gram=n_gram, folder_name=folder_name)
-    return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions
+    X, y, class_names, feature_names, feature_indices, critical_decisions = generate_processed_data(process_model, categorical_attributes=categorical_attributes, numerical_attributes=numerical_attributes, num_cases=num_cases, n_gram=n_gram, folder_name=folder_name)
+    return X, y, class_names, feature_names, feature_indices, critical_decisions
 
 # define neural network architecture
 def build_nn(input_dim, output_dim):
@@ -196,6 +197,7 @@ def evaluate_nn(model, X_test, y_test):
     test_loss, test_accuracy = model.evaluate(X_test, y_test)
     print(f'accuracy: {test_accuracy:.2f}, loss: {test_loss:.2f}')
     print("--------------------------------------------------------------------------------------------------")
+    return test_accuracy
 
 def print_metrics_nn(nn, dt, X, node_ids):
     class_names = dt.class_names
@@ -228,6 +230,33 @@ def calculate_fairness(nn, X, critical_decisions, feature_indices, class_names, 
                 for metric in metrics:
                     print(metric)
                 print("")
+
+def calculate_shapley_scores(model, X, relevant_attributes, feature_names, background_size=1000):
+    # Verify that relevant attributes are in feature_names
+    assert all(attr in feature_names for attr in relevant_attributes), "Relevant attributes must exist in feature names."
+
+    # Map relevant attributes to their indices in X
+    relevant_indices = [feature_names.index(attr) for attr in relevant_attributes]
+
+    if X.shape[0] > background_size:
+        X = X[np.random.choice(X.shape[0], size=background_size, replace=False), :]
+
+    # Initialize SHAP DeepExplainer
+    explainer = shap.DeepExplainer(model, X)
+
+    # Compute SHAP values
+    shap_values = explainer.shap_values(X)  # Returns a list of arrays (one for each output class)
+
+    # For simplicity, aggregate shap values across all classes (sum of absolute values)
+    if isinstance(shap_values, list):  # If multiple outputs
+        shap_values = np.sum(np.abs(np.array(shap_values)), axis=0)
+
+    # Extract Shapley scores for relevant attributes
+    shapley_scores = {}
+    for i, idx in enumerate(relevant_indices):
+        shapley_scores[relevant_attributes[i]] = np.mean(np.abs(shap_values[:, idx]))
+
+    return shapley_scores
 
 def evaluate_dt(dt, X_test, y_test):
     print("testing dt:")
@@ -328,211 +357,27 @@ def print_samples(n, X, y, class_names, feature_names, numerical_attributes):
         target_activity = class_names[np.argmax(y[i])]
         print(f"Sample {i}: Features: {', '.join(active_features)}, Target: {target_activity}")
 
-def get_rules(folder_name):
-    rules = []
-
-    if folder_name == "hb_enriched":
-        rules = [
-            {
-                'subsequence': [],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 40,
-                    'std': 10,
-                    'min': 20,
-                    'max': 85
-                }
-            },
-            {
-                'subsequence': ['CHANGE DIAGN'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 50,
-                    'std': 10,
-                    'min': 20,
-                    'max': 85
-                }
-            },
-            {
-                'subsequence': ['CODE NOK'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 85,
-                    'std': 5,
-                    'min': 20,
-                    'max': 100
-                }
-            }
-        ]
-    if folder_name == "hb_enriched_gender":
-        rules = [
-            {
-                'subsequence': [],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.6995), ("female", 0.2995), ("non conforming", 0.001)]
-                }
-            },
-            {
-                'subsequence': ['CHANGE DIAGN'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.295), ("female", 0.695), ("non conforming", 0.01)]
-                }
-            },
-            {
-                'subsequence': ['CODE NOK'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.1), ("female", 0.1), ("non conforming", 0.8)]
-                }
-            },
-        ]
-    if folder_name == "cc_enriched":
-        rules = [
-            {
-                'subsequence': ['refuse screening'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.4), ("female", 0.6)]
-                }
-            },
-            {
-                'subsequence': ['prostate screening'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 1), ("female", 0)]
-                }
-            },
-            {
-                'subsequence': ['mammary screening'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0), ("female", 1)]
-                }
-            },
-            {
-                'subsequence': [],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 40,
-                    'std': 15,
-                    'min': 20,
-                    'max': 100
-                }
-            },
-            {
-                'subsequence': ['explain diagnosis'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 50,
-                    'std': 15,
-                    'min': 20,
-                    'max': 100
-                }
-            },
-            {
-                'subsequence': ['inform prevention'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 30,
-                    'std': 15,
-                    'min': 20,
-                    'max': 100
-                }
-            }
-        ]
-         
-    return rules
-
-def get_attributes(folder_name):
-    categorical_attributes = ["day_of_week"]
-    numerical_attributes = ["time_delta", "time_of_day"]
-
-    if folder_name == "cc_n":
-        categorical_attributes = ["gender"]
-        numerical_attributes = ["age"]
-    elif folder_name == "hb":
-        categorical_attributes = []
-        numerical_attributes = []
-    elif folder_name == "hb_enriched":
-        categorical_attributes = []
-        numerical_attributes = ["age"]
-    elif folder_name == "hb_enriched_gender":
-        categorical_attributes = ["gender"]
-        numerical_attributes = []
-    elif folder_name == "cc_enriched":
-        categorical_attributes = ["gender"]
-        numerical_attributes = ["age"]
-    elif "hiring" in folder_name:
-        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
-        numerical_attributes += ["case:age", "case:yearsOfEducation"]
-    elif "hospital" in folder_name:
-        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:private_insurance", "case:underlying_condition"]
-        numerical_attributes += ["case:age"]
-    elif "lending" in folder_name:
-        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
-        numerical_attributes += ["case:age", "case:yearsOfEducation", "case:CreditScore"]
-    elif "renting" in folder_name:
-        categorical_attributes += ["case:citizen", "case:german speaking", "case:gender", "case:married"]
-        numerical_attributes += ["case:age", "case:yearsOfEducation"]
-
-    return categorical_attributes, numerical_attributes
-
-
-def get_critical_decisions(folder_name):
-    critical_decisions = []
-
-    if "hiring" in folder_name:
-        critical_decisions.append(Decision(attributes=["case:age", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Application Rejected"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["case:yearsOfEducation"], possible_events=["Application Rejected"], to_remove=False))
-    elif "hospital" in folder_name:
-        critical_decisions.append(Decision(attributes=["case:private_insurance", "case:underlying_condition", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Expert Examination"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["case:age"], possible_events=["Expert Examination"], to_remove=False))
-    elif "cc_n" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
-    elif "cc_enriched" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
-    elif "hb_enriched_gender" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
-    elif "hb_enriched" in folder_name:
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
-    
-    return critical_decisions
-
 
 # generates and or processes the data
 def run_preprocessing(folder_name, file_name=None, model_name=None, n_gram=3, num_cases=10000, enrichment=False):
     if model_name:
-        X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram)
+        print(model_name)
+        X, y, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram)
     elif file_name:
         df = load_xes_to_df(file_name, folder_name=folder_name, num_cases=num_cases)
         if enrichment:
             run_enrichment(folder_name)
             df = load_data(folder_name, "df.pkl")
         categorical_attributes, numerical_attributes = get_attributes(folder_name)
-        X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+        X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     else:
         if enrichment:
             run_enrichment(folder_name)
         df = load_data(folder_name, "df.pkl")
         categorical_attributes, numerical_attributes = get_attributes(folder_name)
-        X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+        X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     save_data(X_train, folder_name, 'X_train.pkl')
     save_data(X_test, folder_name, 'X_test.pkl')
@@ -724,32 +569,91 @@ def run_modify(folder_name, node_ids=[], console_output=True):
     y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
     save_data(y_encoded, folder_name, "y_modified.pkl")
 
+def run_demo(folder_name, n_gram=3, num_cases=1000, preprocessing=False):
+    male_shapley_scores = load_data(folder_name, "male_shapley_scores.pkl")
+    female_shapley_scores = load_data(folder_name, "female_shapley_scores.pkl")
+    male_shapley_scores_modified = load_data(folder_name, "male_shapley_scores_modified.pkl")
+    female_shapley_scores_modified = load_data(folder_name, "female_shapley_scores_modified.pkl")
+    plot_shapley(male_shapley_scores, male_shapley_scores_modified, folder_name, "shapley_male.png")
+    plot_shapley(female_shapley_scores, female_shapley_scores_modified, folder_name, "shapley_female.png")
 
-def run_demo(folder_name, n_gram=2, num_cases=1000, preprocessing=False):
-    #run_transformer(folder_name)
-    mine_bpm("hospital_billing", "hb_enriched")
-    #run_enrichment(folder_name)
-    #run_unfair_data_preset()
-    sys.exit()
-    #df = load_xes_to_df("hospital_billing")
-    #process_model = build_process_model(folder_name)
-    #trace_generator = TraceGenerator(process_model=process_model)
-    #generated_cases = trace_generator.generate_traces(start_time=datetime.now(), num_cases=num_cases)
-    #df = cases_to_dataframe(generated_cases)
-    folder_name = "hb_high"
-    file_name = "hospital_log_high.xes"
-    run_xes_preprocessing(file_name, folder_name=folder_name)
+def run_shapley(folder_name, n_gram=3):
+    feature_names = load_data(folder_name, "feature_names.pkl")
+    enriched_accuracy_values = []
+    modified_accuracy_values = []
+    male_shapley_scores = []
+    female_shapley_scores = []
+    male_shapley_scores_modified = []
+    female_shapley_scores_modified = []
     df = load_data(folder_name, "df.pkl")
-    print(df.head(20))
-    X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices = process_df(df, ["case:gender", "case:citizen", "case:private_insurance", "case:german speaking"], ["case:age"], folder_name="hb_high")
-    nn = train_nn(X_train, y_train, folder_name=folder_name)
-    y_distilled = distill_nn(nn, X_train)
-    print("y_distilled")
-    print(y_distilled.shape)
-    dt_distilled = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
-    print("Base model:")
-    evaluate_nn(nn, X_test, y_test)
-    evaluate_dt(dt_distilled, X_test, y_test)
+    categorical_attributes, numerical_attributes = get_attributes(folder_name)
+    critical_decisions = get_critical_decisions(folder_name)
+    X_enriched, y_enriched, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+
+    for _ in tqdm(range(10), desc="evaluating model:"):
+        # evaluating the enriched model
+        X_train, X_test, y_train, y_test = train_test_split(X_enriched, y_enriched, test_size=0.3)
+        nn = train_nn(X_train, y_train)
+        y_distilled = distill_nn(nn, X_train)
+        dt_distilled = train_dt(X_train, y_distilled, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+        enriched_accuracy = evaluate_nn(nn, X_test, y_test)
+        enriched_accuracy_values.append(enriched_accuracy)
+        shapley_scores = calculate_shapley_scores(nn, X_test, feature_names, feature_names)
+        male_shapley_score = shapley_scores["gender = male"]
+        female_shapley_score = shapley_scores["gender = female"]
+        male_shapley_scores.append(male_shapley_score)
+        female_shapley_scores.append(female_shapley_score)
+
+        # modifying the distilled model
+        nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+        if nodes_to_remove:
+            print(f"Removing nodes: {nodes_to_remove}")
+            for node_id in nodes_to_remove:
+                dt_distilled.delete_branch(node_id)
+            y_modified = dt_distilled.predict(X_train)
+            y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
+
+            # finetuning and evaluating the changed model
+            nn_modified = finetune_nn(nn, X_train, y_encoded, y_train=y_train, mode="changed")
+            modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
+            shapley_scores = calculate_shapley_scores(nn_modified, X_test, feature_names, feature_names)
+            male_shapley_score_modified = shapley_scores["gender = male"]
+            female_shapley_score_modified = shapley_scores["gender = female"]
+        else:
+            print(f"No nodes to remove!")
+            male_shapley_score_modified = male_shapley_score
+            female_shapley_score_modified = female_shapley_score
+            modified_accuracy = enriched_accuracy
+
+        male_shapley_scores_modified.append(male_shapley_score_modified)
+        female_shapley_scores_modified.append(female_shapley_score_modified)
+        modified_accuracy_values.append(modified_accuracy)
+
+        print(f"enriched accuracy: {enriched_accuracy}, modified accuracy: {modified_accuracy}")
+        print(f"male shapley score: {male_shapley_score}, female shapley score: {female_shapley_score}")
+        print(f"male shapley score: {male_shapley_score_modified}, female shapley score: {female_shapley_score_modified}")
+        print("--------------------------------------------------------------------------------------------------")
+
+    save_data(male_shapley_scores, folder_name, "male_shapley_scores.pkl")
+    save_data(female_shapley_scores, folder_name, "female_shapley_scores.pkl")
+    save_data(male_shapley_scores_modified, folder_name, "male_shapley_scores_modified.pkl")
+    save_data(female_shapley_scores_modified, folder_name, "female_shapley_scores_modified.pkl")
+    save_data(enriched_accuracy_values, folder_name, "enriched_accuracy_values.pkl")
+    save_data(modified_accuracy_values, folder_name, "modified_accuracy_values.pkl")
+    plot_shapley(male_shapley_scores, male_shapley_scores_modified, folder_name, "shapley_male.png")
+    plot_shapley(female_shapley_scores, female_shapley_scores_modified, folder_name, "shapley_female.png")
+
+
+
+def run_4_cases():
+    #folder_names = ["hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender"]
+    folder_names = ["hb_-age_+gender"]
+
+    for folder_name in folder_names:
+        load_xes_to_df("hospital_billing", folder_name=folder_name)
+        run_enrichment(folder_name)
+        run_evaluate(folder_name)
+
 
 def run_enrichment(folder_name):
     print("Running enrichment...")
@@ -873,6 +777,57 @@ def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, preprocessing=Fal
     print("Transformed distilled DT:")
     evaluate_dt(dt_transformed, X_test, y_test)
 
+def run_evaluate(folder_name, iterations=10, n_gram=3):
+    base_accuracy_values = []
+    enriched_accuracy_values = []
+    modified_accuracy_values = []
+    df = load_data(folder_name, "df.pkl")
+    categorical_attributes, numerical_attributes = get_attributes(folder_name)
+    critical_decisions = get_critical_decisions(folder_name)
+    X_base, y_base, class_names, feature_names, feature_indices = process_df(df, [], [], n_gram=n_gram)
+    X_enriched, y_enriched, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+
+    for _ in tqdm(range(iterations), desc="evaluating model:"):
+        # evaluating the base model
+        X_train, X_test, y_train, y_test = train_test_split(X_base, y_base, test_size=0.3)
+        nn = train_nn(X_train, y_train)
+        base_accuracy = evaluate_nn(nn, X_test, y_test)
+        base_accuracy_values.append(base_accuracy)
+
+        # evaluating the enriched model
+        X_train, X_test, y_train, y_test = train_test_split(X_enriched, y_enriched, test_size=0.3)
+        nn = train_nn(X_train, y_train)
+        y_distilled = distill_nn(nn, X_train)
+        dt_distilled = train_dt(X_train, y_distilled, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+        enriched_accuracy = evaluate_nn(nn, X_test, y_test)
+        enriched_accuracy_values.append(enriched_accuracy)
+
+        # modifying the distilled model
+        nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+        if nodes_to_remove:
+            print(f"Removing nodes: {nodes_to_remove}")
+            for node_id in nodes_to_remove:
+                dt_distilled.delete_branch(node_id)
+            y_modified = dt_distilled.predict(X_train)
+            y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
+
+            # finetuning and evaluating the changed model
+            nn_modified = finetune_nn(nn, X_train, y_encoded, y_train=y_train, mode="changed")
+            modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
+        else:
+            print(f"No nodes to remove!")
+            modified_accuracy = enriched_accuracy
+        modified_accuracy_values.append(modified_accuracy)
+
+        print(f"base accuracy: {base_accuracy}, enriched accuracy: {enriched_accuracy}, modified accuracy: {modified_accuracy}")
+        print("--------------------------------------------------------------------------------------------------")
+
+    save_data(base_accuracy_values, folder_name, "base_accuracy_values.pkl")
+    save_data(enriched_accuracy_values, folder_name, "enriched_accuracy_values.pkl")
+    save_data(modified_accuracy_values, folder_name, "modified_accuracy_values.pkl")
+    plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name)
+    return base_accuracy_values, modified_accuracy_values
+
 
 def run_interactive():
     print("Python Interactive Shell. Type 'exit' or 'quit' to stop.")
@@ -907,7 +862,7 @@ def main():
     parser.add_argument('--model_name', type=str, default=None, help='Name of the model to use (default: None)')
     parser.add_argument('--file_name', type=str, default=None, help='Name of the file to use (default: None)')
     parser.add_argument('--folder_name', type=str, default=None, help='Name of the folder to use (default: same as model_name)')
-    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'i', 'm', 'p', 't'], default='c',
+    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'i', 'm', 'p', 't', 'v'], default='c',
                         help="Choose 'complete' to run full pipeline or 'preprocessed' to use preprocessed data (default: complete)")
     parser.add_argument('--n_gram', type=int, default=3, help='Value for n-gram (default: 3)')
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
@@ -943,6 +898,8 @@ def main():
         run_preprocessing(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases)
     elif args.mode == 't':
         run_train_base(args.folder_name)
+    elif args.mode == 'v':
+        run_evaluate(args.folder_name)
 
 if __name__ == "__main__":
     main()
