@@ -1,19 +1,77 @@
 % !TEX root = ../thesis.tex
-%
 \chapter{Methodology}
+% complete outline of the pipeline
 
 \section{Data Gathering}
+% real logs with protected attributes hard to come by
 
-\subsection{Data Simulation}
+% 4 simulated log didn't show the necessary structure
 
-\subsection{Data Augmentation}
+\subsection*{Data Simulation}
+% model/rule based transitions
+
+\subsection*{Data Augmentation}
+% rule based augmentation
 
 \section{Data Processing}
+% transformation into pandas dataframe?
+
+% output: event classe
+
+% input: should consist of last events and attributes
+
+% fixed input - n_gram of last events
+
+% attributes - one-hot/min-max encoded
 
 \section{Training the Model}
+% give model architecture
+
+% discuss hyperparameters
+
+% train test split
 
 \section{Knowledge Distillation}
+% transfer the knowledge from NN to DT
+
+% predict all training labels
+
+% use relabeled data as training data for decision tree
+
+% explain hyperparameters
+
+% image: process
 
 \section{Modification of the Decision Tree}
+% now visualized how the NN decides
+
+% human inspector can decide whether usage of attributes is inappropriate
+
+% when inappropriate node is found, what to do:
+
+% image: comparative
+
+\subsection*{Cutting Branches}
+% exploitation of attribute not allowed, though rest distinctions ok
+
+% choose most visited branch
+
+% least effort
+
+\subsection*{Retraining Subtrees}
+% removing node might make subtrees invalid
+
+% retrain starting from the node, while ignoring certain attributes
+
+% more effort, might remove wanted bias in a subtree
 
 \section{Finetuning of the Model}
+% use modified DT to predict label for training data
+
+% use this relabeled data to finetune the neural network
+
+% explanation of methods
+
+% explanation of hyperparameters
+
+%image: process

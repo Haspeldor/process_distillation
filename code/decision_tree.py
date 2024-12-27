@@ -73,7 +73,7 @@ class DecisionTreeClassifier:
             print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
             self._print_sub_tree(node.right, depth + 1, indent + "|   ")
 
-    def _grow_tree(self, X, y, depth=0, removed_features=[], recursive_removal=False):
+    def _grow_tree(self, X, y, depth=0, removed_features=[], recursive_removal=True):
         """Recursively grows the decision tree."""
         num_samples, num_features = X.shape
         unique_classes = np.unique(y)
@@ -199,7 +199,7 @@ class DecisionTreeClassifier:
         else:
             raise ValueError("Direction must be 'left', 'right', or None.")
 
-    def delete_node(self, X, y, node_id, recursive_removal=False):
+    def delete_node(self, X, y, node_id, recursive_removal=True):
         """Delete the node with the specified node_id and regrow the subtree."""
         # Find the node and the parent node
         parent_node, node_to_delete, direction = self._find_node(self.root, node_id)

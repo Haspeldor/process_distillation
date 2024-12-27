@@ -388,7 +388,50 @@ def build_process_model(model_name) -> ProcessModel:
 def get_rules(folder_name):
     rules = []
 
-    if folder_name == "hb_-age_-gender":
+    if folder_name == "bpi_A":
+        rules = [
+            {
+                'subsequence': [''],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.5), ("female", 0.5)]
+                }
+            },
+            {
+                'subsequence': ['A_PARTLYSUBMITTED', 'A_DECLINED'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.4), ("female", 0.6)]
+                }
+            },
+            {
+                'subsequence': ['A_PARTLYSUBMITTED', 'A_PREACCEPTED'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.7), ("female", 0.3)]
+                }
+            },
+            {
+                'subsequence': ['A_CANCELLED'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.3), ("female", 0.7)]
+                }
+            },
+            {
+                'subsequence': ['A_APPROVED'],
+                'attribute': 'gender',
+                'distribution': {
+                    'type': 'discrete',
+                    'values': [("male", 0.7), ("female", 0.3)]
+                }
+            },
+        ]
+    elif folder_name == "hb_-age_-gender":
         rules = [
             {
                 'subsequence': [],
@@ -697,6 +740,10 @@ def get_attributes(folder_name):
     elif folder_name == "cc_enriched":
         categorical_attributes = ["gender"]
         numerical_attributes = ["age"]
+    elif folder_name == "bpi_A":
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["case:AMOUNT_REQ"]
+        #numerical_attributes = []
     elif "hb_" in folder_name:
         categorical_attributes = ["gender"]
         numerical_attributes = ["age"]
@@ -741,5 +788,8 @@ def get_critical_decisions(folder_name):
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
         critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
         critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
+    elif "bpi_" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=True))
     
     return critical_decisions

@@ -10,7 +10,7 @@ import argparse
 
 import tensorflow as tf
 from tensorflow.keras import Input, Model
-from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.models import Sequential, load_model, clone_model
 from tensorflow.keras.layers import Layer
 from tensorflow.keras.layers import Dense, Input, Reshape, Flatten, Concatenate
 from tensorflow.keras.layers import LayerNormalization, Dropout, MultiHeadAttention, GlobalAveragePooling1D, Embedding, Masking
@@ -195,7 +195,7 @@ def load_dt(folder_name, file_name):
 def evaluate_nn(model, X_test, y_test):
     print("testing nn:")
     test_loss, test_accuracy = model.evaluate(X_test, y_test)
-    print(f'accuracy: {test_accuracy:.2f}, loss: {test_loss:.2f}')
+    print(f'accuracy: {test_accuracy:.3f}, loss: {test_loss:.3f}')
     print("--------------------------------------------------------------------------------------------------")
     return test_accuracy
 
@@ -231,12 +231,88 @@ def calculate_fairness(nn, X, critical_decisions, feature_indices, class_names, 
                     print(metric)
                 print("")
 
-def calculate_shapley_scores(model, X, relevant_attributes, feature_names, background_size=1000):
+def calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X, critical_decisions, feature_indices, class_names, feature_names, base_attributes):
+    networks = {
+        "Base": nn_base,
+        "Enriched": nn_enriched,
+        "Modified": nn_modified,
+    }
+    disp_imp_results = {}
+    stat_par_results = {}
+    y = {}
+    X_adjusted = remove_attribute_features(X, feature_indices, base_attributes)
+
+    for name, nn in networks.items():
+        if name == "Base":
+            y[name] = nn.predict(X_adjusted)
+        else:
+            y[name] = nn.predict(X)
+
+    for decision in critical_decisions:
+        for attribute in decision.attributes:
+            feature_indices_to_use = feature_indices.get(attribute, [])
+            for feature_index in feature_indices_to_use:
+                for event in decision.possible_events:
+                    outer_key = (feature_names[feature_index], event)
+                    disp_imp_results[outer_key] = {}
+                    stat_par_results[outer_key] = {}
+                    for name, nn in networks.items():
+                        if event not in class_names:
+                            raise ValueError(f"Event '{event}' not found in class_names.")
+                        if isinstance(class_names, list):
+                            event_index = class_names.index(event)
+                        elif isinstance(class_names, np.ndarray):
+                            event_index = np.where(class_names == event)[0][0]
+                        protected_attribute = X[:, feature_index]
+                        stat_par, disp_imp = get_fairness_metrics(y[name], protected_attribute, event_index)
+
+                        disp_imp_results[outer_key][name] = disp_imp
+                        stat_par_results[outer_key][name] = stat_par
+                        print(f"Disparate Impact for {feature_names[feature_index]}, {event}, {name}: {disp_imp}")
+                        print(f"Statistical Parity for {feature_names[feature_index]}, {event}, {name}: {stat_par}")
+
+    return stat_par_results, disp_imp_results
+
+def remove_attribute_features(X, feature_indices, base_attributes):
+    remove_indices = [idx for attr, indices in feature_indices.items() if attr not in base_attributes for idx in indices]
+    return np.delete(X, remove_indices, axis=1)
+
+def get_fairness_metrics(y, protected_attribute, event_index):
+    if y.ndim == 2:
+        y = np.argmax(y, axis=1)
+
+    y_binary = np.zeros_like(y)
+    y_binary[y == event_index] = 1
+    total_amount = np.sum(y_binary == 1)
+    if total_amount < 1:
+        return 0, 1
+
+    unprivileged_mask = protected_attribute == 0
+    privileged_mask = protected_attribute == 1
+    if np.any(unprivileged_mask):
+        selection_rate_unprivileged = np.mean(y_binary[unprivileged_mask])
+    else:
+        selection_rate_unprivileged = 0
+    if np.any(privileged_mask):
+        selection_rate_privileged = np.mean(y_binary[privileged_mask])
+    else:
+        selection_rate_privileged = 0
+    if selection_rate_privileged == 0:
+        disp_impact = float("inf") if selection_rate_unprivileged != 0 else 0
+    else:
+        disp_impact = selection_rate_unprivileged / selection_rate_privileged
+
+    stat_parity = selection_rate_unprivileged - selection_rate_privileged
+    return stat_parity, disp_impact
+
+
+def calculate_shapley_scores(model, X, relevant_attributes, feature_names, output_index, background_size=1000):
     # Verify that relevant attributes are in feature_names
     assert all(attr in feature_names for attr in relevant_attributes), "Relevant attributes must exist in feature names."
 
     # Map relevant attributes to their indices in X
     relevant_indices = [feature_names.index(attr) for attr in relevant_attributes]
+    print(relevant_indices)
 
     if X.shape[0] > background_size:
         X = X[np.random.choice(X.shape[0], size=background_size, replace=False), :]
@@ -246,15 +322,19 @@ def calculate_shapley_scores(model, X, relevant_attributes, feature_names, backg
 
     # Compute SHAP values
     shap_values = explainer.shap_values(X)  # Returns a list of arrays (one for each output class)
+    print(shap_values.shape)
 
     # For simplicity, aggregate shap values across all classes (sum of absolute values)
-    if isinstance(shap_values, list):  # If multiple outputs
-        shap_values = np.sum(np.abs(np.array(shap_values)), axis=0)
+    #shap_values = np.sum(np.abs(np.array(shap_values)), axis=0)
+    shap_values = shap_values[:, :, output_index]
+    print(shap_values.shape)
 
-    # Extract Shapley scores for relevant attributes
     shapley_scores = {}
     for i, idx in enumerate(relevant_indices):
         shapley_scores[relevant_attributes[i]] = np.mean(np.abs(shap_values[:, idx]))
+        if i in [34, 35]:
+            plot_density(shap_values[:, idx], idx)
+    print(shapley_scores)
 
     return shapley_scores
 
@@ -262,7 +342,7 @@ def evaluate_dt(dt, X_test, y_test):
     print("testing dt:")
     y_argmax = np.argmax(y_test, axis=1)
     accuracy = dt.score(X_test, y_argmax)
-    print(f"Accuracy: {accuracy:.2f}")
+    print(f"Accuracy: {accuracy:.3f}")
     print("")
     dt.visualize()
     print("")
@@ -433,7 +513,7 @@ def run_unfair_data_preset():
 
 
 # executes the complete pipeline
-def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cases=1000, preprocessing=False, train_base=False, enrichment=False):
+def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cases=1000, preprocessing=False, train_base=False, enrichment=False, retrain=False):
     if preprocessing or enrichment:
         run_preprocessing(folder_name, model_name=model_name, file_name=file_name, n_gram=n_gram, num_cases=num_cases, enrichment=enrichment)
         run_train_base(folder_name=folder_name, console_output=False)
@@ -453,7 +533,7 @@ def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cas
     if nodes_to_remove:
         print(f"Nodes to remove accordingly: {nodes_to_remove}")
         print("--------------------------------------------------------------------------------------------------")
-        run_modify(folder_name, node_ids=nodes_to_remove, console_output=False)
+        run_modify(folder_name, node_ids=nodes_to_remove, console_output=False, retrain=retrain)
         run_finetuning(folder_name, console_output=False)
     print("Pipeline done, running analysis...")
     print("--------------------------------------------------------------------------------------------------")
@@ -553,14 +633,18 @@ def run_finetuning(folder_name, epochs=5, batch_size=32, learning_rate=1e-3, wei
         evaluate_nn(nn_weighted, X, y)
 
 
-def run_modify(folder_name, node_ids=[], console_output=True):
+def run_modify(folder_name, node_ids=[], console_output=True, retrain=False):
     X_train  = load_data(folder_name, "X_train.pkl")
+    y_train  = load_data(folder_name, "y_encoded.pkl")
     X_test  = load_data(folder_name, "X_test.pkl")
     y_test  = load_data(folder_name, "y_test.pkl")
     dt_distilled = load_dt(folder_name, "dt.json")
 
     for node_id in node_ids:
-        dt_distilled.delete_branch(node_id)
+        if retrain:
+            dt_distilled.delete_node(X_train, y_train, node_id)
+        else:
+            dt_distilled.delete_branch(node_id)
     save_dt(dt_distilled, folder_name, "dt_modified.json")
     if console_output:
         evaluate_dt(dt_distilled, X_test, y_test)
@@ -570,6 +654,8 @@ def run_modify(folder_name, node_ids=[], console_output=True):
     save_data(y_encoded, folder_name, "y_modified.pkl")
 
 def run_demo(folder_name, n_gram=3, num_cases=1000, preprocessing=False):
+    run_shapley("bpi_A")
+    sys.exit()
     male_shapley_scores = load_data(folder_name, "male_shapley_scores.pkl")
     female_shapley_scores = load_data(folder_name, "female_shapley_scores.pkl")
     male_shapley_scores_modified = load_data(folder_name, "male_shapley_scores_modified.pkl")
@@ -578,7 +664,6 @@ def run_demo(folder_name, n_gram=3, num_cases=1000, preprocessing=False):
     plot_shapley(female_shapley_scores, female_shapley_scores_modified, folder_name, "shapley_female.png")
 
 def run_shapley(folder_name, n_gram=3):
-    feature_names = load_data(folder_name, "feature_names.pkl")
     enriched_accuracy_values = []
     modified_accuracy_values = []
     male_shapley_scores = []
@@ -589,8 +674,13 @@ def run_shapley(folder_name, n_gram=3):
     categorical_attributes, numerical_attributes = get_attributes(folder_name)
     critical_decisions = get_critical_decisions(folder_name)
     X_enriched, y_enriched, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+    if isinstance(class_names, list):
+        output_index = class_names.index("A_DECLINED")
+    elif isinstance(class_names, np.ndarray):
+        output_index = np.where(class_names == "A_DECLINED")[0][0]
 
-    for _ in tqdm(range(10), desc="evaluating model:"):
+
+    for _ in tqdm(range(3), desc="evaluating model:"):
         # evaluating the enriched model
         X_train, X_test, y_train, y_test = train_test_split(X_enriched, y_enriched, test_size=0.3)
         nn = train_nn(X_train, y_train)
@@ -598,7 +688,7 @@ def run_shapley(folder_name, n_gram=3):
         dt_distilled = train_dt(X_train, y_distilled, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
         enriched_accuracy = evaluate_nn(nn, X_test, y_test)
         enriched_accuracy_values.append(enriched_accuracy)
-        shapley_scores = calculate_shapley_scores(nn, X_test, feature_names, feature_names)
+        shapley_scores = calculate_shapley_scores(nn, X_test, feature_names, feature_names, output_index)
         male_shapley_score = shapley_scores["gender = male"]
         female_shapley_score = shapley_scores["gender = female"]
         male_shapley_scores.append(male_shapley_score)
@@ -608,15 +698,16 @@ def run_shapley(folder_name, n_gram=3):
         nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
         if nodes_to_remove:
             print(f"Removing nodes: {nodes_to_remove}")
+            y_encoded = np.argmax(y_train, axis=1)
             for node_id in nodes_to_remove:
-                dt_distilled.delete_branch(node_id)
+                dt_distilled.delete_node(X_train, y_encoded, node_id)
             y_modified = dt_distilled.predict(X_train)
             y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
 
             # finetuning and evaluating the changed model
             nn_modified = finetune_nn(nn, X_train, y_encoded, y_train=y_train, mode="changed")
             modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
-            shapley_scores = calculate_shapley_scores(nn_modified, X_test, feature_names, feature_names)
+            shapley_scores = calculate_shapley_scores(nn_modified, X_test, feature_names, feature_names, output_index)
             male_shapley_score_modified = shapley_scores["gender = male"]
             female_shapley_score_modified = shapley_scores["gender = female"]
         else:
@@ -630,8 +721,8 @@ def run_shapley(folder_name, n_gram=3):
         modified_accuracy_values.append(modified_accuracy)
 
         print(f"enriched accuracy: {enriched_accuracy}, modified accuracy: {modified_accuracy}")
-        print(f"male shapley score: {male_shapley_score}, female shapley score: {female_shapley_score}")
-        print(f"male shapley score: {male_shapley_score_modified}, female shapley score: {female_shapley_score_modified}")
+        print(f"enriched: male shapley score: {male_shapley_score}, female shapley score: {female_shapley_score}")
+        print(f"modified: male shapley score: {male_shapley_score_modified}, female shapley score: {female_shapley_score_modified}")
         print("--------------------------------------------------------------------------------------------------")
 
     save_data(male_shapley_scores, folder_name, "male_shapley_scores.pkl")
@@ -777,42 +868,55 @@ def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, preprocessing=Fal
     print("Transformed distilled DT:")
     evaluate_dt(dt_transformed, X_test, y_test)
 
-def run_evaluate(folder_name, iterations=10, n_gram=3):
+def run_evaluate(folder_name, iterations=10, n_gram=3, retrain=False):
     base_accuracy_values = []
     enriched_accuracy_values = []
     modified_accuracy_values = []
+    disp_imp_results = {}
+    stat_par_results = {}
     df = load_data(folder_name, "df.pkl")
     categorical_attributes, numerical_attributes = get_attributes(folder_name)
+    categorical_attributes_base, numerical_attributes_base = [], ["case:AMOUNT_REQ"]
+    base_attributes = categorical_attributes_base + numerical_attributes_base
     critical_decisions = get_critical_decisions(folder_name)
-    X_base, y_base, class_names, feature_names, feature_indices = process_df(df, [], [], n_gram=n_gram)
-    X_enriched, y_enriched, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
+    #X_base, y_base, class_names, feature_names, feature_indices = process_df(df, categorical_attributes_base, numerical_attributes_base, n_gram=n_gram)
+    X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
 
-    for _ in tqdm(range(iterations), desc="evaluating model:"):
+    for i in tqdm(range(iterations), desc="evaluating model:"):
         # evaluating the base model
-        X_train, X_test, y_train, y_test = train_test_split(X_base, y_base, test_size=0.3)
-        nn = train_nn(X_train, y_train)
-        base_accuracy = evaluate_nn(nn, X_test, y_test)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+        X_train_base = remove_attribute_features(X_train, feature_indices, base_attributes)
+        X_test_base = remove_attribute_features(X_test, feature_indices, base_attributes)
+        nn_base = train_nn(X_train_base, y_train)
+        base_accuracy = evaluate_nn(nn_base, X_test_base, y_test)
         base_accuracy_values.append(base_accuracy)
 
         # evaluating the enriched model
-        X_train, X_test, y_train, y_test = train_test_split(X_enriched, y_enriched, test_size=0.3)
-        nn = train_nn(X_train, y_train)
-        y_distilled = distill_nn(nn, X_train)
+        nn_enriched = train_nn(X_train, y_train)
+        y_distilled = distill_nn(nn_enriched, X_train)
         dt_distilled = train_dt(X_train, y_distilled, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
-        enriched_accuracy = evaluate_nn(nn, X_test, y_test)
+        enriched_accuracy = evaluate_nn(nn_enriched, X_test, y_test)
+        evaluate_dt(dt_distilled, X_test, y_test)
         enriched_accuracy_values.append(enriched_accuracy)
 
         # modifying the distilled model
         nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
         if nodes_to_remove:
             print(f"Removing nodes: {nodes_to_remove}")
-            for node_id in nodes_to_remove:
-                dt_distilled.delete_branch(node_id)
+            if retrain:
+                y_encoded = np.argmax(y_train, axis=1)
+                for node_id in nodes_to_remove:
+                    dt_distilled.delete_node(X_train, y_encoded, node_id)
+            else:
+                for node_id in nodes_to_remove:
+                    dt_distilled.delete_branch(node_id)
             y_modified = dt_distilled.predict(X_train)
             y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
 
             # finetuning and evaluating the changed model
-            nn_modified = finetune_nn(nn, X_train, y_encoded, y_train=y_train, mode="changed")
+            nn_modified = clone_model(nn_enriched)
+            nn_modified.set_weights(nn_enriched.get_weights())
+            nn_modified = finetune_nn(nn_modified, X_train, y_encoded, y_train=y_train, mode="changed")
             modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
         else:
             print(f"No nodes to remove!")
@@ -820,13 +924,51 @@ def run_evaluate(folder_name, iterations=10, n_gram=3):
         modified_accuracy_values.append(modified_accuracy)
 
         print(f"base accuracy: {base_accuracy}, enriched accuracy: {enriched_accuracy}, modified accuracy: {modified_accuracy}")
+        stat_par_result, disp_imp_result = calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X_test, critical_decisions, feature_indices, class_names, feature_names, base_attributes)
+        for outer_key, outer_value in stat_par_result.items():
+            if i == 0:
+                stat_par_results[outer_key] = {}
+            for inner_key, inner_value in outer_value.items():
+                if i == 0:
+                    stat_par_results[outer_key][inner_key] = []
+                stat_par_results[outer_key][inner_key].append(inner_value)
+        for outer_key, outer_value in disp_imp_result.items():
+            if i == 0:
+                disp_imp_results[outer_key] = {}
+            for inner_key, inner_value in outer_value.items():
+                if i == 0:
+                    disp_imp_results[outer_key][inner_key] = []
+                disp_imp_results[outer_key][inner_key].append(inner_value)
         print("--------------------------------------------------------------------------------------------------")
 
     save_data(base_accuracy_values, folder_name, "base_accuracy_values.pkl")
     save_data(enriched_accuracy_values, folder_name, "enriched_accuracy_values.pkl")
     save_data(modified_accuracy_values, folder_name, "modified_accuracy_values.pkl")
     plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name)
+    plot_all_fairness(stat_par_results, disp_imp_results, folder_name)
     return base_accuracy_values, modified_accuracy_values
+
+def run_fairness(folder_name):
+    nn_base = load_nn(folder_name, "nn_base.keras")
+    nn_enriched = load_nn(folder_name, "nn_enriched.keras")
+    nn_modified = load_nn(folder_name, "nn_modified.keras")
+    X_test  = load_data(folder_name, "X_test.pkl")
+    class_names = load_data(folder_name, "class_names.pkl")
+    feature_names = load_data(folder_name, "feature_names.pkl")
+    feature_indices = load_data(folder_name, "feature_indices.pkl")
+    critical_decisions = get_critical_decisions(folder_name)
+    base_attributes = ["case:AMOUNT_REQ"]
+    disp_imp_results = {}
+
+    disp_imp_result = calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X_test, critical_decisions, feature_indices, class_names, feature_names, base_attributes)
+    print(disp_imp_result)
+    for outer_key, outer_value in disp_imp_result.items():
+        disp_imp_results[outer_key] = {}
+        for inner_key, inner_value in outer_value.items():
+            disp_imp_results[outer_key][inner_key] = []
+            disp_imp_results[outer_key][inner_key].append(inner_value)
+    print(disp_imp_results)
+    #plot_all_fairness(stat_par_results, disp_imp_results, folder_name)
 
 
 def run_interactive():
@@ -871,9 +1013,11 @@ def main():
     parser.add_argument('--e', dest='enrichment', action='store_true', 
                         help='Enrich original data')
     parser.add_argument('--t', dest='train_base', action='store_true', 
-                        help='Enrich original data')
+                        help='Train base models')
     parser.add_argument('--p', dest='preprocessing', action='store_true', 
                         help='Generate new data')
+    parser.add_argument('--r', dest='retrain', action='store_true', 
+                        help='Retrain deleted nodes')
     parser.add_argument("node_ids", type=int, nargs="*", help="List of node_ids")
     args = parser.parse_args()
     if args.folder_name is None:
@@ -883,7 +1027,7 @@ def main():
     if args.mode == 'a':
         run_analysis(args.folder_name)
     elif args.mode == 'c':
-        run_complete(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing, train_base=args.train_base, enrichment=args.enrichment)
+        run_complete(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing, train_base=args.train_base, enrichment=args.enrichment, retrain=args.retrain)
     elif args.mode == 'd':
         run_demo(args.folder_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing)
     elif args.mode == 'e':
@@ -893,13 +1037,13 @@ def main():
     elif args.mode == 'i':
         run_interactive()
     elif args.mode == 'm':
-        run_modify(args.folder_name, node_ids=args.node_ids)
+        run_modify(args.folder_name, node_ids=args.node_ids, retrain=args.retrain)
     elif args.mode == 'p':
         run_preprocessing(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases)
     elif args.mode == 't':
         run_train_base(args.folder_name)
     elif args.mode == 'v':
-        run_evaluate(args.folder_name)
+        run_evaluate(args.folder_name, retrain=args.retrain)
 
 if __name__ == "__main__":
     main()

@@ -34,14 +34,15 @@ def load_csv_to_df(file_name):
     file_path = os.path.join('raw_data', file_name)
     return pd.read_csv(file_path)
 
-def load_xes_to_df(file_name, folder_name=None, num_cases=10000):
+def load_xes_to_df(file_name, folder_name=None, num_cases=None):
     file_path = os.path.join("raw_data", file_name)
     df = pm4py.read_xes(file_path)
     df.rename(columns={'case:concept:name': 'case_id', 'concept:name': 'activity'}, inplace=True)
     columns = ['case_id', 'activity'] + [col for col in df.columns if col not in ['case_id', 'activity']]
     df = df[columns]
-    df = df[df['case_id'].isin(df['case_id'].unique()[:num_cases])]
     df = df.loc[:, ~df.columns.duplicated()]
+    if num_cases:
+        df = df[df['case_id'].isin(df['case_id'].unique()[:num_cases])]
     df = process_df_timestamps(df)
     if folder_name:
         save_data(df, folder_name, "df.pkl")
@@ -211,7 +212,7 @@ def process_data_padded(df, categorical_attributes, numerical_attributes, max_se
 
 
 #TODO: leaking test info for minmax
-def process_df(df, categorical_attributes, numerical_attributes, n_gram=3, folder_name=None, test_size=0.2):
+def process_df(df, categorical_attributes, numerical_attributes, n_gram=3):
     """Processes dataframe data for neural network training"""
     # keep only specified attributes
     standard_attributes = ['case_id', 'activity']
@@ -409,6 +410,61 @@ def plot_shapley(enriched_accuracy_values, modified_accuracy_values, folder_name
     plt.savefig(image_path)
     plt.close()
 
+def plot_all_fairness(stat_par, disp_imp, folder_name):
+    for (feature, event), value in stat_par.items():
+        title = f"Statistical Parity of {feature}, {event} for {folder_name}"
+        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Statistical Parity")
+    for (feature, event), value in disp_imp.items():
+        title = f"Disparate Impact of {feature}, {event} for {folder_name}"
+        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Disparate Impact")
+
+def plot_density(data, title):
+    sns.kdeplot(data, fill=True, color="blue", alpha=0.5)
+    plt.title(title)
+    plt.xlabel("Value")
+    plt.ylabel("Density")
+    plt.grid(True)
+    plt.show()
+
+
+def plot_distribution(base_values, enriched_values, modified_values, folder_name, title, measurement):
+    img_folder = os.path.join("img", folder_name)
+    os.makedirs(img_folder, exist_ok=True)
+    
+    data = {
+        'Base': np.array(base_values),
+        'Enriched': np.array(enriched_values),
+        'Modified': np.array(modified_values)
+    }
+    
+    # Calculate mean and standard deviation
+    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
+    print(f"{title} Statistics:")
+    for name, (mean, std) in stats.items():
+        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
+    for i, (name, values) in enumerate(data.items()):
+        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.3f}, σ={stats[name][1]:.3f})',
+                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
+    
+    # Add titles and labels
+    plt.title(title, fontsize=16, fontweight='bold')
+    plt.xlabel(measurement, fontsize=14)
+    plt.ylabel('Density', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
+    
+    # Save the plot
+    plt.tight_layout()
+    image_path = os.path.join('img', folder_name, title)
+    plt.savefig(image_path)
+    plt.close()
+
 def plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name):
     img_folder = os.path.join("img", folder_name)
     os.makedirs(img_folder, exist_ok=True)
@@ -423,7 +479,7 @@ def plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accur
     stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
     print("Accuracy Statistics:")
     for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
+        print(f"{name}: Mean = {mean:.3f}, Std Dev = {std:.3f}")
     
     # Create the plot
     plt.figure(figsize=(10, 6))
@@ -534,7 +590,8 @@ def mine_bpm(file_name, folder_name):
     os.makedirs(output_dir, exist_ok=True)
 
     # the log is filtered on the top 5 variants
-    data_df = pm4py.filter_variants_top_k(data_df, 15)
+    data_df = data_df[data_df['concept:name'].str.startswith('A_')]
+    data_df = pm4py.filter_variants_top_k(data_df, 20)
 
     # a directly - follows graph (DFG) is discovered from the log
     dfg, start_activities, end_activities = pm4py.discover_dfg(data_df)
@@ -550,3 +607,22 @@ def mine_bpm(file_name, folder_name):
     pm4py.save_vis_dfg(dfg, start_activities, end_activities, os.path.join(output_dir, "dfg.png"), format='png')
     pm4py.save_vis_bpmn(bpmn_diagram, os.path.join(output_dir, "bpmn.png"), format='png')
     print("--------------------------------------------------------------------------------------------------")
+
+def load_bpi_2012():
+    input_file = "raw_data/bpi_2012.xes"
+    log = pm4py.read_xes(input_file)
+
+    # Filter and save BPIC12-O (events starting with "O_")
+    log_o = [trace for trace in log if any(event["concept:name"].startswith("O_") for event in trace)]
+    pm4py.write_xes(log_o, "bpi_2012_o.xes")
+
+    # Filter and save BPIC12-W (events starting with "W_")
+    log_w = [trace for trace in log if any(event["concept:name"].startswith("W_") for event in trace)]
+    pm4py.write_xes(log_w, "bpi_2012_w.xes")
+
+    # Filter and save BPIC12-WC (W_ events with lifecycle "complete")
+    log_wc = [
+        trace for trace in log_w
+        if any(event["concept:name"].startswith("W_") and event["lifecycle:transition"] == "complete" for event in trace)
+    ]
+    pm4py.write_xes(log_wc, "bpi_2012_wc.xes")

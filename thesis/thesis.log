@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  11 DEC 2024 15:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  27 DEC 2024 11:25
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1119,13 +1119,13 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 \tf@toc=\write5
 \openout5 = `thesis.toc'.
 
+
+Underfull \vbox (badness 1389) has occurred while \output is active []
+
  [9
 
 
-] [10
-
-
-] (./content/chapter-introduction.tex
+] [10] (./content/chapter-introduction.tex
 chapter 1.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1138,10 +1138,15 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-related-work.tex [1
+[1
 
 
-] [2
+
+
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [2]) (./content/chapter-related-work.tex [3] [4
 
 
 ]
@@ -1157,7 +1162,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-background.tex [3] [4
+) (./content/chapter-background.tex [5] [6
 
 
 ]
@@ -1173,7 +1178,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-methodology.tex [5] [6
+) (./content/chapter-methodology.tex [7] [8
 
 
 ]
@@ -1189,7 +1194,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-evaluation.tex [7] [8
+) (./content/chapter-evaluation.tex [9] [10
 
 
 ]
@@ -1205,7 +1210,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-conclusion.tex [9] [10
+) (./content/chapter-conclusion.tex [11] [12
 
 
 ]
@@ -1221,12 +1226,21 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [11] [12
+) [13] [14
 
 
 ]
+chapter without number
 
-LaTeX Warning: Empty bibliography on input line 137.
+Class scrreprt Warning: Redefinition of \@makechapterhead detected.
+(scrreprt)              Note: KOMA-Script does use styles for commands like
+(scrreprt)              \chapter. Currently it internally still provides and
+(scrreprt)              uses \@makechapterhead, but a completely different
+(scrreprt)              definition compared to the standard classes.
+(scrreprt)              So redefining or using internal \@makechapterhead
+(scrreprt)              by users or package authors may already break
+(scrreprt)              KOMA-Script and will not work with a coming version,
+(scrreprt)              that will remove this deprecated code.
 
 
 Package biblatex Warning: Type 'online' not found on input line 138.
@@ -1238,21 +1252,24 @@ Package biblatex Warning: 'prefixnumbers' option to '\printbibliography' is no l
 
 LaTeX Warning: Empty bibliography on input line 138.
 
-(./thesis.lof)
+[15
+
+
+] [16
+
+
+] (./thesis.lof)
 \tf@lof=\write6
 \openout6 = `thesis.lof'.
 
- [13
-
-
-] [14
+ [17] [18
 
 
 ] (./thesis.lot)
 \tf@lot=\write7
 \openout7 = `thesis.lot'.
 
- [15] [16
+ [19] [20
 
 
 ] (./content/declaration.tex
@@ -1267,10 +1284,10 @@ Class scrreprt Warning: Redefinition of \@makeschapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [17
+) [21
 
 
-] [18
+] [22
 
 ] (./thesis.aux)
  ***********
@@ -1284,18 +1301,18 @@ Package logreq Info: Writing requests to 'thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 27322 strings out of 474166
- 498540 string characters out of 5749518
- 1935542 words of memory out of 5000000
- 49042 multiletter control sequences out of 15000+600000
- 652190 words of font info for 158 fonts, out of 8000000 for 9000
+ 27618 strings out of 474166
+ 503658 string characters out of 5749518
+ 1938542 words of memory out of 5000000
+ 49262 multiletter control sequences out of 15000+600000
+ 658903 words of font info for 188 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,12n,131p,10972b,2010s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 108i,13n,131p,10972b,2010s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvb.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvr.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvri.pfb><c:/texlive/2023/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on thesis.pdf (28 pages, 237939 bytes).
+Output written on thesis.pdf (32 pages, 251453 bytes).
 PDF statistics:
- 349 PDF objects out of 1000 (max. 8388607)
- 296 compressed objects within 3 object streams
- 82 named destinations out of 1000 (max. 500000)
- 54486 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 442 PDF objects out of 1000 (max. 8388607)
+ 384 compressed objects within 4 object streams
+ 116 named destinations out of 1000 (max. 500000)
+ 55070 words of extra memory for PDF output out of 61914 (max. 10000000)
 

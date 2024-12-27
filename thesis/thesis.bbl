@@ -16,5 +16,28 @@
   {}
 \endgroup
 
-\datalist[entry]{anyt/global//global/global}\enddatalist
+\datalist[entry]{anyt/global//global/global}
+  \entry{amazon_bias}{article}{}
+    \name{author}{1}{}{%
+      {{hash=CX}{%
+         family={Chang},
+         familyi={C\bibinitperiod},
+         given={Xinyu},
+         giveni={X\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CX1}
+    \strng{fullhash}{CX1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Cha23}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{pages}{134\bibrangedash 140}
+    \field{title}{Gender Bias in Hiring: An Analysis of the Impact of Amazon's Recruiting Algorithm}
+    \field{volume}{23}
+    \field{journaltitle}{Advances in Economics, Management and Political Sciences}
+    \field{year}{2023}
+  \endentry
+\enddatalist
 \endinput
