@@ -16,15 +16,8 @@ seitenverteilung:
     - evaluation:   20
     - conclusion:   5
 
-ansatz: vergleich mit debiasing und related work
-    - siehe auch deren referenzen
-
 aknowledgements:
     - personen und chatgpt angeben
-
-todo:
-    - transformer model maskieren
-    - shapley score untersuchen
 
 erweiterungen:
     - fairness
@@ -41,3 +34,37 @@ erweiterungen:
     - transformer als baseline
         - überschaubarer aufwand
         - mehr, falls zu hohe accuracy
+
+
+fragen:
+    - wie simpel beispiele
+    - problem statement / related work vor definitionen
+    - parallele entscheidungen
+    - event-level attributes
+
+    
+
+
+- failure cases, wann funktioniert
+    - erklrungen/verallgemeinerungen
+    - denkbare fixes
+- methodik
+    - zahlen vergleichen?
+    - 
+- related work:
+    - used event logs
+    - prediction goal
+    - ML architecture
+    - metriken
+- results:
+    - pipeline nicht nach accuracy optimieren
+    - verhältnis aussagekräftig
+    - ablation: wie viel einfluss haben komponenten
+        - für einen log ausreichend, simuliert
+        - bias
+        - anzahl attribute/entscheidungen
+    - implications for theory and practise
+- out of scope:
+    - korrelationen
+    - event level
+    - evtl. ML models

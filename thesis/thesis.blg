@@ -19,47 +19,55 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: thesis-blx.bib
 Database file #2: bib-refs.bib
+Warning--I didn't find a database entry for "perceptron"
+Warning--I didn't find a database entry for "perceptron_limited"
+Warning--I didn't find a database entry for "trees"
+Warning--I didn't find a database entry for "gini"
+Warning--I didn't find a database entry for "ccp"
+Warning--I didn't find a database entry for "dem_parity"
+Warning--I didn't find a database entry for "simulated_logs"
 Biblatex version: 3.19
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 2 entries,
+You've used 14 entries,
             6399 wiz_defined-function locations,
-            1209 strings with 9144 characters,
-and the built_in function-call counts, 6064 in all, are:
-= -- 351
-> -- 155
-< -- 30
-+ -- 143
-- -- 56
-* -- 341
-:= -- 793
+            1294 strings with 11748 characters,
+and the built_in function-call counts, 117672 in all, are:
+= -- 9501
+> -- 1710
+< -- 587
++ -- 3263
+- -- 652
+* -- 8740
+:= -- 13352
 add.period$ -- 0
-call.type$ -- 2
-change.case$ -- 14
+call.type$ -- 14
+change.case$ -- 303
 chr.to.int$ -- 44
-cite$ -- 2
-duplicate$ -- 542
-empty$ -- 554
-format.name$ -- 51
-if$ -- 1285
+cite$ -- 26
+duplicate$ -- 11970
+empty$ -- 10175
+format.name$ -- 995
+if$ -- 23990
 int.to.chr$ -- 0
-int.to.str$ -- 2
+int.to.str$ -- 33
 missing$ -- 0
-newline$ -- 43
-num.names$ -- 45
-pop$ -- 381
+newline$ -- 473
+num.names$ -- 728
+pop$ -- 4833
 preamble$ -- 1
-purify$ -- 16
+purify$ -- 376
 quote$ -- 0
-skip$ -- 245
+skip$ -- 2826
 stack$ -- 0
-substring$ -- 564
-swap$ -- 132
-text.length$ -- 47
-text.prefix$ -- 2
+substring$ -- 17763
+swap$ -- 2262
+text.length$ -- 479
+text.prefix$ -- 18
 top$ -- 1
-type$ -- 56
+type$ -- 464
 warning$ -- 0
-while$ -- 124
+while$ -- 1633
 width$ -- 0
-write$ -- 42
+write$ -- 460
+(There were 7 warnings)

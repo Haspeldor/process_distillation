@@ -1,20 +1,60 @@
 % !TEX root = ../thesis.tex
 \chapter{Related Work}
-% general fairness in machine learning
+In recent years, the field of fairness in machine learning has gained significant attention,
+aiming to address biases and ensure equitable outcomes in predictive systems.
+Numerous approaches to quantifying and achieving fairness have been proposed,
+targeting various steps in the ML pipeline.
+These methods are too plentiful to go over in this thesis,
+but an overview can be found in \cite{fairness_ml}.
+
+Comparatively, the existing literature related to fairness specifically in PBPM is quite limited,
+although many foundational concepts and challenges concerning fairness can be transferred
+from general ML, as done in \cite{fairness_overview}.
+Accordingly, the next section will focus on reviewing approaches
+that have explicitly been adapted into the field of PBPM.
 
 \section{Fairness in Predictive Business Process Monitoring}
-% fairness through understandability
+\cite{fairness_foundation} represents one of the initial efforts to incorporate fairness into PBPM.
+This approach employs discrimination-aware decision trees \cite{fairness_decision_tree},
+which extend traditional decision trees by adding fairness constraints during the split-selection process.
+These constraints penalize splits influenced by sensitive attributes,
+ensuring that decisions are less biased. 
+To further enhance fairness,
+a relabeling technique is employed, where outcome classes of the leaf nodes are adjusted
+to reduce the discriminatory impact of sensitive attributes with minimal loss in predictive accuracy.
+This technique is similar to our methodology as described in section \ref{sec: modification},
+there is however a key difference:
+The relabeling in this method is performed automatically,
+based on the assumption that all bias is undesirable and should be eliminated.
+In contrast, our approach emphasizes human stakeholder involvement to decide which biases are unwanted,
+allowing for the preservation of nuanced, context-dependent correlations.
 
-% general fairness in BPMM
-% discrimination aware decision tree learning
+In \cite{fairness_adversarial},
+biases in predictive models are being adressed by leveraging adversarial learning \cite{gan},
+a method where two models are trained simultaneously: a predictor and an adversary.
+The predictor model focuses on accurate outcomes,
+while an adversary model tries to identify sensitive attributes based on the output of the predictor.
+The predictor is penalized when the adversary succeeds,
+encouraging fairness by reducing reliance on these attributes.
+While effective at reducing bias,
+this penalty-based approach lacks context sensitivity,
+treating all biases as inherently undesirable.
+This indiscriminate removal of biases may unintentionally eliminate meaningful correlations,
+thereby diminishing the predictive model's utility in specific scenarios
+where such relationships are crucial.
 
-% fairness using GANs  
-
-% fairness using a custom loss function
+Lastly, \cite{fairness_independence} focuses on ensuring independence
+between predictions and sensitive group memberships using a composite loss function for training the ML model.
+Compared to traditional loss functions, which seek to only optimize the predictive performance of a ML model,
+this composite loss function incorporates integral probability metrics \cite{ipm},
+in order to find a balance between accuracy and fairness.
+However, similar to the other approaches presented before,
+the uniform elimination of biases may inadvertently remove desirable correlations,
+potentially affecting the utility of the predictive model in certain contexts.
 
 \section{Conclusion}
 Current approaches to fairness in PBPM have made significant strides
-but remain limited by their automated and uniform treatment of bias.
-A shift toward stakeholder-driven,
-knowledge distillation-based methods presents a promising direction
-for achieving more balanced and context-sensitive outcomes.
+but remain somewhat limited by their automated and uniform treatment of bias.
+A shift toward an approach that puts more control into the hands of stakeholders
+presents a promising direction for achieving more context-sensitive models,
+that achieve better performance while still making context-based fair decisions.

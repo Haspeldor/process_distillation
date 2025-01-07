@@ -17,6 +17,39 @@
 \endgroup
 
 \datalist[entry]{anyt/global//global/global}
+  \entry{fairness_ml}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CS}{%
+         family={Caton},
+         familyi={C\bibinitperiod},
+         given={Simon},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=HC}{%
+         family={Haas},
+         familyi={H\bibinitperiod},
+         given={Christian},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {ACM New York, NY}%
+    }
+    \strng{namehash}{CSHC1}
+    \strng{fullhash}{CSHC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{CH24}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{number}{7}
+    \field{pages}{1\bibrangedash 38}
+    \field{title}{Fairness in machine learning: A survey}
+    \field{volume}{56}
+    \field{journaltitle}{ACM Computing Surveys}
+    \field{year}{2024}
+  \endentry
+
   \entry{amazon_bias}{article}{}
     \name{author}{1}{}{%
       {{hash=CX}{%
@@ -38,6 +71,403 @@
     \field{volume}{23}
     \field{journaltitle}{Advances in Economics, Management and Political Sciences}
     \field{year}{2023}
+  \endentry
+
+  \entry{fairness_overview}{article}{}
+    \name{author}{3}{}{%
+      {{hash=DAM}{%
+         family={De-Arteaga},
+         familyi={D\bibinithyphendelim A\bibinitperiod},
+         given={Maria},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=FS}{%
+         family={Feuerriegel},
+         familyi={F\bibinitperiod},
+         given={Stefan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=STM}{%
+         family={Saar-Tsechansky},
+         familyi={S\bibinithyphendelim T\bibinitperiod},
+         given={Maytal},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {SAGE Publications Sage CA: Los Angeles, CA}%
+    }
+    \strng{namehash}{DAM+1}
+    \strng{fullhash}{DAMFSSTM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{DAFST22}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{number}{10}
+    \field{pages}{3749\bibrangedash 3770}
+    \field{title}{Algorithmic fairness in business analytics: Directions for research and practice}
+    \field{volume}{31}
+    \field{journaltitle}{Production and Operations Management}
+    \field{year}{2022}
+  \endentry
+
+  \entry{gan}{article}{}
+    \name{author}{8}{}{%
+      {{hash=GI}{%
+         family={Goodfellow},
+         familyi={G\bibinitperiod},
+         given={Ian},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=PAJ}{%
+         family={Pouget-Abadie},
+         familyi={P\bibinithyphendelim A\bibinitperiod},
+         given={Jean},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=MM}{%
+         family={Mirza},
+         familyi={M\bibinitperiod},
+         given={Mehdi},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=XB}{%
+         family={Xu},
+         familyi={X\bibinitperiod},
+         given={Bing},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=WFD}{%
+         family={Warde-Farley},
+         familyi={W\bibinithyphendelim F\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=OS}{%
+         family={Ozair},
+         familyi={O\bibinitperiod},
+         given={Sherjil},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=CA}{%
+         family={Courville},
+         familyi={C\bibinitperiod},
+         given={Aaron},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=BY}{%
+         family={Bengio},
+         familyi={B\bibinitperiod},
+         given={Yoshua},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{GI+1}
+    \strng{fullhash}{GIPAJMMXBWFDOSCABY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Goo+14}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{title}{Generative adversarial nets}
+    \field{volume}{27}
+    \field{journaltitle}{Advances in neural information processing systems}
+    \field{year}{2014}
+  \endentry
+
+  \entry{fairness_decision_tree}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=KF}{%
+         family={Kamiran},
+         familyi={K\bibinitperiod},
+         given={Faisal},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=CT}{%
+         family={Calders},
+         familyi={C\bibinitperiod},
+         given={Toon},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=PM}{%
+         family={Pechenizkiy},
+         familyi={P\bibinitperiod},
+         given={Mykola},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \keyw{Accuracy;Decision trees;Economics;Cleaning;Training data;Biological system modeling;Data mining;Data Mining;Classification;Discrimination Aware Data Mining}
+    \strng{namehash}{KF+1}
+    \strng{fullhash}{KFCTPM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{KCP10}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{booktitle}{2010 IEEE International Conference on Data Mining}
+    \verb{doi}
+    \verb 10.1109/ICDM.2010.50
+    \endverb
+    \field{pages}{869\bibrangedash 874}
+    \field{title}{Discrimination Aware Decision Tree Learning}
+    \field{year}{2010}
+  \endentry
+
+  \entry{ml_comparison}{article}{}
+    \name{author}{4}{}{%
+      {{hash=KW}{%
+         family={Kratsch},
+         familyi={K\bibinitperiod},
+         given={Wolfgang},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=MJ}{%
+         family={Manderscheid},
+         familyi={M\bibinitperiod},
+         given={Jonas},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=RM}{%
+         family={R{\"o}glinger},
+         familyi={R\bibinitperiod},
+         given={Maximilian},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Seyfried},
+         familyi={S\bibinitperiod},
+         given={Johannes},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{KW+1}
+    \strng{fullhash}{KWMJRMSJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Kra+21}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{pages}{261\bibrangedash 276}
+    \field{title}{Machine learning in business process monitoring: a comparison of deep learning and classical approaches used for outcome prediction}
+    \field{volume}{63}
+    \field{journaltitle}{Business \& Information Systems Engineering}
+    \field{year}{2021}
+  \endentry
+
+  \entry{fairness_adversarial}{article}{}
+    \name{author}{2}{}{%
+      {{hash=dLM}{%
+         prefix={de},
+         prefixi={d\bibinitperiod},
+         family={Leoni},
+         familyi={L\bibinitperiod},
+         given={Massimiliano},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PA}{%
+         family={Padella},
+         familyi={P\bibinitperiod},
+         given={Alessandro},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LMdPA1}
+    \strng{fullhash}{LMdPA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{LP24}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{title}{Achieving Fairness in Predictive Process Analytics via Adversarial Learning (Extended Version)}
+    \field{journaltitle}{arXiv preprint arXiv:2410.02618}
+    \field{year}{2024}
+  \endentry
+
+  \entry{fairness_independence}{article}{}
+    \name{author}{2}{}{%
+      {{hash=PJ}{%
+         family={Peeperkorn},
+         familyi={P\bibinitperiod},
+         given={Jari},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=DVS}{%
+         family={De\bibnamedelima Vos},
+         familyi={D\bibinitperiod\bibinitdelim V\bibinitperiod},
+         given={Simon},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{PJDVS1}
+    \strng{fullhash}{PJDVS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{PDV24}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{title}{Achieving Group Fairness through Independence in Predictive Process Monitoring}
+    \field{journaltitle}{arXiv preprint arXiv:2412.04914}
+    \field{year}{2024}
+  \endentry
+
+  \entry{ipm}{article}{}
+    \name{author}{2}{}{%
+      {{hash=PVM}{%
+         family={Panaretos},
+         familyi={P\bibinitperiod},
+         given={Victor\bibnamedelima M},
+         giveni={V\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=ZY}{%
+         family={Zemel},
+         familyi={Z\bibinitperiod},
+         given={Yoav},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Annual Reviews}%
+    }
+    \strng{namehash}{PVMZY1}
+    \strng{fullhash}{PVMZY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{PZ19}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{number}{1}
+    \field{pages}{405\bibrangedash 431}
+    \field{title}{Statistical aspects of Wasserstein distances}
+    \field{volume}{6}
+    \field{journaltitle}{Annual review of statistics and its application}
+    \field{year}{2019}
+  \endentry
+
+  \entry{fairness_foundation}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=QMS}{%
+         family={Qafari},
+         familyi={Q\bibinitperiod},
+         given={Mahnaz\bibnamedelima Sadat},
+         giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=VdAW}{%
+         prefix={Van\bibnamedelima der},
+         prefixi={V\bibinitperiod\bibinitdelim d\bibinitperiod},
+         family={Aalst},
+         familyi={A\bibinitperiod},
+         given={Wil},
+         giveni={W\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{QMSAWVd1}
+    \strng{fullhash}{QMSAWVd1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{QA19}
+    \field{sortinit}{Q}
+    \field{sortinithash}{Q}
+    \field{booktitle}{On the Move to Meaningful Internet Systems: OTM 2019 Conferences: Confederated International Conferences: CoopIS, ODBASE, C\&TC 2019, Rhodes, Greece, October 21--25, 2019, Proceedings}
+    \field{pages}{182\bibrangedash 192}
+    \field{title}{Fairness-aware process mining}
+    \field{year}{2019}
+  \endentry
+
+  \entry{ml_pbpm}{article}{}
+    \name{author}{3}{}{%
+      {{hash=RME}{%
+         family={Rama-Maneiro},
+         familyi={R\bibinithyphendelim M\bibinitperiod},
+         given={Efr{\'e}n},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=VJC}{%
+         family={Vidal},
+         familyi={V\bibinitperiod},
+         given={Juan\bibnamedelima C},
+         giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+      {{hash=LM}{%
+         family={Lama},
+         familyi={L\bibinitperiod},
+         given={Manuel},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {IEEE}%
+    }
+    \strng{namehash}{RME+1}
+    \strng{fullhash}{RMEVJCLM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{RMVL21}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{number}{1}
+    \field{pages}{739\bibrangedash 756}
+    \field{title}{Deep learning for predictive business process monitoring: Review and benchmark}
+    \field{volume}{16}
+    \field{journaltitle}{IEEE Transactions on Services Computing}
+    \field{year}{2021}
+  \endentry
+
+  \entry{black_white}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RC}{%
+         family={Rudin},
+         familyi={R\bibinitperiod},
+         given={Cynthia},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Nature Publishing Group UK London}%
+    }
+    \strng{namehash}{RC1}
+    \strng{fullhash}{RC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Rud19}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{number}{5}
+    \field{pages}{206\bibrangedash 215}
+    \field{title}{Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead}
+    \field{volume}{1}
+    \field{journaltitle}{Nature machine intelligence}
+    \field{year}{2019}
+  \endentry
+
+  \entry{bpmn}{article}{}
+    \name{author}{1}{}{%
+      {{hash=WSA}{%
+         family={White},
+         familyi={W\bibinitperiod},
+         given={Stephen\bibnamedelima A},
+         giveni={S\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{WSA1}
+    \strng{fullhash}{WSA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Whi04}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \field{number}{0}
+    \field{pages}{0}
+    \field{title}{Introduction to BPMN}
+    \field{volume}{2}
+    \field{journaltitle}{Ibm Cooperation}
+    \field{year}{2004}
   \endentry
 \enddatalist
 \endinput

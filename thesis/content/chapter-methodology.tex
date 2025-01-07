@@ -1,20 +1,40 @@
 % !TEX root = ../thesis.tex
 \chapter{Methodology}
-% complete outline of the pipeline
+\label{sec: methodology}
+This chapter will outline the complete pipeline of our methodology.
+It describes the process of data gathering and preprocessing,
+with a focus on handling bias
+causing attributes.
+The chapter then explains how the initial ML model is trained,
+followed by the application of knowledge distillation to create an interpretable
+representation of the model, which can then be modified to address unwanted biases.
+The methodology further includes how the predictions of the modified representation
+can be used to finetune the original model in order to improve fairness, while maintaining accuracy.
 
 \section{Data Gathering}
-% real logs with protected attributes hard to come by
+Public real life event logs
+containing sensitive attributes are hard to come by.
+Additionally, in order to properly highlight the capacity our method,
+we require the data to have sensitive attributes
+that cause both positive and negative bias respectively.
+Although \cite{simulated_logs} recently published simulated event logs,
+seeking to address the scarcity of fairness-aware datasets in PBPM,
+those event logs didn't show the structure we were looking for in this thesis.
+Therefore we will create the necessary data ourselves,
+either by simulating a process model or by enriching a real life event log with sensitive attributes.
 
-% 4 simulated log didn't show the necessary structure
-
-\subsection*{Data Simulation}
+\subsection{Data Simulation}
 % model/rule based transitions
 
-\subsection*{Data Augmentation}
+% TODO: img model for example
+
+% TODO: table for example traces
+
+\subsection{Data Enrichment}
 % rule based augmentation
 
 \section{Data Processing}
-% transformation into pandas dataframe?
+% something not done because showcase \cite
 
 % output: event classe
 
@@ -32,6 +52,8 @@
 % train test split
 
 \section{Knowledge Distillation}
+% sensitive attribute split NOT penalized \cite{}
+
 % transfer the knowledge from NN to DT
 
 % predict all training labels
@@ -43,6 +65,7 @@
 % image: process
 
 \section{Modification of the Decision Tree}
+\label{sec:modification}
 % now visualized how the NN decides
 
 % human inspector can decide whether usage of attributes is inappropriate
@@ -51,14 +74,14 @@
 
 % image: comparative
 
-\subsection*{Cutting Branches}
+\subsection{Cutting Branches}
 % exploitation of attribute not allowed, though rest distinctions ok
 
 % choose most visited branch
 
 % least effort
 
-\subsection*{Retraining Subtrees}
+\subsection{Retraining Subtrees}
 % removing node might make subtrees invalid
 
 % retrain starting from the node, while ignoring certain attributes
@@ -66,6 +89,9 @@
 % more effort, might remove wanted bias in a subtree
 
 \section{Finetuning of the Model}
+% finetuning for better predictions
+Deep learning generally outperforms traditional machine learning
+\cite{ml_comparison}
 % use modified DT to predict label for training data
 
 % use this relabeled data to finetune the neural network
