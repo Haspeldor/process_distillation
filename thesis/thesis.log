@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  7 JAN 2025 11:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  12 JAN 2025 12:17
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1223,9 +1223,6 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-
-LaTeX Warning: Reference `sec: modification' on page 5 undefined on input line 25.
-
 [5]) (./content/chapter-background.tex [6]
 chapter 3.
 
@@ -1247,32 +1244,34 @@ File: ts1bch.fd 2004/10/18 font definitions for TS1/bch.
 
 ] [8{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
 
-LaTeX Warning: Citation 'perceptron' on page 9 undefined on input line 136.
+LaTeX Warning: Citation 'perceptron' on page 9 undefined on input line 138.
 
-[9]
 
-LaTeX Warning: Citation 'perceptron_limited' on page 10 undefined on input line 149.
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[10{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [11]
+ [9]
 
-LaTeX Warning: Citation 'trees' on page 12 undefined on input line 242.
+LaTeX Warning: Citation 'perceptron_limited' on page 10 undefined on input line 151.
 
-[12]
+[10{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [11] [12]
 
-LaTeX Warning: Citation 'gini' on page 13 undefined on input line 303.
+LaTeX Warning: Citation 'trees' on page 13 undefined on input line 304.
 
 [13]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-LaTeX Warning: Citation 'ccp' on page 14 undefined on input line 337.
+ [14]
 
-[14]
+LaTeX Warning: Citation 'gini' on page 15 undefined on input line 366.
 
-LaTeX Warning: Citation 'dem_parity' on page 15 undefined on input line 352.
+[15]
 
-) (./content/chapter-methodology.tex [15] [16
+LaTeX Warning: Citation 'ccp' on page 16 undefined on input line 409.
 
 
-]
+LaTeX Warning: Citation 'dem_parity' on page 16 undefined on input line 422.
+
+) (./content/chapter-methodology.tex [16]
 chapter 4.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1286,9 +1285,57 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              that will remove this deprecated code.
 
 
-LaTeX Warning: Citation 'simulated_logs' on page 17 undefined on input line 20.
+LaTeX Warning: Citation 'implementation' on page 17 undefined on input line 13.
 
-[17]) (./content/chapter-evaluation.tex [18]
+
+LaTeX Warning: Citation 'simulated_logs' on page 17 undefined on input line 21.
+
+
+LaTeX Warning: Reference `fig:simulated_model' on page 17 undefined on input line 33.
+
+[17
+
+
+]
+
+LaTeX Warning: Reference `sec:evaluation' on page 18 undefined on input line 49.
+
+
+LaTeX Warning: Reference `fig:preprocessing' on page 18 undefined on input line 83.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [18] [19]
+
+LaTeX Warning: Citation 'keras' on page 20 undefined on input line 130.
+
+[20]
+
+LaTeX Warning: Citation 'knowledge_distillation' on page 21 undefined on input line 164.
+
+
+LaTeX Warning: Citation '' on page 21 undefined on input line 178.
+
+
+LaTeX Warning: Citation '' on page 21 undefined on input line 178.
+
+
+Overfull \hbox (39.5745pt too wide) in paragraph at lines 177--182
+[]\T1/bch/m/n/10.95 (-20) Although in re-cent stud-ies more so-phis-ti-cated white-box mod-els such as [[]],
+ []
+
+
+LaTeX Warning: Citation 'sklearn' on page 21 undefined on input line 199.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [21] [22]
+
+LaTeX Warning: Citation 'fine_tuning' on page 23 undefined on input line 274.
+
+[23]) (./content/chapter-evaluation.tex [24]
 chapter 5.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1301,10 +1348,10 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-conclusion.tex [19
+) (./content/chapter-conclusion.tex [25
 
 
-] [20
+] [26
 
 
 ]
@@ -1320,7 +1367,19 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [21] [22
+
+LaTeX Warning: Citation 'eugdpr' on page 27 undefined on input line 20.
+
+
+LaTeX Warning: Citation 'aia' on page 27 undefined on input line 20.
+
+
+Underfull \vbox (badness 2626) has occurred while \output is active []
+
+ [27]
+Underfull \vbox (badness 6157) has occurred while \output is active []
+
+ [28]) [29] [30
 
 
 ]
@@ -1336,7 +1395,21 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-[23
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 138.
+(c:/texlive/2023/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 138.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 138.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 138.
+ [31
 
 
 ]
@@ -1350,21 +1423,21 @@ Package biblatex Warning: 'prefixnumbers' option to '\printbibliography' is no l
 
 LaTeX Warning: Empty bibliography on input line 139.
 
-[24] (./thesis.lof)
+[32] (./thesis.lof)
 \tf@lof=\write6
 \openout6 = `thesis.lof'.
 
- [25
+ [33
 
 
-] [26
+] [34
 
 
 ] (./thesis.lot)
 \tf@lot=\write7
 \openout7 = `thesis.lot'.
 
- [27] [28
+ [35] [36
 
 
 ] (./content/declaration.tex
@@ -1379,10 +1452,10 @@ Class scrreprt Warning: Redefinition of \@makeschapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [29
+) [37
 
 
-] [30
+] [38
 
 ] (./thesis.aux)
  ***********
@@ -1405,18 +1478,18 @@ Package logreq Info: Writing requests to 'thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 28593 strings out of 474166
- 517578 string characters out of 5749518
+ 28745 strings out of 474166
+ 519897 string characters out of 5749518
  1939542 words of memory out of 5000000
- 50054 multiletter control sequences out of 15000+600000
- 676171 words of font info for 268 fonts, out of 8000000 for 9000
+ 50148 multiletter control sequences out of 15000+600000
+ 689540 words of font info for 295 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,13n,131p,10972b,2303s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvb.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvr.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvri.pfb><c:/texlive/2023/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on thesis.pdf (40 pages, 372592 bytes).
+<c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvb.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvr.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvri.pfb><c:/texlive/2023/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
+Output written on thesis.pdf (48 pages, 452385 bytes).
 PDF statistics:
- 658 PDF objects out of 1000 (max. 8388607)
- 574 compressed objects within 6 object streams
- 159 named destinations out of 1000 (max. 500000)
- 65430 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 767 PDF objects out of 1000 (max. 8388607)
+ 668 compressed objects within 7 object streams
+ 182 named destinations out of 1000 (max. 500000)
+ 67510 words of extra memory for PDF output out of 74296 (max. 10000000)
 

@@ -42,27 +42,29 @@ and is used to show the order that activities will be performed in.
 % TODO img: example
 
 \subsection{Event Log Data}
-During the execution of business processes, data is recorded in the form of event logs.
-In order to formally define the structure of this data,
+\label{sec:event_log}
+During the execution of business processes, data is captured and stored in the form of event logs.
+To formally define the structure of this data,
 let $A$ be the universe of all process activities,
 $C$ the universe of case IDs,
 $T$ the universe of possible timestamps
 and $S_1, ..., S_m$ the universes of the $m$ attributes associated with the process.
-%TODO: explain why?
-In this thesis, we will assume all relevant attributes to be case-level.
-Case-level attributes are static,
-which means that their values won't change during the execution of a process instance.
-An example for such an attribute could be the nationality or gender of a patient in a hospital.
 
-In an event log, executed activities as stored as events.
-Such an \textbf{event} $e$ can be described as a tuple $e = (a, c, s, t)$.
-In this tuple, $a \in A$ is the activity that has been executed.
-For ease of notation, we will use the shortcut $\text{\textit{activity}}(e) = a$
-to access the activity $a$ belonging to event $e$.
-$c \in C$ is the case ID, linking the event to a specific process instance.
+In this thesis, we focus exclusively on \textbf{case attributes},
+which are static and remain unchanged throughout the execution of a process instance.
+These attributes describe characteristics of the process instance itself,
+rather than dynamic properties of individual events.
+Case attributes can be either \textbf{categorical},
+containing predefined categories or classes, such as the patients gender or nationality,
+or \textbf{numerical}, representing continuous or discrete numerical values, like the patient's age or income. 
+
+In an event log, executed activities are recorded as individual events.
+Each \textbf{event} $e$ can be formally described as a tuple $e = (a, c, s, t)$.
+Here, $a \in A$ is the activity that has been executed,
+$c \in C$ is the case ID, linking the event to a specific process instance,
 $s$ is a tuple $s = (s_1, ..., s_m)$ with $s_i \in S_i, \forall i \in \{1, ..., m\}$,
-containing the values of each attribute.
-$t \in T$ is the timestamp denoting when the event occurred.
+containing the values of each attribute
+and $t \in T$ is the timestamp denoting when the event occurred.
 
 The sequence of all events $e_1, ..., e_l$ belonging to a single case $c$,
 ordered by their timestamps, is called the \textbf{trace} of $c$ with length $l$.
@@ -83,8 +85,8 @@ allocate resources effectively, and preempt potential issues.
 In this thesis, we will take a closer look specifically at \textbf{next activity prediction},
 where the objective is to forecast the subsequent activity in an ongoing case.
 Formally, given a prefix $e_1, ..., e_{l'}$ of observed events,
-the goal is to predict $\text{\textit{activity}}(e_{l'+1})$,
-the activity label of the next event $e_{l'+1}$.
+the goal is to predict the activity label $a_{l'+1}$ of the next event
+$e_{l'+1} = (a_{l'+1}, c_{l'+1}, s_{l'+1}, t_{l'+1})$.
 
 \section{Black Box vs. White Box}
 Within the field of PBPM, numerous traditional machine learning
@@ -103,27 +105,27 @@ However, this may come at the cost of reduced predictive performance for complex
 \cite{black_white}
 
 The difference between black and white box models will become even clearer
-in the following sections \ref{sec: nn} and \ref{sec: dt},
+in the following sections \ref{sec:nn} and \ref{sec:dt},
 as we will look at feedforward neural networks as an example for a black box model
 and decision trees as an example for a white box model.
 
 \section{Neural Networks}
-\label{sec: nn}
-In this thesis, \textbf{feedforward neural networks} (FNN)
+\label{sec:nn}
+In this thesis, \textbf{feedforward neural networks} (NN)
 will be used as the main predictor for the task of next activity prediction.
 While these are not inherently designed for sequence data,
 such as traces in an event log, their simplicity and ease of training still makes them an attractive choice.
 Additionallly, the focus of this work doesn't lie on achieving maximum predictive performance,
 but rather the conceptual demonstration of our approach.
-Moreover, FNNs have been employed in related work \cite{fairness_adversarial} within PBPM,
+Moreover, NNs have been employed in related work \cite{fairness_adversarial} within PBPM,
 demonstrating their viability for similar tasks.
-Nevertheless, since our methodology described in chapter \ref{sec: methodology}
-is not specific to using FNNs,
+Nevertheless, since our methodology described in chapter \ref{sec:methodology}
+is not specific to using NNs,
 it is entirely feasible to adapt our approach to other deep learning architectures.
 
 \subsection{Perceptron}
-\label{sec: perceptron}
-In order to understand FNNs,
+\label{sec:perceptron}
+In order to understand NNs,
 it is helpful to begin with the basic computational unit in a neural network,
 the perceptron.
 The perceptron processes an input vector $x = (x_1, ..., x_n)$
@@ -135,9 +137,9 @@ which determines the final output of the perceptron.
 This activation function typically introduces non-linearity into the computation,
 such as the ReLU or sigmoid function. \cite{perceptron}
 
-All in all, the perceptron calculates its scalar output $y$ for the input $x$ as:
+Formally, the perceptron calculates its scalar output $y$ for the input $x$ as:
 \begin{align}
-  \label{math: perceptron}
+  \label{math:perceptron}
 	y = \sigma\left(\left[\sum_{i = 1}^n w_i \cdot x_i \right] + b\right)
 \end{align}
 
@@ -147,10 +149,11 @@ All in all, the perceptron calculates its scalar output $y$ for the input $x$ as
 The scalar output of a perceptron can only be used for basic binary classification or regression problems.
 Even then, due to the simple construction of the perceptron,
 its effectiveness is highly limited, depending on the complexity of the task. \cite{perceptron_limited}
-FNNs extend the perceptron model by organizing multiple perceptrons into a structured,
-layered network, enabling them to handle complex tasks.
+NNs extend the perceptron model by organizing multiple perceptrons into fully connected layers,
+where every perceptron in one layer is connected to every perceptron in the next.
+This structure allows NNs to handle more complex tasks.
 
-An FNN consists of three distinct types of layers, ordered sequentially:
+An NN consists of three distinct types of layers, ordered sequentially:
 \begin{itemize}
 \item Input layer:
 The input layer acts as the interface between raw input data and the network.
@@ -164,7 +167,8 @@ enabling the network to capture intricate patterns and relationships.
 \item Output layer:
 The output layer produces the final predictions of the network.
 For multiclass classification tasks, such as next activity prediction,
-the layer includes one perceptron for each class.
+the layer includes one perceptron for each class,
+which in our case corresponds to the number of activities.
 \end{itemize}
 
 The number of hidden layers, the number of perceptrons per layer,
@@ -173,50 +177,105 @@ These design choices are critical in determining the model's ability to handle t
 while balancing computational complexity and capacity.
 
 \subsection{Feedforward Algorithm}
+\label{sec:feedforward}
+%relu
 With the network architecture defined,
 the next step is to understand how input data is processed as it passes through the various layers.
 This process is governed by the \textbf{feedforward algorithm}.
 
 The algorithm begins at the input layer,
 where the input $x = (x_1, ..., x_n)$ is passed directly to the next layer without any transformations. 
-From there, each perceptron in the subsequent hidden and output layers
-performs the same operation as provided in formula \ref{math: perceptron},
+From there, each perceptron in the subsequent hidden layers
+performs the same operation as provided in formula \ref{math:perceptron},
 using the outputs from the previous layer as inputs.
 Formally, the activiation $y_j^{(l)}$ of the $j$-th perceptron in the $l$-th layer
-is computed from the outputs $y_1^{(l-1)}, ..., y_m^{(l-1)}$ of the previous layer,
+is computed from the $m$ outputs $y_1^{(l-1)}, ..., y_m^{(l-1)}$ of the previous layer,
 using weight vector $w^{(l)} = (w_{1,j}^{(l)}, ..., w_{m,j}^{(l)})$, bias $b_j^{(l)}$
-and activation function $\sigma_j^{(l)}$:
+and activation function $\sigma_j^{(l)}$ as follows:
 
 \begin{align}
 	y_j^{(l)} = \sigma\left(\left[\sum_{i = 1}^m w_{i,j}^{(l)} \cdot y_i^{(l-1)} \right] + b_j^{(l)}\right)
 \end{align}
 
-Once the algorithm completes, 
-the values produced by the perceptrons in the output layer are passed through a softmax activation function,
-which transforms them into a probability distribution across all possible classes.
+In the output layer, the perceptrons are activated using the softmax function.
+Let $z_j^{(l')} = \left[\sum_{i = 1}^{m'} w_{i,j}^{(l')} \cdot y_i^{(l'-1)} \right] + b_j^{(l')}$ be 
+the weighted sum of inputs of the $j$-th perceptron in the output layer $L$ before activation.
+Then, given the total number of classes $k$, 
+the softmax activation $y_j^{(l')}$ for the $j$-th output perceptron is defined as:
+
+\begin{align}
+  y_j^{(l')} = \frac{\exp(z_j^{(l')})}{\sum_{i=1}^k \exp(z_k^{(l')})}
+\end{align}
+
+The softmax activation ensures that the outputs $y_1^{(l')},...,y_k^{(l')}$
+form a valid probability distribution,
+with each value between 0 and 1 and their sum equal to 1.
 The predicted class corresponds to the one with the highest probability.
 
-This strictly unidirectional flow of data ensures that no feedback loops are introduced,
-maintaining computational simplicity.
-Each layer's output is used exclusively as the input for the next layer,
-making the process of computation straightforward and efficient.
+All in all, the strictly unidirectional flow of data in the NN
+ensures that no feedback loops are introduced, maintaining computational simplicity.
 However, the interplay of numerous weights and biases across multiple layers,
 combined with the non-linear transformations introduced by activation functions,
 makes it difficult to intuitively understand or trace how specific inputs lead to specific outputs.
-This lack of transparency is why we consider FNNs to be black box models.
+This lack of transparency is why we consider NNs to be black box models.
 
 \subsection{Backpropagation Algorithm}
-% TODO
-% weights need to be trained
+% epochs
+% batch size
+% adam
+% gradient descent
+% learn rate
+\label{sec:backpropagation}
+While the feedforward algorithm enables a neural network to compute predictions
+by propagating input data through its layers,
+this process alone does not modify the network's parameters.
+To improve the network's predictions and reduce errors,
+an optimization process is required.
+This is achieved through the \textbf{backpropagation algorithm},
+which employs the gradient descent optimization in order to
+iteratively update the model's weights and biases in the direction that reduces the error
+between the predicted and target outputs.
 
-% training data, loss
+The training process relies on a dataset $S$ composed of \textbf{training samples},
+where each sample $(x,y) \in S$ consists of an input vector $x=(x_1,...,x_n)$ with $n$ numerical features
+and a corresponding target $y$.
+For our task of next activity prediction,
+$y$ is represented as a \textbf{one-hot encoded vector} $y = (y_1, ..., y_k)$,
+where $y_c = 1$ for the target class $c$, while $y_i = 0, i \neq c$ for all other classes.
+The number of classes $k$ corresponds to the amount of activities in the task.
 
+The discrepancy between the predicted probability distribution $\hat{y} = (\hat{y}_1, ..., \hat{y}_k)$,
+generated by the network, and the target distribution $y = (y_1, ..., y_k)$
+is quantified using the \textbf{cross-entropy loss} $L$.
+When the target distribution $y$ is represented as a one-hot vector, the loss is given by:
+
+\begin{align} L = - \sum_{i=1}^C y_i \log(\hat{y}_i), \end{align}
+
+The cross-entropy loss penalizes the network heavily when the predicted probability for the target class $c$ is low,
+encouraging the network to assign high probabilities to the correct classes.
+
+Backpropagation operates in two main steps: the forward pass and the backward pass.
+In the forward pass,
+the input $x$ is propagated through the network to compute the predicted probabilities $\hat{y}$.
+The cross-entropy loss is then calculated using the predicted probabilities and the target labels.
+
+The backward pass begins at the output layer,
+where the gradients of the loss function with respect to the network's predictions are directly computed
+based on the error calculated during the forward pass.
+These gradients are then propagated back through the hidden layers using the chain rule.
+At each layer, the gradients are used to update the weights and biases,
+moving them closer to their optimal values.
+
+The forward and backward passes are repeated iteratively over the training dataset
+until the loss converges to a satisfactory level or a predefined number of epochs is reached.
+By iteratively refining the weights and biases,
+backpropagation enables the network to learn from data and improve its predictions over time.
 
 \section{Decision Trees}
-\label{sec: dt}
-Similarly to FNNs, we will also use \textbf{Decision Trees} (DT) as a predictor for next activity prediction.
+\label{sec:dt}
+Similarly to NNs, we will also use \textbf{Decision Trees} (DT) as a predictor for next activity prediction.
 One of their most significant strengths lies in their transparency and interpretability,
-especially when compared to more opaque models like FNNs.
+especially when compared to more opaque models like NNs.
 And despite their lack of an inherent mechanism for handling sequential dependencies,
 decision trees have been effectively employed in related work \cite{fairness_foundation} within the PBPM domain,
 making them a suitable choice for in this thesis. 
@@ -227,19 +286,22 @@ A tree $T$ is a special type of directed graph, defined as $T=(V,E)$,
 where $V$ is the finite set of \textbf{nodes} and $E \subset V \times V$ is the set of directed \textbf{edges}.
 When two nodes $u,v \in V$ are connected by an edged $(u,v) \in E$,
 we will call $u$ the \textbf{parent} of $v$ and likewise $v$ the \textbf{child} of $u$.
-Similarly, when there exists a sequence of edges $(u,w_1), (w_1,w_2), ..., (w_{n-1},w_n),(w_n, v) \subset E$,
-$u$ is an \textbf{ancestor} of $v$ and $v$ is a \textbf{descendant} of $u$.
+Similarly, a \textbf{path} from $u$ to $v$,
+defined a sequence of edges $(u,w_1), (w_1,w_2), ..., (w_{n-1},w_n),(w_n, v) \subset E$,
+establishes $u$ as an \textbf{ancestor} of $v$ and $v$ as a \textbf{descendant} of $u$.
 
 Within the tree, nodes are classified into either \textbf{internal nodes},
 when they have at least one child, or \textbf{leaf nodes},
 when they have no children.
-Additionallly, a node $r$ without parents, formally satisfying $\forall v \in V: (v,r) \notin E$,
+Additionally, a node $r$ without parents, formally satisfying $\forall v \in V: (v,r) \notin E$,
 denotes the \textbf{root} of the tree.
 Accordingly, the \textbf{subtree} rooted at a node $v$ refers to the tree $T_v = (V_v, E_v)$,
 where $V_v \subset V$ is the subset containing all descendants of $v$ 
 and $E_v \subset E$ the edges between $V_v$.
+Another essential property of a tree is its \textbf{depth},
+which measures the longest path from the root node to any of its leaf nodes.
 
-Lastly, unlike a general directed graph, a tree must satisfy several strict structural properties: \cite{trees}
+Finally, unlike a general directed graph, a tree must satisfy several strict structural properties: \cite{trees}
 \begin{itemize}
   \item \textbf{Single Root:} There has to be a unique root node $r \in V$.
   \item \textbf{Connectedness:} Every node $v \in V$ must be a descendant of root node $r$.
@@ -252,7 +314,7 @@ When a node has two children, we will assume a fixed distinction into a left chi
 \subsection{Decision Process}
 Having presented the necessary definitions,
 we will now take a closer look at how DTs work internally.
-In this thesis, input data for DTs will have the same shape as the input for FNNs.
+In this thesis, input data for DTs will have the same shape as the input for NNs.
 Therefore a sample $x = (x_1, ..., x_n)$ is a vector containing $n$ numerical features.
 When predicting the next activity $y$ for such a sample $x$, the nodes of the DT serve different roles:
 
@@ -273,6 +335,7 @@ Each path from the root to a leaf corresponds to a set of human-readable decisio
 enabling stakeholders to identify important features and assess the rationale behind each decision.
 
 \subsection{Training Process}
+\label{sec:dt_training}
 Now that we understand how a DT makes predictions,
 we turn our focus to the training process—how a DT is built from data.
 Let $S$ be the collection containing the training data
@@ -308,9 +371,9 @@ At each step, the algorithm evaluates all possible splits of the data by testing
 and various thresholds.
 Thresholds for splitting are derived directly from the values in the dataset associated with the node,
 ensuring that every threshold capable of separating samples into distinct subsets is tested.
-Specifically, given a feature $x_i$ and a sorted list of its values in SS,
+Specifically, given a feature $x_i$ and a sorted list of its values in the associated dataset,
 potential thresholds are chosen as the midpoints between consecutive unique values.
-The split that minimizes the impurity of the resulting subsets is chosen.
+Splits are chosen greedily, selecting the feature and threshold that provide the largest reduction in impurity.
 Formally, if splitting $S$ into $S_1$ and $S_2$ results in Gini impurities $G(S_1)$ and $G(S_2)$,
 the split is selected to minimize the weighted Gini impurity $G_{split}$:
 \begin{align}
@@ -322,13 +385,22 @@ This process is recursively repeated for each child node until a stopping criter
 such as reaching a maximum tree depth, achieving a minimum number of samples per leaf,
 or reducing impurity to a negligible level.
 
+At the end of this recursive process,
+the leaf nodes of the tree represent the terminal points of the decision-making structure.
+Each leaf is associated with a subset of the training data
+that corresponds to the sequence of splits leading to that leaf.
+For our task of next activity prediction,
+the output at each leaf is determined through majority voting:
+the output label $y$ that occurs most frequently in the training samples
+associated with the leaf is selected as the predicted label.
+
 \subsection{Cost Complexity Pruning}
 Depending on the selected stopping criterion,
 the final DT may include subtrees with numerous nodes
-that contribute little to its predictive value.
+that contribute little to the tree's predictive value.
 To address this, pruning is a common technique used to simplify decision trees
 by removing unnecessary branches, ultimately improving the tree's performance and generalizability.
-Additionallly, the reduced amount of nodes 
+Additionally, the reduced amount of nodes 
 will make the DT more easily interpretable for human stakeholders.
 
 One effective approach to pruning is \textbf{cost-complexity pruning},
@@ -338,9 +410,7 @@ which balances the trade-off between a tree's complexity and its predictive accu
 
 \section{Fairness}
 As machine learning systems are increasingly deployed in high-stakes applications,
-ensuring fairness has become a critical concern.
-Both neural networks and decision trees, while powerful tools for prediction,
-must be scrutinized for potential biases in their outcomes.
+both neural networks and decision trees must be scrutinized for potential biases in their prediction.
 This concern underscores the importance of having quantitative measures
 for assessing and comparing models to ensure that they meet fairness criteria
 alongside performance metrics.

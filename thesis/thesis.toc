@@ -13,34 +13,38 @@
 \contentsline {subsection}{\numberline {3.1.3}Next Activity Prediction}{8}{section*.16}%
 \contentsline {section}{\numberline {3.2}Black Box vs. White Box}{9}{section*.17}%
 \contentsline {section}{\numberline {3.3}Neural Networks}{9}{section*.18}%
-\contentsline {subsection}{\numberline {3.3.1}Perceptron}{9}{section*.19}%
+\contentsline {subsection}{\numberline {3.3.1}Perceptron}{10}{section*.19}%
 \contentsline {subsection}{\numberline {3.3.2}Network Architecture}{10}{section*.20}%
 \contentsline {subsection}{\numberline {3.3.3}Feedforward Algorithm}{11}{section*.21}%
-\contentsline {subsection}{\numberline {3.3.4}Backpropagation Algorithm}{11}{section*.22}%
-\contentsline {section}{\numberline {3.4}Decision Trees}{11}{section*.23}%
-\contentsline {subsection}{\numberline {3.4.1}Tree Structure and Key Components}{12}{section*.24}%
-\contentsline {subsection}{\numberline {3.4.2}Decision Process}{12}{section*.25}%
-\contentsline {subsection}{\numberline {3.4.3}Training Process}{13}{section*.26}%
-\contentsline {subsection}{\numberline {3.4.4}Cost Complexity Pruning}{14}{section*.27}%
-\contentsline {section}{\numberline {3.5}Fairness}{14}{section*.28}%
+\contentsline {subsection}{\numberline {3.3.4}Backpropagation Algorithm}{12}{section*.22}%
+\contentsline {section}{\numberline {3.4}Decision Trees}{13}{section*.23}%
+\contentsline {subsection}{\numberline {3.4.1}Tree Structure and Key Components}{13}{section*.24}%
+\contentsline {subsection}{\numberline {3.4.2}Decision Process}{14}{section*.25}%
+\contentsline {subsection}{\numberline {3.4.3}Training Process}{15}{section*.26}%
+\contentsline {subsection}{\numberline {3.4.4}Cost Complexity Pruning}{16}{section*.27}%
+\contentsline {section}{\numberline {3.5}Fairness}{16}{section*.28}%
 \contentsline {chapter}{\numberline {4}Methodology}{17}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Data Gathering}{17}{section*.30}%
-\contentsline {subsection}{\numberline {4.1.1}Data Simulation}{17}{section*.31}%
-\contentsline {subsection}{\numberline {4.1.2}Data Enrichment}{17}{section*.32}%
-\contentsline {section}{\numberline {4.2}Data Processing}{17}{section*.33}%
-\contentsline {section}{\numberline {4.3}Training the Model}{17}{section*.34}%
-\contentsline {section}{\numberline {4.4}Knowledge Distillation}{17}{section*.35}%
-\contentsline {section}{\numberline {4.5}Modification of the Decision Tree}{18}{section*.36}%
-\contentsline {subsection}{\numberline {4.5.1}Cutting Branches}{18}{section*.37}%
-\contentsline {subsection}{\numberline {4.5.2}Retraining Subtrees}{18}{section*.38}%
-\contentsline {section}{\numberline {4.6}Finetuning of the Model}{18}{section*.39}%
-\contentsline {chapter}{\numberline {5}Evaluation}{19}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Cancer Screening}{19}{section*.41}%
-\contentsline {section}{\numberline {5.2}Hospital Billing}{19}{section*.42}%
-\contentsline {section}{\numberline {5.3}BPI Challenge 2012}{19}{section*.43}%
-\contentsline {section}{\numberline {5.4}Ablation}{19}{section*.44}%
-\contentsline {chapter}{\numberline {6}Conclusion}{21}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Implications for theory and practise}{21}{section*.46}%
-\contentsline {section}{\numberline {6.2}Limitations and Challenges}{21}{section*.47}%
-\contentsline {section}{\numberline {6.3}Future Work}{21}{section*.48}%
-\contentsline {chapter}{\nonumberline Bibliography}{23}{chapter*.49}%
+\contentsline {subsection}{\numberline {4.1.1}Event Log Simulation}{17}{section*.31}%
+\contentsline {subsection}{\numberline {4.1.2}Event Log Enrichment}{18}{section*.32}%
+\contentsline {section}{\numberline {4.2}Preprocessing}{18}{section*.33}%
+\contentsline {section}{\numberline {4.3}Training the Neural Network}{20}{section*.34}%
+\contentsline {section}{\numberline {4.4}Knowledge Distillation}{20}{section*.35}%
+\contentsline {section}{\numberline {4.5}Training the Decision Tree}{21}{section*.36}%
+\contentsline {section}{\numberline {4.6}Modification of the Decision Tree}{22}{section*.37}%
+\contentsline {section}{\numberline {4.7}Finetuning of the Model}{23}{section*.38}%
+\contentsline {chapter}{\numberline {5}Evaluation}{25}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Experimental Setup}{25}{section*.40}%
+\contentsline {section}{\numberline {5.2}Cancer Screening}{25}{section*.41}%
+\contentsline {section}{\numberline {5.3}Hospital Billing}{25}{section*.42}%
+\contentsline {section}{\numberline {5.4}BPI Challenge 2012}{25}{section*.43}%
+\contentsline {section}{\numberline {5.5}Results}{25}{section*.44}%
+\contentsline {section}{\numberline {5.6}Ablation}{25}{section*.45}%
+\contentsline {subsection}{\numberline {5.6.1}Bias Strength}{25}{section*.46}%
+\contentsline {subsection}{\numberline {5.6.2}Amount of Attributes}{25}{section*.47}%
+\contentsline {subsection}{\numberline {5.6.3}Amount of Biasing Splits}{25}{section*.48}%
+\contentsline {chapter}{\numberline {6}Conclusion}{27}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Implications for theory and practise}{27}{section*.50}%
+\contentsline {section}{\numberline {6.2}Limitations and Challenges}{28}{section*.51}%
+\contentsline {section}{\numberline {6.3}Future Work}{29}{section*.52}%
+\contentsline {chapter}{\nonumberline Bibliography}{31}{chapter*.53}%

@@ -1,9 +1,111 @@
 % !TEX root = ../thesis.tex
 %
 \chapter{Conclusion}
+This chapter provides an overview of the key implications derived from our results,  
+discusses the limitations of our approach,  
+and outlines potential directions for future research. 
+
 
 \section{Implications for theory and practise}
+One important theoretical implication of our work is the recognition that not all forms of bias
+in machine learning models should be considered inherently negative.  
+While bias is often viewed as a flaw that must be eliminated,
+certain biases can reflect domain-specific requirements
+that contribute to more accurate and context-sensitive predictions.  
+Our experiments have demonstrated that it is possible to remove unwanted biases
+while preserving beneficial ones, highlighting the need for a more nuanced understanding of bias in machine learning. 
+
+From a practical perspective, ensuring fairness in machine learning models is increasingly important,
+especially in light of legal and regulatory frameworks such as
+the European Union's General Data Protection Regulation \cite{eugdpr} and the Artificial Intelligence Act \cite{aia}.  
+These regulations emphasize the need for machine learning systems to be transparent,
+unbiased, and equitable in their decision-making processes.  
+Our method offers a practical way to incorporate fairness into the model development pipeline,
+allowing for both transparent evaluation and targeted adjustments to meet fairness standards,
+without significantly compromising accuracy.
+
+Even in scenarios where fairness-driven changes to the model are not strictly necessary,
+the insights gained from analyzing and addressing bias can play a critical role in building trust among stakeholders.  
+Understanding how a black-box model behaves and ensuring it aligns
+with ethical and legal standards can foster confidence in its use,
+particularly in socially sensitive applications such as hiring, healthcare, and law enforcement.  
+Thus, our fairness-related insights would benefit not only those directly affected by the model's decisions
+but also the broader ecosystem of users, developers, and regulators.  
+
 
 \section{Limitations and Challenges}
+\label{sec:limitations}
+Although our approach holds potential
+we also noticed some shortcomings
+while working on this thesis:
+\begin{itemize}
+    \item \textbf{Decision Tree Splits:}
+        The success of our methods strongly depends on the splits in the decision tree.
+        In order to be able to remove negative bias stemming from a sensitive attribute,
+        without removing the positive bias it has,
+        it is essential for these biases to manifest in different splits.
+        When both kinds of biases are fused into a single node of the tree,
+        they are impossible to separate using our approach.
+        It would be feasible to avoid this by using a modified training algorithm,
+        that penalizes splits based on sensitive attributes,
+        similar to how it was done in \cite{fairness_decision_tree}.
+        This however might lead to a lower accuracy and transparency,
+        since the decision tree no longer accurately portrays the inner workings of its teacher model,
+        the neural network.
+    \item \textbf{Decision Tree Accuracy:}
+
+    \item \textbf{Decision Tree Complexity:}
+        Another problem with higher complexity of tasks,
+        is that the complexity of the decision tree rises as well.
+        When the amount of activities, attributes and their dependencies rises,
+        more splits and therefore nodes are needed in the decision tree to accurately model them,
+        which makes it difficult for domain experts to interpret the decision tree.
+        When limiting the amount of nodes and the depth of the decision tree however,
+        the decision tree remains interpretable, yet may lack in accuracy since it can no
+        longer protray the inner workings of the neural network.
+        This is likely to be a definite bottleneck of our approach,
+        since for highly complex problem there needs to be a tradoff between accuracy and interpretability.
+    \item \textbf{Manual Labor:}
+        Finally, compared to other methods from related work such as \cite{fairness_foundation}, \cite{fairness_adversarial}
+        or \cite{fairness_independence}, that seek to achieve fairness automatically,
+        based on fixed sets of rules and formulas,
+        our approach requires comparatively more user input from domain experts.
+        Even though it is possible to utilize our method to remove all bias stemming from a sensitive attribute altogether,
+        by removing all nodes that use the sensitive attribute as its split feature,
+        attempting to preserve the positive biases requires a domain expert scrutinizing and carfully modifying the decision tree.
+        This means that in practise,
+        our approach is likely to be more labor-intensive and consequently more cost-intensive than similar methods.
+\end{itemize}
+% NN might not be powerful enough
+
+% sensitive attribute too early: worst case root
+
+% decision tree not good enough accuracy: soft decision trees
+% bottleneck for finetuning
+
+% decision tree too complex for stakeholder: compromise between interpretability and accuracy
+
+% iterative process, modification may lead to new biases
+
+% requires manual labor, not automatic
 
 \section{Future Work}
+Besides tackling the topics we listed in the previous section \ref{sec:limitations},
+in order to overcome some of the faced challenges,
+there are some other topics one could look at for future work.
+
+% event attributes
+In this thesis, we focused exclusively on case attributes.
+
+
+% timestamps
+
+% correlations
+
+% direct comparison
+
+% see ms teams
+
+% different black box: transformer
+
+% different white box: soft decision trees

@@ -287,6 +287,32 @@
     \field{year}{2024}
   \endentry
 
+  \entry{hospital_billing}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=MF}{%
+         family={Mannhardt},
+         familyi={M\bibinitperiod},
+         given={Felix},
+         giveni={F\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {4TU.ResearchData}%
+    }
+    \strng{namehash}{MF1}
+    \strng{fullhash}{MF1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Man17}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{howpublished}{\url{https://doi.org/10.4121/uuid:76c46b83-c930-4798-a1c9-4be94dfeb741}}
+    \field{note}{dataset}
+    \field{title}{Hospital Billing - Event Log}
+    \field{version}{1}
+    \field{year}{2017}
+  \endentry
+
   \entry{fairness_independence}{article}{}
     \name{author}{2}{}{%
       {{hash=PJ}{%
@@ -444,6 +470,37 @@
     \field{volume}{1}
     \field{journaltitle}{Nature machine intelligence}
     \field{year}{2019}
+  \endentry
+
+  \entry{data_split}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=WH}{%
+         family={Weytjens},
+         familyi={W\bibinitperiod},
+         given={Hans},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=DWJ}{%
+         family={De\bibnamedelima Weerdt},
+         familyi={D\bibinitperiod\bibinitdelim W\bibinitperiod},
+         given={Jochen},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{WHDWJ1}
+    \strng{fullhash}{WHDWJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{WDW21}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \field{booktitle}{International Conference on Business Process Management}
+    \field{pages}{18\bibrangedash 29}
+    \field{title}{Creating unbiased public benchmark datasets with data leakage prevention for predictive process monitoring}
+    \field{year}{2021}
   \endentry
 
   \entry{bpmn}{article}{}
