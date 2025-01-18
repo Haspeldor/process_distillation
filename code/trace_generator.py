@@ -23,6 +23,7 @@ class Decision:
     attributes: List[str]
     possible_events: List[str]
     to_remove: bool = True
+    previous: str = None
 
 @dataclass
 class ProcessModel:
@@ -194,6 +195,23 @@ def build_process_model(model_name) -> ProcessModel:
         })
         process_model.add_transition("casual background check", "end", conditions={})
         process_model.add_transition("exhaustive background check", "end", conditions={})
+
+    elif model_name == "showcase":
+        process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
+        process_model.add_activity("register patient", start_activity=True)
+        process_model.add_activity("regular treatment")
+        process_model.add_activity("expert treatment")
+        process_model.add_activity("bill patient")
+        process_model.add_transition("register patient", "regular treatment", conditions={
+            ("gender", "male"): 0.4,
+            ("gender", "female"): 0.6
+        })
+        process_model.add_transition("register patient", "expert treatment", conditions={
+            ("gender", "male"): 0.6,
+            ("gender", "female"): 0.4
+        })
+        process_model.add_transition("regular treatment", "bill patient", conditions={})
+        process_model.add_transition("expert treatment", "bill patient", conditions={})
 
     elif model_name == "model_2":
         process_model.add_categorical_attribute("gender", [("male", 0.45), ("female", 0.45), ("diverse", 0.1)])
@@ -722,12 +740,15 @@ def get_rules(folder_name):
     return rules
 
 def get_attributes(folder_name):
-    categorical_attributes = ["day_of_week"]
-    numerical_attributes = ["time_delta", "time_of_day"]
+    categorical_attributes = []
+    numerical_attributes = ["time_delta"]
 
     if folder_name == "cc_n":
         categorical_attributes = ["gender"]
         numerical_attributes = ["age"]
+    if folder_name == "showcase":
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["time_delta"]
     elif folder_name == "hb":
         categorical_attributes = []
         numerical_attributes = []
@@ -742,11 +763,10 @@ def get_attributes(folder_name):
         numerical_attributes = ["age"]
     elif folder_name == "bpi_A":
         categorical_attributes = ["gender"]
-        numerical_attributes = ["case:AMOUNT_REQ"]
-        #numerical_attributes = []
+        numerical_attributes = ["case:AMOUNT_REQ", "time_delta"]
     elif "hb_" in folder_name:
         categorical_attributes = ["gender"]
-        numerical_attributes = ["age"]
+        numerical_attributes = ["age", "time_delta"]
     elif "hiring" in folder_name:
         categorical_attributes += ["case:citizen", "case:german speaking", "case:gender"]
         numerical_attributes += ["case:age", "case:yearsOfEducation"]
@@ -769,6 +789,8 @@ def get_critical_decisions(folder_name):
     if "hiring" in folder_name:
         critical_decisions.append(Decision(attributes=["case:age", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Application Rejected"], to_remove=True))
         critical_decisions.append(Decision(attributes=["case:yearsOfEducation"], possible_events=["Application Rejected"], to_remove=False))
+    elif folder_name == "showcase":
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["expert treatment", "regular treatment"], to_remove=True, previous="register patient"))
     elif "hospital" in folder_name:
         critical_decisions.append(Decision(attributes=["case:private_insurance", "case:underlying_condition", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Expert Examination"], to_remove=True))
         critical_decisions.append(Decision(attributes=["case:age"], possible_events=["Expert Examination"], to_remove=False))
@@ -779,17 +801,17 @@ def get_critical_decisions(folder_name):
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
     elif "hb_enriched_gender" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False), previous="NEW")
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
     elif "hb_enriched" in folder_name:
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False), previous="NEW")
     elif "hb_" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False))
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW"))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE"))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW"))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE"))
     elif "bpi_" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=False))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=True))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=False, previous="A_FINALIZED"))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=True, previous="A_PARTLYSUBMITTED"))
     
     return critical_decisions

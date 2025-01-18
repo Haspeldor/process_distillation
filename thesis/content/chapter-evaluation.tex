@@ -1,12 +1,53 @@
 % !TEX root = ../thesis.tex
 %
 \chapter{Evaluation}
+In this chapter, we systematically evaluate the performance and characteristics of the proposed methodology
+under various experimental setups and datasets.
+The objective is to assess not only the predictive accuracy but also the fairness across different scenarios.
+We also investigate the impact of various factors,
+such as bias strength and the number of biasing attributes or splits,
+on the model's behavior and outcomes.
 
-\section{Experimental Setup}
+\section{Experimental Framework}
+To evaluate our approach, we employ three distinct model configurations:
+\begin{itemize}
+    \item \textbf{Base Model:}
+        The base model operates without access to any sensitive attributes.
+        Its inputs are limited to recent activities and the time delta since the last event,
+        unless explicitly stated otherwise.
+        Because it does not use sensitive attributes,
+        this model ensures fairness by default and serves as a baseline for comparison with other models.
+    \item \textbf{Enriched Model:}
+        The enriched model leverages all available sensitive attributes to maximize its performance,
+        fully exploiting the dataset's potential.
+        However, this approach prioritizes accuracy at the expense of fairness,
+        representing the biased model that we aim to improve using our methodology.
+    \item \textbf{Modified Model:}
+        The modified model applies our proposed fairness-enhancing method to the enriched model.
+        Specifically, during the modification process,
+        we adjust the decision tree distilled from the enriched model by removing any node
+        that uses a sensitive attribute for splitting if the node's subtree contains leaves
+        where the sensitive attribute introduces negative bias in the output class.
+        When removing such nodes, we use the "cutting branches" method unless stated otherwise.
+\end{itemize}
+
+To ensure robust evaluation of these models, we utilize \textbf{10-fold cross-validation} \cite{10_fold},
+a standard technique in machine learning and statistical analysis.
+This method involves partitioning the dataset into ten approximately equal subsets \textbf{(folds)}.
+Each fold serves as a test set exactly once, while the remaining nine folds are used for training the model.
+This process is repeated ten times, with each iteration using a different fold as the test set.
+We assess each model across all folds using accuracy as the metric for predictive performance
+and demographic parity to measure the effect of negative bias from sensitive attributes.
+The mean and standard deviation of these metrics are presented in a summary table,
+while their distributions are visualized in plots to provide deeper insights into performance and fairness.
 
 \section{Cancer Screening}
 
 \section{Hospital Billing}
+
+%TODO: img of DFG
+
+%TODO: img of age/gender distribution
 
 \section{BPI Challenge 2012}
 
@@ -15,7 +56,9 @@
 \section{Ablation}
 
 \subsection{Bias Strength}
+% for a single split, plot from 0.5 to 1.0 in distances of 0.005
 
 \subsection{Amount of Attributes}
+% for a single split, plot 1, 5, 10, 25, 50, 100
 
 \subsection{Amount of Biasing Splits}

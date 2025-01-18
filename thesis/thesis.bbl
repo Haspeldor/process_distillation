@@ -17,6 +17,29 @@
 \endgroup
 
 \datalist[entry]{anyt/global//global/global}
+  \entry{trees}{book}{}
+    \name{author}{1}{}{%
+      {{hash=BL}{%
+         family={Breiman},
+         familyi={B\bibinitperiod},
+         given={Leo},
+         giveni={L\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Routledge}%
+    }
+    \strng{namehash}{BL1}
+    \strng{fullhash}{BL1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Bre17}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{title}{Classification and regression trees}
+    \field{year}{2017}
+  \endentry
+
   \entry{fairness_ml}{article}{}
     \name{author}{2}{}{%
       {{hash=CS}{%
@@ -110,6 +133,73 @@
     \field{volume}{31}
     \field{journaltitle}{Production and Operations Management}
     \field{year}{2022}
+  \endentry
+
+  \entry{gdpr}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=E}{%
+         family={{European Union}},
+         familyi={E\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{E2}
+    \strng{fullhash}{E2}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{{Eur}16}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \field{howpublished}{\url{https://eur-lex.europa.eu/eli/reg/2016/679/oj}}
+    \field{note}{Accessed: 2025-01-12}
+    \field{title}{{General Data Protection Regulation (GDPR), Regulation (EU) 2016/679}}
+    \field{year}{2016}
+  \endentry
+
+  \entry{aia}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=E}{%
+         family={{European Commission}},
+         familyi={E\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{E1}
+    \strng{fullhash}{E1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{{Eur}21}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \field{howpublished}{\url{https://eur-lex.europa.eu}}
+    \field{note}{Accessed: 2025-01-12}
+    \field{title}{{Artificial Intelligence Act, COM(2021) 206 final}}
+    \field{year}{2021}
+  \endentry
+
+  \entry{soft_decision_tree}{article}{}
+    \name{author}{2}{}{%
+      {{hash=FN}{%
+         family={Frosst},
+         familyi={F\bibinitperiod},
+         given={Nicholas},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=HG}{%
+         family={Hinton},
+         familyi={H\bibinitperiod},
+         given={Geoffrey},
+         giveni={G\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{FNHG1}
+    \strng{fullhash}{FNHG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{FH17}
+    \field{sortinit}{F}
+    \field{sortinithash}{F}
+    \field{title}{Distilling a neural network into a soft decision tree}
+    \field{journaltitle}{arXiv preprint arXiv:1711.09784}
+    \field{year}{2017}
   \endentry
 
   \entry{gan}{article}{}
@@ -470,6 +560,28 @@
     \field{volume}{1}
     \field{journaltitle}{Nature machine intelligence}
     \field{year}{2019}
+  \endentry
+
+  \entry{shapley}{article}{}
+    \name{author}{1}{}{%
+      {{hash=SLS}{%
+         family={Shapley},
+         familyi={S\bibinitperiod},
+         given={Lloyd\bibnamedelima S},
+         giveni={L\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{SLS1}
+    \strng{fullhash}{SLS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Sha53}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{A value for n-person games}
+    \field{volume}{2}
+    \field{journaltitle}{Contribution to the Theory of Games}
+    \field{year}{1953}
   \endentry
 
   \entry{data_split}{inproceedings}{}

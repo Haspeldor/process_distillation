@@ -1,6 +1,7 @@
 % !TEX root = ../thesis.tex
 %
-\chapter{Conclusion}
+\chapter{Conclusions}
+% TODO give overview over results in table
 This chapter provides an overview of the key implications derived from our results,  
 discusses the limitations of our approach,  
 and outlines potential directions for future research. 
@@ -17,7 +18,7 @@ while preserving beneficial ones, highlighting the need for a more nuanced under
 
 From a practical perspective, ensuring fairness in machine learning models is increasingly important,
 especially in light of legal and regulatory frameworks such as
-the European Union's General Data Protection Regulation \cite{eugdpr} and the Artificial Intelligence Act \cite{aia}.  
+the European Union's General Data Protection Regulation \cite{gdpr} or the Artificial Intelligence Act \cite{aia}.  
 These regulations emphasize the need for machine learning systems to be transparent,
 unbiased, and equitable in their decision-making processes.  
 Our method offers a practical way to incorporate fairness into the model development pipeline,
@@ -35,77 +36,144 @@ but also the broader ecosystem of users, developers, and regulators.
 
 \section{Limitations and Challenges}
 \label{sec:limitations}
-Although our approach holds potential
-we also noticed some shortcomings
-while working on this thesis:
-\begin{itemize}
-    \item \textbf{Decision Tree Splits:}
-        The success of our methods strongly depends on the splits in the decision tree.
-        In order to be able to remove negative bias stemming from a sensitive attribute,
-        without removing the positive bias it has,
-        it is essential for these biases to manifest in different splits.
-        When both kinds of biases are fused into a single node of the tree,
-        they are impossible to separate using our approach.
-        It would be feasible to avoid this by using a modified training algorithm,
-        that penalizes splits based on sensitive attributes,
-        similar to how it was done in \cite{fairness_decision_tree}.
-        This however might lead to a lower accuracy and transparency,
-        since the decision tree no longer accurately portrays the inner workings of its teacher model,
-        the neural network.
-    \item \textbf{Decision Tree Accuracy:}
+While our approach shows considerable promise,
+several limitations and challenges became evident during the course of this work. 
 
-    \item \textbf{Decision Tree Complexity:}
-        Another problem with higher complexity of tasks,
-        is that the complexity of the decision tree rises as well.
-        When the amount of activities, attributes and their dependencies rises,
-        more splits and therefore nodes are needed in the decision tree to accurately model them,
-        which makes it difficult for domain experts to interpret the decision tree.
-        When limiting the amount of nodes and the depth of the decision tree however,
-        the decision tree remains interpretable, yet may lack in accuracy since it can no
-        longer protray the inner workings of the neural network.
-        This is likely to be a definite bottleneck of our approach,
-        since for highly complex problem there needs to be a tradoff between accuracy and interpretability.
-    \item \textbf{Manual Labor:}
-        Finally, compared to other methods from related work such as \cite{fairness_foundation}, \cite{fairness_adversarial}
-        or \cite{fairness_independence}, that seek to achieve fairness automatically,
-        based on fixed sets of rules and formulas,
-        our approach requires comparatively more user input from domain experts.
-        Even though it is possible to utilize our method to remove all bias stemming from a sensitive attribute altogether,
-        by removing all nodes that use the sensitive attribute as its split feature,
-        attempting to preserve the positive biases requires a domain expert scrutinizing and carfully modifying the decision tree.
-        This means that in practise,
-        our approach is likely to be more labor-intensive and consequently more cost-intensive than similar methods.
-\end{itemize}
-% NN might not be powerful enough
+\subsection{Decision Tree Splits}
+The success of our methods heavily depends on how the splits in the distilled decision tree are structured.  
+To effectively remove negative bias associated with a sensitive attribute while preserving positive bias,  
+it is crucial for these biases to manifest in separate splits.  
+If both types of biases are merged into a single node, they become impossible to separate using our approach.  
+This issue is more likely to occur in higher-level splits (nodes with low depth),  
+as early splits are more general and less context-specific compared to deeper splits.  
 
-% sensitive attribute too early: worst case root
+A potential approach to address this is to use a modified training algorithm that penalizes splits based on sensitive attributes,  
+similar as proposed in \cite{fairness_decision_tree}.  
+This would cause sensitive features to appear at deeper-level splits (nodes with higher depth),
+where they can be evaluated in a more context-sensitive manner. 
+However, this approach may come at the cost of accuracy and transparency,  
+as the decision tree might no longer directly capture the inner workings of its teacher model, the neural network. 
 
-% decision tree not good enough accuracy: soft decision trees
-% bottleneck for finetuning
+\subsection{Decision Tree Accuracy}
+Decision trees may struggle to handle complex tasks with the same effectiveness as deep learning methods.  
+As a result, the performance gap between the distilled decision tree and its teacher model
+can widen significantly as task complexity increases.
+This issue is worsened by the decision tree's reliance on discrete target labels, 
+which can be too coarse to capture the nuances of the model's output distribution.
+Consequently, the decision tree may fail to fully leverage the wealth of information contained in the model's predictions,
+leading to significantly lower accuracies.
 
-% decision tree too complex for stakeholder: compromise between interpretability and accuracy
+One potential solution is to use soft decision trees as the student model, 
+as proposed in \cite{soft_decision_tree}.
+Soft decision trees employ probabilistic decision boundaries, 
+enabling them to better incorporate the output distribution from the teacher model. 
+While they do retain a level of interpretability, as decisions are still based on hierarchical rules,
+the probabilistic nature of decisions can make them less straightforward than hard decision rules.
 
-% iterative process, modification may lead to new biases
+Even with this potential improvement, the accuracy of the decision tree remains a critical factor in fine-tuning.
+If the tree generates inaccurate relabeling, it could hinder the fine-tuned model's performance.
+To address this, one could implement early stopping during fine-tuning, 
+helping to balance fairness improvements with accuracy retention and avoiding overfitting to imprecise relabeling.
 
-% requires manual labor, not automatic
+\subsection{Decision Tree Complexity}
+As task complexity increases, the complexity of the decision tree also rises.
+With more activities, attributes, and dependencies, 
+more splits and nodes are required in the decision tree to capture these intricacies, 
+resulting in a larger, more intricate model that becomes increasingly difficult for domain experts to interpret.
+
+Limiting the number of nodes and tree depth can preserve interpretability, 
+but this may come at the cost of accuracy, 
+as the tree may no longer represent the internal processes of the neural network to the full extent.
+This tradeoff between accuracy and interpretability seems to be an inherent bottleneck of our approach, 
+especially for highly complex problems.
+
+\subsection{Manual Labor}
+Finally, compared to methods from related work such as \cite{fairness_foundation}, \cite{fairness_adversarial}, 
+or \cite{fairness_independence}, which aim to achieve fairness automatically based on predefined rules, 
+our approach requires more direct input from domain experts.
+While it is possible to use our method automatically to eliminate all bias from a sensitive attribute
+by removing all nodes that use it for splitting, 
+preserving positive biases requires domain experts to carefully examine and adjust the decision tree.
+In practice, this means that our approach is likely to be more labor-intensive
+and consequently more cost-intensive than comparable methods.
 
 \section{Future Work}
-Besides tackling the topics we listed in the previous section \ref{sec:limitations},
-in order to overcome some of the faced challenges,
-there are some other topics one could look at for future work.
+Besides addressing the challenges we listed in the previous section \ref{sec:limitations},
+future research could expand on this thesis in several directions.
 
-% event attributes
-In this thesis, we focused exclusively on case attributes.
+\subsection{Event Attributes}
+Since this thesis focused exclusively on case attributes,
+future work could expand by incorporating event attributes to further enhance both fairness analysis and model performance.
+These event attributes could be encoded in a similar manner to case attributes
+and integrated into the input vector for each recent event within the time window considered.
+Furthermore, including timestamp data, such as time deltas for each event rather than just the most recent one,
+could provide a richer temporal context and potentially improve the predictive capabilities of the models as well.
+
+\subsection{Fairness Metrics}
+%TODO: WASSERSTEIN????
+Our evaluation exclusively utilized demographic parity as a fairness metric, which, while straightforward,
+can be imprecise for numerical data due to its dependence on predefined thresholds.
+Future studies could explore distribution-based metrics such as the Wasserstein distance \cite{wasserstein},
+as utilized in \cite{fairness_independence}, which better capture fairness across continuous attributes
+by comparing entire distributions rather than relying on single thresholds.
+
+Other approaches to group fairness, such as Shapley values \cite{shapley} as used in \cite{fairness_adversarial},
+are worth investigating due to their ability to provide a attribution-based perspective on bias.
+Unlike demographic parity, which evaluates fairness at a group level by comparing outcome distributions across demographic groups,
+Shapley values assess the contribution of individual features to a model's decisions,
+which allows for pinpointing the specific attributes that drive disparities in predictions.
+
+Additionally, future work could examine how the proposed methodology influences individual fairness metrics,
+Unlike group fairness, which focuses on comparing outcomes across demographic groups,
+individual fairness emphasizes treating comparable individuals within demographic groups similarly.
+
+\subsection{Prediction Tasks}
+The proposed methodology could be extended to other key tasks in PBPM,
+such as outcome prediction and remaining-time prediction, to evaluate its broader applicability.
+
+Outcome prediction involves determining the final result of a process,
+such as whether a loan will be approved or a treatment will succeed.
+Like next-activity prediction, outcome prediction is a classification task,
+making it likely that our proposed methodology could be applied with minimal adjustments:
+Simply replacing the next activity with the process outcome as the target labels in the dataset might suffice.
+
+Remaining-time prediction, however, introduces additional challenges.
+As a regression problem, it requires a fairness metric that is suitable for continuous outputs,
+such as the Shapley values \cite{shapley}, which were used for evaluating the remaining time task in \cite{fairness_adversarial}. 
+Moreover, since traditional decision trees are not designed for continuous outputs,
+an appropriate white-box model, such as regression trees \cite{trees},
+would need to be used as the student model for knowledge distillation.
+
+\subsection{Correlations}
+Fairness and debiasing research frequently highlights the issue of correlated attributes,
+as simply removing access to a sensitive attribute does not guarantee the elimination of its influence
+if it correlates with other non-sensitive attributes used in decision-making.
+
+For instance, in the BPI Challenge 2012 dataset discussed in section \ref{sec:bpi},
+the event log includes the non-sensitive attribute \textit{amount\_req},
+which represents the amount of money requested from the lending firm.
+Higher request amounts typically warrant additional scrutiny,
+making it reasonable for inquiries with larger sums to be denied more often. 
+However, if \textit{amount\_req} is correlated with a sensitive attribute like \textit{gender},
+for example, if women generally request higher sums than men,
+a "fair" model that relies on this attribute might unintentionally deny requests from women more frequently,
+even without direct access to the attribute \textit{gender}.
+
+Determining whether such correlations are fair requires careful consideration on a case-by-case basis,
+as some correlations may be justified while others may perpetuate bias.
+To adress this, future research should investigate how correlations involving sensitive attributes may
+appear in the distilled decision trees and develop methods to communicate information about such correlations
+to end-users in a clear and transparent manner.
+
+\subsection{Comparisons to Related Work}
+In this thesis, we evaluated our approach solely against a fully fair and a fully biased model.
+However, future work should include comparisons with alternative fairness methods in PBPM,
+such as those proposed in \cite{fairness_foundation}, \cite{fairness_adversarial}, and \cite{fairness_independence}.
+These comparisons may necessitate adjustments to our pipeline to account for differences in datasets,
+prediction tasks, or evaluation metrics used by these other approaches.
+Nonetheless, such comparisons would offer a more comprehensive view
+of the relative strengths and weaknesses of various methods,
+helping to position our approach within the broader landscape of fairness in PBPM.
 
 
-% timestamps
-
-% correlations
-
-% direct comparison
-
-% see ms teams
-
-% different black box: transformer
-
-% different white box: soft decision trees
+%TODO: different black box - transformer

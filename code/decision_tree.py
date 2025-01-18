@@ -369,7 +369,7 @@ class DecisionTreeClassifier:
 
         return filtered_nodes
 
-    def find_nodes_to_remove(self, critical_decisions, exhaustive=True, node=None):
+    def find_nodes_to_remove(self, critical_decisions, protective=False, node=None):
         if node is None:
             node = self.root
 
@@ -380,27 +380,21 @@ class DecisionTreeClassifier:
         right_result = self.find_nodes_to_remove(critical_decisions, node=node.right)
 
         output = left_result + right_result
-        # removes if a decision with the attribute exists, unless coherent with to_remove=False
-        if exhaustive:
-            for decision in critical_decisions:
-                if decision.to_remove:
-                    continue
-                for attribute in decision.attributes:
-                    if node.feature_index in self.feature_indices[attribute]:
-                        possible_events = self.collect_events(node_id=node.node_id)
-                        if not set(possible_events) & set(decision.possible_events):
+        # removes every nodes that overlaps with a to_remove=True
+        for decision in critical_decisions:
+            if not decision.to_remove:
+                continue
+            for attribute in decision.attributes:
+                if node.feature_index in self.feature_indices[attribute]:
+                    possible_events = self.collect_events(node_id=node.node_id)
+                    print(possible_events)
+                    print(decision.possible_events)
+                    if protective:
+                        if set(possible_events) & set(decision.possible_events):
                             output.append(node.node_id)
                             return output
-        
-        # removes only the nodes coherent with the to_remove=True
-        else:
-            for decision in critical_decisions:
-                if not decision.to_remove:
-                    continue
-                for attribute in decision.attributes:
-                    if node.feature_index in self.feature_indices[attribute]:
-                        possible_events = self.collect_events(node_id=node.node_id)
-                        if set(possible_events) & set(decision.possible_events):
+                    else:
+                        if set(possible_events) <= set(decision.possible_events):
                             output.append(node.node_id)
                             return output
 

@@ -62,7 +62,7 @@ The input $x$ should contain information about both the prefix and the correspon
 Since neural networks require inputs of a fixed size,
 we handle the varying lengths of prefixes by applying a sliding window of a static size $w$.
 If a prefix is shorter than the window size,
-we pad the sequence with a special <PAD> activity to fill the remaining positions.
+we pad the sequence with a special \textit{<PAD>} activity to fill the remaining positions.
 Conversely, if a prefix is longer than $w$, we truncate it to include only the most recent $w$ events. 
 
 Case attributes are encoded based on their type.
@@ -75,7 +75,7 @@ preventing numerical attributes with larger magnitudes from dominating those wit
 as well as categorical attributes.
 Given a numerical value $z$, the scaled value $z'$ is calculated as 
 \begin{align}
-    z' = \frac{z - \text{min}}{\text{max} - \text{min}}
+    z' = \frac{z - \textit{min}}{\textit{max} - \textit{min}}
 \end{align}
 where \textit{min} and \textit{max} refer to the minimum and maximum observed values of the attribute in the dataset.
 Finally, we concatenate the sequence of one-hot encoded activities
@@ -106,11 +106,11 @@ This setup mimics real-world predictive scenarios where historical data is used 
 In our case, we mostly use simulated event logs, in which there is no chronological difference,
 or public event logs, in which the timestamps have been anonymized,
 maintaining only the time difference between events. \cite{hospital_billing}
-Therefore, we simply used a random split instead.
+Therefore, a random split can be used instead.
 \item \textbf{Cluster Leakage:}  
-If the dataset contains groups of highly similar cases, e.g., grouped by customer, department, or product line,
+If the dataset contains groups of highly similar cases, e.g., cases grouped by customer, department, or product line,
 assigning entire clusters to either the training or test set prevents correlated information from leaking between the splits.
-Our datasets however are either simulated or highly anonymized to protect personal information \cite{hospital_billing}.
+The datasets we use however are either simulated or anonymized to protect personal information \cite{hospital_billing}.
 As a result, no distinct clusters are evident, making a random split both appropriate and sufficient.
 \item \textbf{Representative Datasets:}  
 Lastly, it's important to ensure that the test set is representative of the dataset's overall diversity.
@@ -212,6 +212,7 @@ eliminating splits that provide negligible reductions in impurity.
 %TODO: img trained tree
 
 \section{Modification of the Decision Tree}
+\label{sec:modification}
 Now that the inner workings of the NN have been represented as a decision tree,
 we can examine its structure for potential biases.
 Specifically, we look for inner nodes that use sensitive attributes as the basis for their splits
@@ -222,36 +223,38 @@ thereby removing their influence.
 To remove a biased node $v$ while maintaining the defined structure of a binary DT,
 we have several possible options:
 
-\label{sec:modification}
 \begin{itemize}
-\item \textbf{Cutting Branches:} 
-Let $u_1, u_2$ be the children of $v$ and $|S_{u_1}|, |S_{u_2}|$
-the number of training samples associated with each child respectively.
-When removing the node $v$ from the tree,
-the simplest approach would be to replace $v$ with the child node $u_i$
-that has more associated training sampels $|S_{u_i}|$, with $i \in \{1,2\}$.
-Basically, we would eliminate the subtree rooted at the child with less samples.
-This method ensures that the majority of samples are still handled similarly,
-while removing the biased split from the DT.
-However, the subtree and its splits may lose their coherence without the biased split,
-potentially leading to a significant drop in predictive performance after the modification.
-\item \textbf{Retraining Subtrees:}
-% TODO: retrain algorithm explained
-When removing $v$, an alternative approach would be to delete the entire subtree rooted at $v$
-and retrain it using the samples associated with $v$.
-To prevent the retrained subtree from making the same biased split,
-any features related to the sensitive attributes used by $v$ must be excluded from the entire subtree.
-Although this results in more coherent splits,
-there is a possibility that the sensitive attribute could have been used by a descendant of $v$ in a beneficial way,
-which we might not want to eliminate.
-Consequently, such positive splits would also be prevented.
-\item \textbf{Manual Modification:}  
-Finally, a domain expert could modify the decision tree, its node structure,
-and the associated features and thresholds based on their understanding
-of how the splits should be structured.
-However, even with domain knowledge,
-manually adjusting the decision tree requires significant effort
-and is challenging to do without substantially compromising prediction accuracy.
+    \item \textbf{Cutting Branches:} 
+    Let $u_1, u_2$ be the children of $v$ and $|S_{u_1}|, |S_{u_2}|$
+    the number of training samples associated with each child respectively.
+    When removing the node $v$ from the tree,
+    the simplest approach would be to replace $v$ with the child node $u_i$
+    that has more associated training sampels $|S_{u_i}|$, with $i \in \{1,2\}$.
+    Basically, we would eliminate the subtree rooted at the child with less samples.
+    This method ensures that the majority of samples are still handled similarly,
+    while removing the biased split from the DT.
+    However, the subtree and its splits may lose their coherence without the biased split,
+    potentially leading to a significant drop in predictive performance after the modification.
+
+    \item \textbf{Retraining Subtrees:}
+    An alternative approach when removing $v$ is to delete the entire subtree rooted at $v$
+    and retrain it using the samples associated with $v$.  
+    The retraining process follows the procedure outlined in section \ref{sec:dt_training},
+    stopping when the dataset becomes fully pure or when the subtree reaches a greater depth than the rest of the tree.  
+    To prevent the retrained subtree from making the same biased split however,
+    any features related to the sensitive attributes used by $v$ must be excluded from the entire subtree.  
+    Although this results in more coherent splits,
+    there is a possibility that the sensitive attribute could have been used by a descendant of $v$ in a beneficial way,
+    which we might not want to eliminate.
+    Additionally, the retraining process could introduce new biases related to other sensitive attributes that were not previously present.  
+    This means the retraining may need to be repeated multiple times until all unwanted bias is removed.  
+
+    \item \textbf{Manual Modification:}  
+    Finally, a domain expert could manually modify the decision tree, its node structure,
+    and the associated features and thresholds based on their understanding of how the splits should be structured.
+    However, even with domain knowledge,
+    manually adjusting the decision tree is challenging to do without substantially compromising prediction accuracy
+    and requires significant effort.
 \end{itemize}
 
 % TODO: image comparative before and after mod
@@ -265,13 +268,13 @@ when it comes to solving complex tasks \cite{ml_comparison}.
 In order to combine the more precise predictions of the NN with the fairer decisions of the DT,
 we attempt to fine-tune our NN in accordance to the predictions of the DT.
 
-\textbf{Fine-tuning} is a transfer learning technique
+\textbf{Fine-tuning} \cite{fine_tuning} is a transfer learning technique
 that involves adapting a pre-trained model to a new task or dataset.
 Rather than training a neural network from scratch,
 fine-tuning starts with a model that has already been trained on a related task,
 leveraging its pre-learned features.
 This reduces training time, requires fewer data, and often improves performance
-by building on the general representations learned during pre-training. \cite{fine_tuning}
+by building on the general representations learned during pre-training.
 
 In our case, we fine-tune the pre-trained NN from the previous section \ref{sec:training}
 using a training set modified to enhance fairness.

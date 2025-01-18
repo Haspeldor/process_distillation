@@ -24,6 +24,8 @@ from sklearn.tree import export_text
 from trace_generator import *
 from data_processing import *
 from decision_tree import *
+from plotting import *
+from experiments import *
 
 
 class ExpandDimsLayer(Layer):
@@ -38,8 +40,8 @@ def generate_data(num_cases, model_name, n_gram):
     process_model = build_process_model(model_name)
     folder_name = model_name
     categorical_attributes, numerical_attributes = get_attributes(folder_name)
-    X, y, class_names, feature_names, feature_indices, critical_decisions = generate_processed_data(process_model, categorical_attributes=categorical_attributes, numerical_attributes=numerical_attributes, num_cases=num_cases, n_gram=n_gram, folder_name=folder_name)
-    return X, y, class_names, feature_names, feature_indices, critical_decisions
+    X, y, class_names, feature_names, feature_indices = generate_processed_data(process_model, categorical_attributes=categorical_attributes, numerical_attributes=numerical_attributes, num_cases=num_cases, n_gram=n_gram, folder_name=folder_name)
+    return X, y, class_names, feature_names, feature_indices
 
 # define neural network architecture
 def build_nn(input_dim, output_dim):
@@ -145,6 +147,7 @@ def train_sklearn_dt(X_train, y_train):
     print("training decision tree:")
     #dt = SklearnDecisionTreeClassifier(max_depth=10)
     #dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5)
+    # TODO: try various ccp
     dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5, ccp_alpha=0.001)
     dt.fit(X_train, y_train)
     print("--------------------------------------------------------------------------------------------------")
@@ -222,10 +225,15 @@ def print_metrics_nn(nn, dt, X, node_ids):
 def calculate_fairness(nn, X, critical_decisions, feature_indices, class_names, feature_names):
     y = nn.predict(X)
     for decision in critical_decisions:
+        previous_feature = "-1. Event = " + decision.previous
+        previous_index = feature_names.index(previous_feature)
+        filter_mask = X[:, previous_index] == 1
+        X_filtered = X[filter_mask]
+        y_filtered = y[filter_mask]
         for attribute in decision.attributes:
             for feature_index in feature_indices[attribute]:
                 possible_events = decision.possible_events
-                metrics = get_metrics(X, y, feature_index, possible_events, class_names, feature_names)
+                metrics = get_metrics(X_filtered, y_filtered, feature_index, possible_events, class_names, feature_names)
                 print(f"Metrics for {feature_names[feature_index]}, {possible_events}:")
                 for metric in metrics:
                     print(metric)
@@ -249,6 +257,8 @@ def calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X, critical
             y[name] = nn.predict(X)
 
     for decision in critical_decisions:
+        previous_feature = "-1. Event = " + decision.previous
+        previous_index = feature_names.index(previous_feature)
         for attribute in decision.attributes:
             feature_indices_to_use = feature_indices.get(attribute, [])
             for feature_index in feature_indices_to_use:
@@ -263,12 +273,15 @@ def calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X, critical
                             event_index = class_names.index(event)
                         elif isinstance(class_names, np.ndarray):
                             event_index = np.where(class_names == event)[0][0]
-                        protected_attribute = X[:, feature_index]
-                        stat_par, disp_imp = get_fairness_metrics(y[name], protected_attribute, event_index)
+                        filter_mask = X[:, previous_index] == 1
+                        X_filtered = X[filter_mask]
+                        y_filtered = y[name][filter_mask]
+                        protected_attribute = X_filtered[:, feature_index]
+                        stat_par, disp_imp = get_fairness_metrics(y_filtered, protected_attribute, event_index)
 
                         disp_imp_results[outer_key][name] = disp_imp
                         stat_par_results[outer_key][name] = stat_par
-                        print(f"Disparate Impact for {feature_names[feature_index]}, {event}, {name}: {disp_imp}")
+                        #print(f"Disparate Impact for {feature_names[feature_index]}, {event}, {name}: {disp_imp}")
                         print(f"Statistical Parity for {feature_names[feature_index]}, {event}, {name}: {stat_par}")
 
     return stat_par_results, disp_imp_results
@@ -302,7 +315,7 @@ def get_fairness_metrics(y, protected_attribute, event_index):
     else:
         disp_impact = selection_rate_unprivileged / selection_rate_privileged
 
-    stat_parity = selection_rate_unprivileged - selection_rate_privileged
+    stat_parity = abs(selection_rate_unprivileged - selection_rate_privileged)
     return stat_parity, disp_impact
 
 
@@ -384,20 +397,20 @@ def masked_accuracy(y_true, y_pred):
     return tf.reduce_sum(correct_predictions) / tf.reduce_sum(mask)
 
 
-def finetune_nn(nn, X, y_modified, y_train=[], epochs=5, batch_size=32, learning_rate=1e-5, weight=5, mode="simple"):
+def finetune_nn(nn, X_train, y_modified, y_train=[], X_test=[], y_test=[], epochs=5, batch_size=32, learning_rate=1e-3, weight=5, mode="simple"):
     # if mode is simple, just train with y_modified
     if mode == "simple":
         nn.compile(optimizer=Adam(learning_rate=learning_rate), loss='categorical_crossentropy', metrics=['accuracy'])
-        nn.fit(X, y_modified, epochs=epochs, batch_size=batch_size)
+        nn.fit(X_train, y_modified, epochs=epochs, batch_size=batch_size)
 
     # if mode is changed, just use the samples that changed value
     elif mode == "changed":
         changed_rows = np.any(y_train != y_modified, axis=1)
         changed_indices = np.where(changed_rows)[0]
-        X_changed = X[changed_indices]
+        X_changed = X_train[changed_indices]
         y_changed = y_modified[changed_indices]
         nn.compile(optimizer=Adam(learning_rate=learning_rate), loss='categorical_crossentropy', metrics=['accuracy'])
-        nn.fit(X_changed, y_changed, epochs=epochs, batch_size=batch_size)
+        nn.fit(X_changed, y_changed, epochs=epochs, batch_size=batch_size, validation_data=(X_test, y_test))
     
     # if mode is weighted, use all samples but weigh the changed indices higher
     elif mode == "weighted":
@@ -406,7 +419,7 @@ def finetune_nn(nn, X, y_modified, y_train=[], epochs=5, batch_size=32, learning
         sample_weight[changed_indices] = weight
         print(len(sample_weight))
         nn.compile(optimizer=Adam(learning_rate=learning_rate), loss='categorical_crossentropy', metrics=['accuracy'])
-        nn.fit(X, y_modified, sample_weight=sample_weight, epochs=epochs, batch_size=batch_size)
+        nn.fit(X_train, y_modified, sample_weight=sample_weight, epochs=epochs, batch_size=batch_size)
     
     else:
         raise(f"mode {mode} doesn't exist!")
@@ -442,7 +455,8 @@ def print_samples(n, X, y, class_names, feature_names, numerical_attributes):
 def run_preprocessing(folder_name, file_name=None, model_name=None, n_gram=3, num_cases=10000, enrichment=False):
     if model_name:
         print(model_name)
-        X, y, class_names, feature_names, feature_indices, critical_decisions = generate_data(num_cases, model_name, n_gram)
+        X, y, class_names, feature_names, feature_indices = generate_data(num_cases, model_name, n_gram)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     elif file_name:
         df = load_xes_to_df(file_name, folder_name=folder_name, num_cases=num_cases)
         if enrichment:
@@ -530,9 +544,9 @@ def run_complete(folder_name, model_name=None, file_name=None, n_gram=3, num_cas
     evaluate_dt(dt_distilled, X_test, y_test)
     print(f"Critical Decisions: {critical_decisions}")
     nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+    print(f"Nodes to remove accordingly: {nodes_to_remove}")
+    print("--------------------------------------------------------------------------------------------------")
     if nodes_to_remove:
-        print(f"Nodes to remove accordingly: {nodes_to_remove}")
-        print("--------------------------------------------------------------------------------------------------")
         run_modify(folder_name, node_ids=nodes_to_remove, console_output=False, retrain=retrain)
         run_finetuning(folder_name, console_output=False)
     print("Pipeline done, running analysis...")
@@ -591,13 +605,13 @@ def run_finetuning(folder_name, epochs=5, batch_size=32, learning_rate=1e-3, wei
     print("finetuning mode: changed")
     nn = load_nn(folder_name, "nn.keras")
     nn_changed = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="changed", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
-    save_nn(nn_simple, folder_name, "nn_changed.keras")
+    save_nn(nn_changed, folder_name, "nn_changed.keras")
     y_distilled = distill_nn(nn_changed, X_train)
     dt_changed = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_changed.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
     print("finetuning mode: weighted")
     nn = load_nn(folder_name, "nn.keras")
     nn_weighted = finetune_nn(nn, X_train, y_modified, y_train=y_train, mode="weighted", epochs=epochs, batch_size=batch_size, learning_rate=learning_rate, weight=weight)
-    save_nn(nn_simple, folder_name, "nn_weighted.keras")
+    save_nn(nn_weighted, folder_name, "nn_weighted.keras")
     y_distilled = distill_nn(nn_weighted, X_train)
     dt_weighted = train_dt(X_train, y_distilled, folder_name=folder_name, model_name="dt_weighted.json", class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
 
@@ -654,7 +668,7 @@ def run_modify(folder_name, node_ids=[], console_output=True, retrain=False):
     save_data(y_encoded, folder_name, "y_modified.pkl")
 
 def run_demo(folder_name, n_gram=3, num_cases=1000, preprocessing=False):
-    run_shapley("bpi_A")
+    run_4_cases()
     sys.exit()
     male_shapley_scores = load_data(folder_name, "male_shapley_scores.pkl")
     female_shapley_scores = load_data(folder_name, "female_shapley_scores.pkl")
@@ -737,13 +751,13 @@ def run_shapley(folder_name, n_gram=3):
 
 
 def run_4_cases():
-    #folder_names = ["hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender"]
-    folder_names = ["hb_-age_+gender"]
+    folder_names = ["hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender"]
+    #folder_names = ["hb_-age_+gender"]
 
     for folder_name in folder_names:
-        load_xes_to_df("hospital_billing", folder_name=folder_name)
+        load_xes_to_df("hospital_billing", folder_name=folder_name, num_cases=10000)
         run_enrichment(folder_name)
-        run_evaluate(folder_name)
+        run_k_fold(folder_name)
 
 
 def run_enrichment(folder_name):
@@ -868,7 +882,92 @@ def run_sklearn_test(folder_name="cc", n_gram=2, num_cases=10, preprocessing=Fal
     print("Transformed distilled DT:")
     evaluate_dt(dt_transformed, X_test, y_test)
 
-def run_evaluate(folder_name, iterations=10, n_gram=3, retrain=False):
+def run_k_fold(folder_name, folds=10, n_gram=3, retrain=True):
+    base_accuracy_values = []
+    enriched_accuracy_values = []
+    modified_accuracy_values = []
+    stat_par_results = {}
+    df = load_data(folder_name, "df.pkl")
+    categorical_attributes, numerical_attributes = get_attributes(folder_name)
+    if folder_name == "bpi_A":
+        categorical_attributes_base, numerical_attributes_base = [], ["case:AMOUNT_REQ", "time_delta"]
+    else:
+        categorical_attributes_base, numerical_attributes_base = get_attributes("")
+    
+    base_attributes = categorical_attributes_base + numerical_attributes_base
+    critical_decisions = get_critical_decisions(folder_name)
+    class_names = sorted(df["activity"].unique().tolist() + ["<PAD>"])
+    attribute_pools = create_attribute_pools(df, categorical_attributes)
+    feature_names = create_feature_names(class_names, attribute_pools, numerical_attributes, n_gram)
+    feature_indices = create_feature_indices(class_names, attribute_pools, numerical_attributes, n_gram)
+    print(class_names)
+    print(feature_names)
+    print(feature_indices)
+
+    folds = k_fold_cross_validation(df, categorical_attributes, numerical_attributes, n_gram=3, k=folds)
+
+    for i, (X_train, y_train, X_test, y_test) in tqdm(enumerate(folds), desc="evaluating model:"):
+        # evaluating the base model
+        X_train_base = remove_attribute_features(X_train, feature_indices, base_attributes)
+        X_test_base = remove_attribute_features(X_test, feature_indices, base_attributes)
+        nn_base = train_nn(X_train_base, y_train)
+        base_accuracy = evaluate_nn(nn_base, X_test_base, y_test)
+        base_accuracy_values.append(base_accuracy)
+
+        # evaluating the enriched model
+        nn_enriched = train_nn(X_train, y_train)
+        y_distilled = distill_nn(nn_enriched, X_train)
+        dt_distilled = train_dt(X_train, y_distilled, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+        enriched_accuracy = evaluate_nn(nn_enriched, X_test, y_test)
+        evaluate_dt(dt_distilled, X_test, y_test)
+        enriched_accuracy_values.append(enriched_accuracy)
+
+        # modifying the distilled model
+        nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+        if nodes_to_remove:
+            print(f"Removing nodes: {nodes_to_remove}")
+            if retrain:
+                y_encoded = np.argmax(y_train, axis=1)
+                for node_id in nodes_to_remove:
+                    dt_distilled.delete_node(X_train, y_encoded, node_id)
+            else:
+                for node_id in nodes_to_remove:
+                    dt_distilled.delete_branch(node_id)
+            y_modified = dt_distilled.predict(X_train)
+            y_encoded = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
+
+            # finetuning and evaluating the changed model
+            nn_modified = clone_model(nn_enriched)
+            nn_modified.set_weights(nn_enriched.get_weights())
+            nn_modified = finetune_nn(nn_modified, X_train, y_encoded, y_train=y_train, X_test=X_test, y_test=y_test, mode="changed")
+            modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
+        else:
+            nn_modified = clone_model(nn_enriched)
+            nn_modified.set_weights(nn_enriched.get_weights())
+            print(f"No nodes to remove!")
+            modified_accuracy = enriched_accuracy
+        modified_accuracy_values.append(modified_accuracy)
+
+        print(f"base accuracy: {base_accuracy}, enriched accuracy: {enriched_accuracy}, modified accuracy: {modified_accuracy}")
+        calculate_fairness(nn_modified, X_test, critical_decisions, feature_indices, class_names, feature_names)
+        stat_par_result, _ = calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X_test, critical_decisions, feature_indices, class_names, feature_names, base_attributes)
+        for outer_key, outer_value in stat_par_result.items():
+            if i == 0:
+                stat_par_results[outer_key] = {}
+            for inner_key, inner_value in outer_value.items():
+                if i == 0:
+                    stat_par_results[outer_key][inner_key] = []
+                stat_par_results[outer_key][inner_key].append(inner_value)
+        print("--------------------------------------------------------------------------------------------------")
+
+    save_data(base_accuracy_values, folder_name, "base_accuracy_values.pkl")
+    save_data(enriched_accuracy_values, folder_name, "enriched_accuracy_values.pkl")
+    save_data(modified_accuracy_values, folder_name, "modified_accuracy_values.pkl")
+    plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name)
+    plot_all_parity(stat_par_results, folder_name)
+    return base_accuracy_values, modified_accuracy_values
+
+def run_evaluate(folder_name, iterations=3, n_gram=3, retrain=True):
     base_accuracy_values = []
     enriched_accuracy_values = []
     modified_accuracy_values = []
@@ -876,10 +975,9 @@ def run_evaluate(folder_name, iterations=10, n_gram=3, retrain=False):
     stat_par_results = {}
     df = load_data(folder_name, "df.pkl")
     categorical_attributes, numerical_attributes = get_attributes(folder_name)
-    categorical_attributes_base, numerical_attributes_base = [], ["case:AMOUNT_REQ"]
+    categorical_attributes_base, numerical_attributes_base = get_attributes("")
     base_attributes = categorical_attributes_base + numerical_attributes_base
     critical_decisions = get_critical_decisions(folder_name)
-    #X_base, y_base, class_names, feature_names, feature_indices = process_df(df, categorical_attributes_base, numerical_attributes_base, n_gram=n_gram)
     X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
 
     for i in tqdm(range(iterations), desc="evaluating model:"):
@@ -919,6 +1017,8 @@ def run_evaluate(folder_name, iterations=10, n_gram=3, retrain=False):
             nn_modified = finetune_nn(nn_modified, X_train, y_encoded, y_train=y_train, mode="changed")
             modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
         else:
+            nn_modified = clone_model(nn_enriched)
+            nn_modified.set_weights(nn_enriched.get_weights())
             print(f"No nodes to remove!")
             modified_accuracy = enriched_accuracy
         modified_accuracy_values.append(modified_accuracy)
@@ -1004,7 +1104,7 @@ def main():
     parser.add_argument('--model_name', type=str, default=None, help='Name of the model to use (default: None)')
     parser.add_argument('--file_name', type=str, default=None, help='Name of the file to use (default: None)')
     parser.add_argument('--folder_name', type=str, default=None, help='Name of the folder to use (default: same as model_name)')
-    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'i', 'm', 'p', 't', 'v'], default='c',
+    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'i', 'k', 'm', 'p', 't', 'v'], default='c',
                         help="Choose 'complete' to run full pipeline or 'preprocessed' to use preprocessed data (default: complete)")
     parser.add_argument('--n_gram', type=int, default=3, help='Value for n-gram (default: 3)')
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
@@ -1036,6 +1136,8 @@ def main():
         run_finetuning(args.folder_name)
     elif args.mode == 'i':
         run_interactive()
+    elif args.mode == 'k':
+        run_k_fold(args.folder_name, retrain=args.retrain)
     elif args.mode == 'm':
         run_modify(args.folder_name, node_ids=args.node_ids, retrain=args.retrain)
     elif args.mode == 'p':

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  12 JAN 2025 12:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  17 JAN 2025 12:29
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1242,36 +1242,38 @@ File: ts1bch.fd 2004/10/18 font definitions for TS1/bch.
 ) [7
 
 
-] [8{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
+] [8{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [9]
 
-LaTeX Warning: Citation 'perceptron' on page 9 undefined on input line 138.
+LaTeX Warning: Citation 'perceptron' on page 10 undefined on input line 143.
 
 
+LaTeX Warning: Citation 'perceptron_limited' on page 10 undefined on input line 156.
+
+[10{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [9]
+ [11] [12]
 
-LaTeX Warning: Citation 'perceptron_limited' on page 10 undefined on input line 151.
-
-[10{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [11] [12]
-
-LaTeX Warning: Citation 'trees' on page 13 undefined on input line 304.
+LaTeX Warning: Citation 'trees_structure' on page 13 undefined on input line 290.
 
 [13]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1226) has occurred while \output is active []
 
  [14]
 
-LaTeX Warning: Citation 'gini' on page 15 undefined on input line 366.
+LaTeX Warning: Citation 'gini' on page 15 undefined on input line 372.
 
 [15]
 
-LaTeX Warning: Citation 'ccp' on page 16 undefined on input line 409.
+LaTeX Warning: Citation 'ccp' on page 16 undefined on input line 415.
 
 
-LaTeX Warning: Citation 'dem_parity' on page 16 undefined on input line 422.
+LaTeX Warning: Citation 'dem_parity' on page 16 undefined on input line 433.
 
-) (./content/chapter-methodology.tex [16]
+[16]) (./content/chapter-methodology.tex [17] [18
+
+
+]
 chapter 4.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1285,40 +1287,43 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              that will remove this deprecated code.
 
 
-LaTeX Warning: Citation 'implementation' on page 17 undefined on input line 13.
+LaTeX Warning: Citation 'implementation' on page 19 undefined on input line 13.
 
 
-LaTeX Warning: Citation 'simulated_logs' on page 17 undefined on input line 21.
+LaTeX Warning: Citation 'simulated_logs' on page 19 undefined on input line 21.
 
 
-LaTeX Warning: Reference `fig:simulated_model' on page 17 undefined on input line 33.
+LaTeX Warning: Reference `fig:simulated_model' on page 19 undefined on input line 33.
 
-[17
+[19]
 
-
-]
-
-LaTeX Warning: Reference `sec:evaluation' on page 18 undefined on input line 49.
+LaTeX Warning: Reference `sec:evaluation' on page 20 undefined on input line 49.
 
 
-LaTeX Warning: Reference `fig:preprocessing' on page 18 undefined on input line 83.
+LaTeX Warning: Reference `fig:preprocessing' on page 20 undefined on input line 83.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [18] [19]
+ [20]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-LaTeX Warning: Citation 'keras' on page 20 undefined on input line 130.
+ [21]
 
-[20]
-
-LaTeX Warning: Citation 'knowledge_distillation' on page 21 undefined on input line 164.
-
-
-LaTeX Warning: Citation '' on page 21 undefined on input line 178.
+LaTeX Warning: Citation 'keras' on page 22 undefined on input line 130.
 
 
-LaTeX Warning: Citation '' on page 21 undefined on input line 178.
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [22]
+
+LaTeX Warning: Citation 'knowledge_distillation' on page 23 undefined on input line 164.
+
+
+LaTeX Warning: Citation '' on page 23 undefined on input line 178.
+
+
+LaTeX Warning: Citation '' on page 23 undefined on input line 178.
 
 
 Overfull \hbox (39.5745pt too wide) in paragraph at lines 177--182
@@ -1326,16 +1331,16 @@ Overfull \hbox (39.5745pt too wide) in paragraph at lines 177--182
  []
 
 
-LaTeX Warning: Citation 'sklearn' on page 21 undefined on input line 199.
+LaTeX Warning: Citation 'sklearn' on page 23 undefined on input line 199.
+
+[23] [24]
+
+LaTeX Warning: Citation 'fine_tuning' on page 25 undefined on input line 271.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [21] [22]
-
-LaTeX Warning: Citation 'fine_tuning' on page 23 undefined on input line 274.
-
-[23]) (./content/chapter-evaluation.tex [24]
+ [25]) (./content/chapter-evaluation.tex [26]
 chapter 5.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1348,13 +1353,13 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) (./content/chapter-conclusion.tex [25
+
+LaTeX Warning: Citation '10_fold' on page 27 undefined on input line 34.
+
+[27
 
 
-] [26
-
-
-]
+]) (./content/chapter-conclusion.tex [28]
 chapter 6.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1368,21 +1373,23 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              that will remove this deprecated code.
 
 
-LaTeX Warning: Citation 'eugdpr' on page 27 undefined on input line 20.
-
-
-LaTeX Warning: Citation 'aia' on page 27 undefined on input line 20.
-
-
 Underfull \vbox (badness 2626) has occurred while \output is active []
 
- [27]
-Underfull \vbox (badness 6157) has occurred while \output is active []
-
- [28]) [29] [30
+ [29
 
 
-]
+] [30]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31]
+
+LaTeX Warning: Citation 'wasserstein' on page 32 undefined on input line 116.
+
+[32]
+
+LaTeX Warning: Reference `sec:bpi' on page 33 undefined on input line 152.
+
+[33]) [34]
 chapter without number
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1409,7 +1416,9 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <7> on input line 138.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 138.
- [31
+ [35
+
+
 
 
 ]
@@ -1423,21 +1432,21 @@ Package biblatex Warning: 'prefixnumbers' option to '\printbibliography' is no l
 
 LaTeX Warning: Empty bibliography on input line 139.
 
-[32] (./thesis.lof)
+[36] (./thesis.lof)
 \tf@lof=\write6
 \openout6 = `thesis.lof'.
 
- [33
+ [37
 
 
-] [34
+] [38
 
 
 ] (./thesis.lot)
 \tf@lot=\write7
 \openout7 = `thesis.lot'.
 
- [35] [36
+ [39] [40
 
 
 ] (./content/declaration.tex
@@ -1452,10 +1461,10 @@ Class scrreprt Warning: Redefinition of \@makeschapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [37
+) [41
 
 
-] [38
+] [42
 
 ] (./thesis.aux)
  ***********
@@ -1478,18 +1487,18 @@ Package logreq Info: Writing requests to 'thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 28745 strings out of 474166
- 519897 string characters out of 5749518
+ 28840 strings out of 474166
+ 521490 string characters out of 5749518
  1939542 words of memory out of 5000000
- 50148 multiletter control sequences out of 15000+600000
- 689540 words of font info for 295 fonts, out of 8000000 for 9000
+ 50184 multiletter control sequences out of 15000+600000
+ 692672 words of font info for 316 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,13n,131p,10972b,2303s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvb.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvr.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvri.pfb><c:/texlive/2023/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on thesis.pdf (48 pages, 452385 bytes).
+Output written on thesis.pdf (52 pages, 470149 bytes).
 PDF statistics:
- 767 PDF objects out of 1000 (max. 8388607)
- 668 compressed objects within 7 object streams
- 182 named destinations out of 1000 (max. 500000)
- 67510 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 876 PDF objects out of 1000 (max. 8388607)
+ 772 compressed objects within 8 object streams
+ 210 named destinations out of 1000 (max. 500000)
+ 67582 words of extra memory for PDF output out of 74296 (max. 10000000)
 

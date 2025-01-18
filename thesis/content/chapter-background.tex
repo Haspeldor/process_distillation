@@ -24,9 +24,8 @@ which we will also use a simplified subset of \cite{bpmn}:
 \begin{itemize}
 \item \textbf{Activities} are represented as rectangles with rounded corners,
 denoting the individual tasks or operations within the process.
-%TODO: parallel
-\item \textbf{Gateways} are depicted as diamonds,
-used to control divergence and convergence in the workflow.
+\item \textbf{Gateways} are depicted as diamonds containing a cross,
+and they are used to control divergence and convergence in the workflow.
 These indicate either decision points or the merging of paths.
 In this thesis, decisions are considered to be exclusive,
 so only one of the paths can be chosen.
@@ -76,7 +75,7 @@ Lastly, the \textbf{event log} is a finite collection of traces belonging to the
 
 %TODO: table example traces for example model
 
-\subsection{Next Activity Prediction}
+\subsection{Prediction Tasks}
 When utilizing these event logs for PBPM,
 there are multiple tasks one could consider taking on,
 such as predicting the remaining time of a case or determining its final outcome.
@@ -88,10 +87,16 @@ Formally, given a prefix $e_1, ..., e_{l'}$ of observed events,
 the goal is to predict the activity label $a_{l'+1}$ of the next event
 $e_{l'+1} = (a_{l'+1}, c_{l'+1}, s_{l'+1}, t_{l'+1})$.
 
+The task of next activity prediction is categorized as a classification problem.
+\textbf{Classification tasks} aim to predict discrete categories,
+such as determining which event will occur next or whether an outcome is positive or negative.
+In contrast, \textbf{regression tasks} predict continuous values,
+such as estimating the remaining time for a process or the monetary amount of a transaction.
+
 \section{Black Box vs. White Box}
 Within the field of PBPM, numerous traditional machine learning
 and deep learning architectures have been employed
-to develop effective predictors for next activity prediction \cite{ml_pbpm}.
+to develop effective predictive models \cite{ml_pbpm}.
 A fundamental distinction among these approaches
 lies in their categorization as either black box or white box models.
 
@@ -220,9 +225,9 @@ makes it difficult to intuitively understand or trace how specific inputs lead t
 This lack of transparency is why we consider NNs to be black box models.
 
 \subsection{Backpropagation Algorithm}
+% TODO: adam
 % epochs
 % batch size
-% adam
 % gradient descent
 % learn rate
 \label{sec:backpropagation}
@@ -273,7 +278,7 @@ backpropagation enables the network to learn from data and improve its predictio
 
 \section{Decision Trees}
 \label{sec:dt}
-Similarly to NNs, we will also use \textbf{Decision Trees} (DT) as a predictor for next activity prediction.
+Similarly to NNs, we will also use \textbf{Decision Trees} (DT) \cite{trees} as a predictor for next activity prediction.
 One of their most significant strengths lies in their transparency and interpretability,
 especially when compared to more opaque models like NNs.
 And despite their lack of an inherent mechanism for handling sequential dependencies,
@@ -282,6 +287,7 @@ making them a suitable choice for in this thesis.
 
 \subsection{Tree Structure and Key Components}
 In order to understand DTs, we will first go over the structure and key components of a tree in general.
+\cite{trees_structure}
 A tree $T$ is a special type of directed graph, defined as $T=(V,E)$,
 where $V$ is the finite set of \textbf{nodes} and $E \subset V \times V$ is the set of directed \textbf{edges}.
 When two nodes $u,v \in V$ are connected by an edged $(u,v) \in E$,
@@ -301,7 +307,7 @@ and $E_v \subset E$ the edges between $V_v$.
 Another essential property of a tree is its \textbf{depth},
 which measures the longest path from the root node to any of its leaf nodes.
 
-Finally, unlike a general directed graph, a tree must satisfy several strict structural properties: \cite{trees}
+Finally, unlike a general directed graph, a tree must satisfy several strict structural properties:
 \begin{itemize}
   \item \textbf{Single Root:} There has to be a unique root node $r \in V$.
   \item \textbf{Connectedness:} Every node $v \in V$ must be a descendant of root node $r$.
@@ -405,21 +411,37 @@ will make the DT more easily interpretable for human stakeholders.
 
 One effective approach to pruning is \textbf{cost-complexity pruning},
 which balances the trade-off between a tree's complexity and its predictive accuracy.
-% TODO:explain the method
+% TODO: explain the method
 \cite{ccp}
 
 \section{Fairness}
 As machine learning systems are increasingly deployed in high-stakes applications,
 both neural networks and decision trees must be scrutinized for potential biases in their prediction.
-This concern underscores the importance of having quantitative measures
+This concern highlights the importance of having quantitative measures
 for assessing and comparing models to ensure that they meet fairness criteria
 alongside performance metrics.
 
-Quantitative group fairness metrics provide a systematic way
-to evaluate whether a machine learning model behaves equitably
-across different groups within the population.
-In this thesis, we focus on one of the most prevalent fairness metrics, \textbf{demographic parity}.
-\cite{dem_parity}
-%TODO
+Quantitative \textbf{group fairness} metrics offer a way to assess whether a machine learning model's predictions
+are equitable across different groups within the population.
+For PBPM, these metrics help ensure that predictions, such as the next activity or outcome in a business process,
+do not favor one group over another based on sensitive attributes.
+\textbf{Sensitive attributes} refer to characteristics of individuals or groups
+that are typically protected by laws or ethical guidelines due to their potential to lead to biased or discriminatory treatment,
+such as gender, ethnicity, age, disability status, etc.
 
-% threshold independent?
+%TODO: dem parity in discrimination aware decision tree
+In this thesis, we utilize on one of the most prevalent fairness metrics, \textbf{demographic parity} \cite{dem_parity},
+which quantifies the disparity in positive prediction rates across different demographic groups defined by sensitive attributes. 
+Let $y$ be the prediction of the model, that is either categorized as positive for $y = 1$ or negative for $y = 0$.
+Moreover let $S$ be a sensitive attribute whose values can be split into the demographic groups $s_1$ and $s_2$.
+Then, the demographic parity difference \textit{DPD} for the groups $s_1$, $s_2$ regarding outcome $y$
+is calculated as the absolute difference between the probabilities of receiving a positive outcome for two demographic groups:
+\begin{align}
+  \textit{DPD}(y, s_1, s_2) = |P(y = 1 |S = s_1) - P(y = 1 |S = s_2)|
+\end{align}
+where $P(y = 1 |S = s_i), i \in {1,2}$ is estimated by letting the predictive model classify
+all test samples a
+A smaller \textit{DPD} indicates that the model's predictions are more equitable across groups,
+while a larger \textit{DPD} signals a potential bias in the model's predictions.
+
+% TODO: img of example for lending firm, 

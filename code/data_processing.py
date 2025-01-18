@@ -10,6 +10,7 @@ from typing import List, Dict
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, LabelEncoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 from trace_generator import Event, Case, TraceGenerator
 from tqdm import tqdm 
 
@@ -64,22 +65,10 @@ def generate_processed_data(process_model, categorical_attributes=[], numerical_
     df = cases_to_dataframe(cases)
     save_data(df, folder_name, "df.pkl")
     
-    X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram, folder_name=folder_name)
+    X, y, class_names, feature_names, feature_indices = process_df(df, categorical_attributes, numerical_attributes, n_gram=n_gram)
     print("--------------------------------------------------------------------------------------------------")
-    if folder_name:
-        save_data(X_train, folder_name, 'X_train.pkl')
-        save_data(X_test, folder_name, 'X_test.pkl')
-        save_data(y_train, folder_name, 'y_train.pkl')
-        save_data(y_test, folder_name, 'y_test.pkl')
-        y_encoded = np.argmax(y_train, axis=1)
-        save_data(y_encoded, folder_name, 'y_encoded.pkl')
-        save_data(class_names, folder_name, "class_names.pkl")
-        save_data(feature_names, folder_name, "feature_names.pkl")
-        save_data(feature_indices, folder_name, "feature_indices.pkl")
-        save_data(df, folder_name, "df.pkl")
-        save_data(process_model.critical_decisions, folder_name, "critical_decisions.pkl")
 
-    return X_train, X_test, y_train, y_test, class_names, feature_names, feature_indices, process_model.critical_decisions
+    return X, y, class_names, feature_names, feature_indices
 
 def create_feature_names(event_pool, attribute_pools, numerical_attributes, n_gram):
     feature_names = []
@@ -123,12 +112,19 @@ def create_attribute_pools(df, case_attributes):
 
 def process_df_timestamps(df):
     if "time" in df.columns:
-        df['time'] = pd.to_datetime(df['time'])
-        df = df.sort_values(by=['case_id', 'time']).reset_index(drop=True)
-        df['time_delta'] = df.groupby('case_id')['time'].diff().dt.total_seconds()
-        df['time_delta'] = df['time_delta'].fillna(0)  # Set time_delta to 0 for the first event in each case
-        df['time_of_day'] = df['time'].dt.hour / 24 + df['time'].dt.minute / 1440 + df['time'].dt.second / 86400
-        df['day_of_week'] = df['time'].dt.dayofweek  # Monday=0, Sunday=6
+        time_column = "time"
+    elif "time:timestamp" in df.columns:
+        time_column = "time:timestamp"
+    else:
+        return df
+
+    print(time_column)
+    df[time_column] = pd.to_datetime(df[time_column])
+    df = df.sort_values(by=['case_id', time_column]).reset_index(drop=True)
+    df['time_delta'] = df.groupby('case_id')[time_column].diff().dt.total_seconds()
+    df['time_delta'] = df['time_delta'].fillna(0)  # Set time_delta to 0 for the first event in each case
+    df['time_of_day'] = df[time_column].dt.hour / 24 + df[time_column].dt.minute / 1440 + df[time_column].dt.second / 86400
+    df['day_of_week'] = df[time_column].dt.dayofweek  # Monday=0, Sunday=6
     return df
 
 def cases_to_dataframe(cases: List[Case]) -> pd.DataFrame:
@@ -212,6 +208,8 @@ def process_data_padded(df, categorical_attributes, numerical_attributes, max_se
 
 
 #TODO: leaking test info for minmax
+#TODO: 10-fold
+#TODO: split case by case
 def process_df(df, categorical_attributes, numerical_attributes, n_gram=3):
     """Processes dataframe data for neural network training"""
     # keep only specified attributes
@@ -369,216 +367,9 @@ def enrich_df(df: pd.DataFrame, rules: list, folder_name: str):
         df[attribute] = df['case_id'].map(values)
     
     # plot these for evaluation of the success
-    plot_attributes(df, rules, folder_name)
+    #plot_attributes(df, rules, folder_name)
 
     return df
-
-def plot_shapley(enriched_accuracy_values, modified_accuracy_values, folder_name, file_name):
-    img_folder = os.path.join("img", folder_name)
-    os.makedirs(img_folder, exist_ok=True)
-    
-    data = {
-        'Enriched': np.array(enriched_accuracy_values),
-        'Modified': np.array(modified_accuracy_values)
-    }
-    
-    # Calculate mean and standard deviation
-    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
-    print("Accuracy Statistics:")
-    for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
-    
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
-    for i, (name, values) in enumerate(data.items()):
-        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.2f}, σ={stats[name][1]:.3f})',
-                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
-    
-    # Add titles and labels
-    plt.title(f'Shapley Score of {folder_name}', fontsize=16, fontweight='bold')
-    plt.xlabel('Shapley', fontsize=14)
-    plt.ylabel('Density', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
-    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
-    
-    # Save the plot
-    plt.tight_layout()
-    image_path = os.path.join('img', folder_name, file_name)
-    plt.savefig(image_path)
-    plt.close()
-
-def plot_all_fairness(stat_par, disp_imp, folder_name):
-    for (feature, event), value in stat_par.items():
-        title = f"Statistical Parity of {feature}, {event} for {folder_name}"
-        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Statistical Parity")
-    for (feature, event), value in disp_imp.items():
-        title = f"Disparate Impact of {feature}, {event} for {folder_name}"
-        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Disparate Impact")
-
-def plot_density(data, title):
-    sns.kdeplot(data, fill=True, color="blue", alpha=0.5)
-    plt.title(title)
-    plt.xlabel("Value")
-    plt.ylabel("Density")
-    plt.grid(True)
-    plt.show()
-
-
-def plot_distribution(base_values, enriched_values, modified_values, folder_name, title, measurement):
-    img_folder = os.path.join("img", folder_name)
-    os.makedirs(img_folder, exist_ok=True)
-    
-    data = {
-        'Base': np.array(base_values),
-        'Enriched': np.array(enriched_values),
-        'Modified': np.array(modified_values)
-    }
-    
-    # Calculate mean and standard deviation
-    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
-    print(f"{title} Statistics:")
-    for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
-    
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
-    for i, (name, values) in enumerate(data.items()):
-        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.3f}, σ={stats[name][1]:.3f})',
-                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
-    
-    # Add titles and labels
-    plt.title(title, fontsize=16, fontweight='bold')
-    plt.xlabel(measurement, fontsize=14)
-    plt.ylabel('Density', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
-    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
-    
-    # Save the plot
-    plt.tight_layout()
-    image_path = os.path.join('img', folder_name, title)
-    plt.savefig(image_path)
-    plt.close()
-
-def plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name):
-    img_folder = os.path.join("img", folder_name)
-    os.makedirs(img_folder, exist_ok=True)
-    
-    data = {
-        'Base': np.array(base_accuracy_values),
-        'Enriched': np.array(enriched_accuracy_values),
-        'Modified': np.array(modified_accuracy_values)
-    }
-    
-    # Calculate mean and standard deviation
-    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
-    print("Accuracy Statistics:")
-    for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.3f}, Std Dev = {std:.3f}")
-    
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
-    for i, (name, values) in enumerate(data.items()):
-        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.2f}, σ={stats[name][1]:.3f})',
-                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
-    
-    # Add titles and labels
-    plt.title(f'Accuracy Distribution of {folder_name}', fontsize=16, fontweight='bold')
-    plt.xlabel('Accuracy', fontsize=14)
-    plt.ylabel('Density', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
-    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
-    
-    # Save the plot
-    plt.tight_layout()
-    image_path = os.path.join('img', folder_name, f"accuracy.png")
-    plt.savefig(image_path)
-    plt.close()
-
-def plot_attributes(df: pd.DataFrame, rules: list, folder_name: str):
-
-    img_folder = os.path.join("img", folder_name)
-    os.makedirs(img_folder, exist_ok=True)
-    # Group by case_id to ensure each case is only counted once
-    grouped = df.groupby('case_id')
-
-    # Collect unique attributes and their rules
-    attribute_rules = {}
-    for rule in rules:
-        attribute = rule['attribute']
-        if attribute not in attribute_rules:
-            attribute_rules[attribute] = []
-        attribute_rules[attribute].append(rule)
-
-    for attribute, rules in attribute_rules.items():
-        # Combine data for the attribute
-        attribute_values = grouped[attribute].first().dropna()
-
-        # Start plotting
-        plt.figure(figsize=(10, 6))
-        sns.set_style("whitegrid")
-
-        # Handle discrete attributes
-        if any(rule['distribution']['type'] == 'discrete' for rule in rules):
-            # Discrete values and their labels
-            discrete_values = []
-            for rule in rules:
-                if rule['distribution']['type'] == 'discrete':
-                    values, _ = zip(*rule['distribution']['values'])
-                    discrete_values.extend(values)
-            discrete_values = list(set(discrete_values))  # Remove duplicates
-
-            # Calculate percentages
-            counts = attribute_values.value_counts(normalize=True).reindex(discrete_values, fill_value=0)
-            counts *= 100  # Convert to percentages
-
-            # Bar plot for discrete attributes
-            sns.barplot(x=counts.index, y=counts.values, palette="viridis", saturation=0.9)
-            plt.title(f"Distribution of {attribute} (Discrete, per Case)", fontsize=16, fontweight="bold")
-            plt.xlabel("Value", fontsize=14)
-            plt.ylabel("Percentage (%)", fontsize=14)
-            plt.xticks(fontsize=12)
-            plt.yticks(fontsize=12)
-            for i, v in enumerate(counts.values):
-                plt.text(i, v + 1, f"{v:.1f}%", ha='center', fontsize=10, fontweight="bold")
-        
-        # Handle continuous attributes
-        elif any(rule['distribution']['type'] == 'normal' for rule in rules):
-            # Calculate number of bins (using Sturges' rule)
-            bins = int(np.ceil(np.log2(len(attribute_values))) + 1)
-
-            # Histogram for continuous attributes
-            sns.histplot(attribute_values, bins=bins, kde=True, color='mediumvioletred', alpha=0.7)
-            plt.title(f"Distribution of {attribute} (Continuous, per Case)", fontsize=16, fontweight="bold")
-            plt.xlabel("Value", fontsize=14)
-            plt.ylabel("Percentage (%)", fontsize=14)
-            plt.xticks(fontsize=12)
-            plt.yticks(fontsize=12)
-
-            # Display percentages on the histogram bars
-            n, bin_edges = np.histogram(attribute_values, bins=bins)
-            percentages = (n / n.sum()) * 100
-            for i in range(len(n)):
-                plt.text(bin_edges[i] + (bin_edges[i+1] - bin_edges[i]) / 2, percentages[i] + 0.5, 
-                         f"{percentages[i]:.1f}%", ha='center', fontsize=10, fontweight="bold")
-
-        else:
-            print(f"Unsupported distribution type for attribute '{attribute}'. Skipping.")
-            continue
-
-        # Add final touches
-        plt.tight_layout()
-        image_path = os.path.join('img', folder_name, f"{attribute}.png")
-        plt.savefig(image_path)
-        plt.close()
 
 
 def mine_bpm(file_name, folder_name):
@@ -626,3 +417,98 @@ def load_bpi_2012():
         if any(event["concept:name"].startswith("W_") and event["lifecycle:transition"] == "complete" for event in trace)
     ]
     pm4py.write_xes(log_wc, "bpi_2012_wc.xes")
+
+
+def k_fold_cross_validation(df, categorical_attributes, numerical_attributes, n_gram=3, k=10):
+    # Ensure the attributes are sorted consistently
+    categorical_attributes.sort()
+    numerical_attributes.sort()
+
+    # Group by case_id for consistent splitting
+    grouped = df.groupby('case_id')
+    case_ids = list(grouped.groups.keys())
+    
+    # Initialize KFold
+    kf = KFold(n_splits=k, shuffle=True, random_state=0)
+    
+    for fold, (train_idx, test_idx) in enumerate(kf.split(case_ids)):
+        print(f"Processing fold {fold + 1}/{k}")
+        
+        # Split the data
+        train_case_ids = [list(case_ids)[i] for i in train_idx]
+        test_case_ids = [list(case_ids)[i] for i in test_idx]
+        
+        train_df = df[df['case_id'].isin(train_case_ids)]
+        test_df = df[df['case_id'].isin(test_case_ids)]
+        
+        # Process training data for scaling and encoding
+        class_names = sorted(train_df["activity"].unique().tolist() + ["<PAD>"])
+        activity_encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore", categories=[class_names])
+        activity_encoder.fit(train_df[['activity']])
+        
+        attribute_encoders = {}
+        for attr in categorical_attributes:
+            attribute_pools = sorted(train_df[attr].unique())
+            encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore", categories=[attribute_pools])
+            encoder.fit(train_df[[attr]])
+            attribute_encoders[attr] = encoder
+        
+        numerical_scalers = {}
+        for attr in numerical_attributes:
+            scaler = MinMaxScaler()
+            scaler.fit(train_df[[attr]])
+            numerical_scalers[attr] = scaler
+        
+        # Process training and test data into n-grams
+        X_train, y_train = transform_samples(train_df, activity_encoder, attribute_encoders, numerical_scalers,
+                                         categorical_attributes, numerical_attributes, n_gram)
+        X_test, y_test = transform_samples(test_df, activity_encoder, attribute_encoders, numerical_scalers,
+                                       categorical_attributes, numerical_attributes, n_gram, train=False)
+        
+        print(f"Fold {fold + 1}: Train samples = {len(X_train)}, Test samples = {len(X_test)}")
+        print(X_train[:10])
+        yield X_train, y_train, X_test, y_test
+
+
+def transform_samples(df, activity_encoder, attribute_encoders, numerical_scalers,
+                  categorical_attributes, numerical_attributes, n_gram, train=True):
+    """
+    Generate n-gram sequences from the dataset.
+    """
+    grouped = df.groupby('case_id')
+    cases = []
+
+    # Prepare data for each case
+    for case_id, group in tqdm(grouped, desc="Preparing cases" if train else "Processing test cases"):
+        activities = activity_encoder.transform(group[['activity']])
+        attributes = {attr: attribute_encoders[attr].transform(group[[attr]]) for attr in categorical_attributes}
+        
+        # Scale numerical attributes
+        for attr in numerical_attributes:
+            group[attr] = numerical_scalers[attr].transform(group[[attr]])
+        cases.append((activities, attributes, group[numerical_attributes].values))
+    
+    # Generate n-grams with padding
+    X, y = [], []
+    pad_activity = activity_encoder.transform([["<PAD>"]])
+    pad_attributes = {attr: np.zeros((1, enc.categories_[0].shape[0])) for attr, enc in attribute_encoders.items()}
+    pad_numerical = np.zeros((1, len(numerical_attributes)))
+
+    for activities, attributes, numerical in cases:
+        padded_activities = np.vstack([pad_activity] * n_gram + [activities])
+        padded_attributes = {attr: np.vstack([pad_attributes[attr]] * n_gram + [attributes[attr]])
+                             for attr in sorted(attributes)}
+        padded_numerical = np.vstack([pad_numerical] * n_gram + [numerical])
+
+        for i in range(len(activities)):
+            x_activities = padded_activities[i:i + n_gram]
+            x_attributes = np.hstack([padded_attributes[attr][i + n_gram] for attr in categorical_attributes])
+            x_numerical = padded_numerical[i + n_gram]
+
+            x_combined = np.hstack([x_activities.flatten(), x_attributes, x_numerical])
+            y_next_activity = activities[i]
+            
+            X.append(x_combined)
+            y.append(y_next_activity)
+    
+    return np.array(X), np.array(y)
