@@ -37,13 +37,17 @@ erweiterungen:
 
 
 fragen:
-    - wie simpel beispiele
-    - problem statement / related work vor definitionen
-    - parallele entscheidungen
-    - event-level attributes
+    - retrain/cutting berichten: future work
+    - finetuning: future work
+    - 5 fold ok?
+    - tabelle mit 2 attributes?
+    - ablation bias strength: beide punkte varieren?
+    - ablation attribute: anzahl?
+    - ablation decisions: mit/ohne bias belassen
+    - farbe in bpmn
 
-    
 
+- formal problem statement later
 
 - failure cases, wann funktioniert
     - erklrungen/verallgemeinerungen

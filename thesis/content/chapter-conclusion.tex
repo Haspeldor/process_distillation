@@ -39,7 +39,7 @@ but also the broader ecosystem of users, developers, and regulators.
 While our approach shows considerable promise,
 several limitations and challenges became evident during the course of this work. 
 
-\subsection{Decision Tree Splits}
+\subsection*{Decision Tree Splits}
 The success of our methods heavily depends on how the splits in the distilled decision tree are structured.  
 To effectively remove negative bias associated with a sensitive attribute while preserving positive bias,  
 it is crucial for these biases to manifest in separate splits.  
@@ -52,9 +52,9 @@ similar as proposed in \cite{fairness_decision_tree}.
 This would cause sensitive features to appear at deeper-level splits (nodes with higher depth),
 where they can be evaluated in a more context-sensitive manner. 
 However, this approach may come at the cost of accuracy and transparency,  
-as the decision tree might no longer directly capture the inner workings of its teacher model, the neural network. 
+as the decision tree might no longer directly capture the inner workings of its teacher model.
 
-\subsection{Decision Tree Accuracy}
+\subsection*{Decision Tree Accuracy}
 Decision trees may struggle to handle complex tasks with the same effectiveness as deep learning methods.  
 As a result, the performance gap between the distilled decision tree and its teacher model
 can widen significantly as task complexity increases.
@@ -75,7 +75,7 @@ If the tree generates inaccurate relabeling, it could hinder the fine-tuned mode
 To address this, one could implement early stopping during fine-tuning, 
 helping to balance fairness improvements with accuracy retention and avoiding overfitting to imprecise relabeling.
 
-\subsection{Decision Tree Complexity}
+\subsection*{Decision Tree Complexity}
 As task complexity increases, the complexity of the decision tree also rises.
 With more activities, attributes, and dependencies, 
 more splits and nodes are required in the decision tree to capture these intricacies, 
@@ -87,7 +87,7 @@ as the tree may no longer represent the internal processes of the neural network
 This tradeoff between accuracy and interpretability seems to be an inherent bottleneck of our approach, 
 especially for highly complex problems.
 
-\subsection{Manual Labor}
+\subsection*{Manual Labor}
 Finally, compared to methods from related work such as \cite{fairness_foundation}, \cite{fairness_adversarial}, 
 or \cite{fairness_independence}, which aim to achieve fairness automatically based on predefined rules, 
 our approach requires more direct input from domain experts.
@@ -101,7 +101,7 @@ and consequently more cost-intensive than comparable methods.
 Besides addressing the challenges we listed in the previous section \ref{sec:limitations},
 future research could expand on this thesis in several directions.
 
-\subsection{Event Attributes}
+\subsection*{Event Attributes}
 Since this thesis focused exclusively on case attributes,
 future work could expand by incorporating event attributes to further enhance both fairness analysis and model performance.
 These event attributes could be encoded in a similar manner to case attributes
@@ -109,7 +109,7 @@ and integrated into the input vector for each recent event within the time windo
 Furthermore, including timestamp data, such as time deltas for each event rather than just the most recent one,
 could provide a richer temporal context and potentially improve the predictive capabilities of the models as well.
 
-\subsection{Fairness Metrics}
+\subsection*{Fairness Metrics}
 %TODO: WASSERSTEIN????
 Our evaluation exclusively utilized demographic parity as a fairness metric, which, while straightforward,
 can be imprecise for numerical data due to its dependence on predefined thresholds.
@@ -127,7 +127,7 @@ Additionally, future work could examine how the proposed methodology influences 
 Unlike group fairness, which focuses on comparing outcomes across demographic groups,
 individual fairness emphasizes treating comparable individuals within demographic groups similarly.
 
-\subsection{Prediction Tasks}
+\subsection*{Prediction Tasks}
 The proposed methodology could be extended to other key tasks in PBPM,
 such as outcome prediction and remaining-time prediction, to evaluate its broader applicability.
 
@@ -144,7 +144,7 @@ Moreover, since traditional decision trees are not designed for continuous outpu
 an appropriate white-box model, such as regression trees \cite{trees},
 would need to be used as the student model for knowledge distillation.
 
-\subsection{Correlations}
+\subsection*{Correlations}
 Fairness and debiasing research frequently highlights the issue of correlated attributes,
 as simply removing access to a sensitive attribute does not guarantee the elimination of its influence
 if it correlates with other non-sensitive attributes used in decision-making.
@@ -165,7 +165,7 @@ To adress this, future research should investigate how correlations involving se
 appear in the distilled decision trees and develop methods to communicate information about such correlations
 to end-users in a clear and transparent manner.
 
-\subsection{Comparisons to Related Work}
+\subsection*{Comparisons to Related Work}
 In this thesis, we evaluated our approach solely against a fully fair and a fully biased model.
 However, future work should include comparisons with alternative fairness methods in PBPM,
 such as those proposed in \cite{fairness_foundation}, \cite{fairness_adversarial}, and \cite{fairness_independence}.

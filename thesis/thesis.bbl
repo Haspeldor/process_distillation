@@ -17,7 +17,7 @@
 \endgroup
 
 \datalist[entry]{anyt/global//global/global}
-  \entry{trees}{book}{}
+  \entry{decision_trees}{book}{}
     \name{author}{1}{}{%
       {{hash=BL}{%
          family={Breiman},
@@ -135,6 +135,55 @@
     \field{year}{2022}
   \endentry
 
+  \entry{demographic_parity}{inproceedings}{}
+    \name{author}{5}{}{%
+      {{hash=DC}{%
+         family={Dwork},
+         familyi={D\bibinitperiod},
+         given={Cynthia},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=HM}{%
+         family={Hardt},
+         familyi={H\bibinitperiod},
+         given={Moritz},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PT}{%
+         family={Pitassi},
+         familyi={P\bibinitperiod},
+         given={Toniann},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=RO}{%
+         family={Reingold},
+         familyi={R\bibinitperiod},
+         given={Omer},
+         giveni={O\bibinitperiod},
+      }}%
+      {{hash=ZRS}{%
+         family={Zemel},
+         familyi={Z\bibinitperiod},
+         given={Richard\bibnamedelima S.},
+         giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {ACM}%
+    }
+    \strng{namehash}{DC+1}
+    \strng{fullhash}{DCHMPTROZRS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Dwo+12}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{booktitle}{Proceedings of the 3rd Innovations in Theoretical Computer Science Conference}
+    \field{pages}{214\bibrangedash 226}
+    \field{title}{Fairness Through Awareness}
+    \field{year}{2012}
+  \endentry
+
   \entry{gdpr}{misc}{}
     \name{author}{1}{}{%
       {{hash=E}{%
@@ -142,8 +191,8 @@
          familyi={E\bibinitperiod},
       }}%
     }
-    \strng{namehash}{E2}
-    \strng{fullhash}{E2}
+    \strng{namehash}{E1}
+    \strng{fullhash}{E1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
     \field{labelalpha}{{Eur}16}
@@ -153,26 +202,6 @@
     \field{note}{Accessed: 2025-01-12}
     \field{title}{{General Data Protection Regulation (GDPR), Regulation (EU) 2016/679}}
     \field{year}{2016}
-  \endentry
-
-  \entry{aia}{misc}{}
-    \name{author}{1}{}{%
-      {{hash=E}{%
-         family={{European Commission}},
-         familyi={E\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{E1}
-    \strng{fullhash}{E1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelalpha}{{Eur}21}
-    \field{sortinit}{E}
-    \field{sortinithash}{E}
-    \field{howpublished}{\url{https://eur-lex.europa.eu}}
-    \field{note}{Accessed: 2025-01-12}
-    \field{title}{{Artificial Intelligence Act, COM(2021) 206 final}}
-    \field{year}{2021}
   \endentry
 
   \entry{soft_decision_tree}{article}{}
@@ -304,6 +333,27 @@
     \field{year}{2010}
   \endentry
 
+  \entry{k_fold}{article}{}
+    \name{author}{1}{}{%
+      {{hash=KR}{%
+         family={Kohavi},
+         familyi={K\bibinitperiod},
+         given={R},
+         giveni={R},
+      }}%
+    }
+    \strng{namehash}{KR1}
+    \strng{fullhash}{KR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Koh95}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{title}{A study of cross-validation and bootstrap for accuracy estimation and model selection}
+    \field{journaltitle}{Morgan Kaufman Publishing}
+    \field{year}{1995}
+  \endentry
+
   \entry{ml_comparison}{article}{}
     \name{author}{4}{}{%
       {{hash=KW}{%
@@ -428,6 +478,47 @@
     \field{title}{Achieving Group Fairness through Independence in Predictive Process Monitoring}
     \field{journaltitle}{arXiv preprint arXiv:2412.04914}
     \field{year}{2024}
+  \endentry
+
+  \entry{simulated_logs}{article}{}
+    \name{author}{4}{}{%
+      {{hash=PT}{%
+         family={Pohl},
+         familyi={P\bibinitperiod},
+         given={Timo},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=BA}{%
+         family={Berti},
+         familyi={B\bibinitperiod},
+         given={Alessandro},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=QMS}{%
+         family={Qafari},
+         familyi={Q\bibinitperiod},
+         given={Mahnaz\bibnamedelima Sadat},
+         giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=vdAWM}{%
+         prefix={van\bibnamedelima der},
+         prefixi={v\bibinitperiod\bibinitdelim d\bibinitperiod},
+         family={Aalst},
+         familyi={A\bibinitperiod},
+         given={Wil\bibnamedelima MP},
+         giveni={W\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{PT+1}
+    \strng{fullhash}{PTBAQMSAWMvd1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Poh+23}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{title}{A Collection of Simulated Event Logs for Fairness Assessment in Process Mining}
+    \field{journaltitle}{arXiv preprint arXiv:2306.11453}
+    \field{year}{2023}
   \endentry
 
   \entry{ipm}{article}{}

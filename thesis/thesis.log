@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  17 JAN 2025 12:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  30 JAN 2025 12:28
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -214,13 +214,22 @@ LaTeX Info: Redefining \Relbar on input line 971.
 \mathdisplay@stack=\toks24
 LaTeX Info: Redefining \[ on input line 2953.
 LaTeX Info: Redefining \] on input line 2954.
+) (c:/texlive/2023/texmf-dist/tex/latex/tools/array.sty
+Package: array 2023/10/16 v2.5g Tabular extension package (FMi)
+\col@sep=\dimen151
+\ar@mcellbox=\box55
+\extrarowheight=\dimen152
+\NC@list=\toks25
+\extratabsurround=\skip68
+\backup@length=\skip69
+\ar@cellbox=\box56
 ) (./cleanthesis.sty
 Package: cleanthesis 2015/08/26 v0.3.1 Clean-looking thesis style inspired by Apple's user guide documents
  (c:/texlive/2023/texmf-dist/tex/latex/xkeyval/xkeyval.sty
 Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
  (c:/texlive/2023/texmf-dist/tex/generic/xkeyval/xkeyval.tex (c:/texlive/2023/texmf-dist/tex/generic/xkeyval/xkvutils.tex
-\XKV@toks=\toks25
-\XKV@tempa@toks=\toks26
+\XKV@toks=\toks26
+\XKV@tempa@toks=\toks27
 )
 \XKV@depth=\count277
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
@@ -298,22 +307,22 @@ Package: microtype 2023/03/13 v3.1a Micro-typographical refinements (RS)
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count278
 )
-\MT@toks=\toks27
-\MT@tempbox=\box55
+\MT@toks=\toks28
+\MT@tempbox=\box57
 \MT@count=\count279
 LaTeX Info: Redefining \noprotrusionifhmode on input line 1059.
 LaTeX Info: Redefining \leftprotrusion on input line 1060.
-\MT@prot@toks=\toks28
+\MT@prot@toks=\toks29
 LaTeX Info: Redefining \rightprotrusion on input line 1078.
 LaTeX Info: Redefining \textls on input line 1368.
-\MT@outer@kern=\dimen151
+\MT@outer@kern=\dimen153
 LaTeX Info: Redefining \textmicrotypecontext on input line 1988.
 \MT@listname@count=\count280
  (c:/texlive/2023/texmf-dist/tex/latex/microtype/microtype-pdftex.def
 File: microtype-pdftex.def 2023/03/13 v3.1a Definitions specific to pdftex (RS)
 LaTeX Info: Redefining \lsstyle on input line 902.
 LaTeX Info: Redefining \lslig on input line 902.
-\MT@outer@space=\skip68
+\MT@outer@space=\skip70
 )
 Package microtype Info: Loading configuration file microtype.cfg.
  (c:/texlive/2023/texmf-dist/tex/latex/microtype/microtype.cfg
@@ -331,8 +340,8 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
 )
-\Gin@req@height=\dimen152
-\Gin@req@width=\dimen153
+\Gin@req@height=\dimen154
+\Gin@req@width=\dimen155
 )
 
 Class scrreprt Warning: Usage of package `fancyhdr' together
@@ -350,21 +359,21 @@ Class scrreprt Warning: Usage of package `fancyhdr' together
 
 (c:/texlive/2023/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
-\f@nch@headwidth=\skip69
-\f@nch@O@elh=\skip70
-\f@nch@O@erh=\skip71
-\f@nch@O@olh=\skip72
-\f@nch@O@orh=\skip73
-\f@nch@O@elf=\skip74
-\f@nch@O@erf=\skip75
-\f@nch@O@olf=\skip76
-\f@nch@O@orf=\skip77
+\f@nch@headwidth=\skip71
+\f@nch@O@elh=\skip72
+\f@nch@O@erh=\skip73
+\f@nch@O@olh=\skip74
+\f@nch@O@orh=\skip75
+\f@nch@O@elf=\skip76
+\f@nch@O@erf=\skip77
+\f@nch@O@olf=\skip78
+\f@nch@O@orf=\skip79
 ) (c:/texlive/2023/texmf-dist/tex/latex/enumitem/enumitem.sty
 Package: enumitem 2019/06/20 v3.9 Customized lists
-\labelindent=\skip78
-\enit@outerparindent=\dimen154
-\enit@toks=\toks29
-\enit@inbox=\box56
+\labelindent=\skip80
+\enit@outerparindent=\dimen156
+\enit@toks=\toks30
+\enit@inbox=\box58
 \enit@count@id=\count281
 \enitdp@description=\count282
 ) (c:/texlive/2023/texmf-dist/tex/latex/blindtext/blindtext.sty
@@ -428,7 +437,7 @@ Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
 \c@section@level=\count301
 )
-\@linkdim=\dimen155
+\@linkdim=\dimen157
 \Hy@linkcounter=\count302
 \Hy@pagecounter=\count303
  (c:/texlive/2023/texmf-dist/tex/latex/hyperref/pd1enc.def
@@ -458,15 +467,15 @@ Package hyperref Info: Bookmarks ON on input line 4448.
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4786.
-\XeTeXLinkMargin=\dimen156
+\XeTeXLinkMargin=\dimen158
  (c:/texlive/2023/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
  (c:/texlive/2023/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
 \Fld@menulength=\count306
-\Field@Width=\dimen157
-\Fld@charsize=\dimen158
+\Field@Width=\dimen159
+\Fld@charsize=\dimen160
 Package hyperref Info: Hyper figures OFF on input line 6065.
 Package hyperref Info: Link nesting OFF on input line 6070.
 Package hyperref Info: Hyper index ON on input line 6073.
@@ -498,19 +507,19 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
-\Hy@SectionHShift=\skip79
+\Hy@SectionHShift=\skip81
 ) (c:/texlive/2023/texmf-dist/tex/latex/caption/caption.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
  (c:/texlive/2023/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen159
-\captionmargin=\dimen160
-\caption@leftmargin=\dimen161
-\caption@rightmargin=\dimen162
-\caption@width=\dimen163
-\caption@indent=\dimen164
-\caption@parindent=\dimen165
-\caption@hangindent=\dimen166
+\caption@tempdima=\dimen161
+\captionmargin=\dimen162
+\caption@leftmargin=\dimen163
+\caption@rightmargin=\dimen164
+\caption@width=\dimen165
+\caption@indent=\dimen166
+\caption@parindent=\dimen167
+\caption@hangindent=\dimen168
 Package caption Info: KOMA-Script document class detected.
  (c:/texlive/2023/texmf-dist/tex/latex/caption/caption-koma.sto
 File: caption-koma.sto 2023/09/08 v2.0e Adaption of the caption package to the KOMA-Script document classes (AR)
@@ -519,8 +528,8 @@ File: caption-koma.sto 2023/09/08 v2.0e Adaption of the caption package to the K
 \c@continuedfloat=\count313
 Package caption Info: hyperref package is loaded.
 Package caption Info: KOMA-Script scrextend package detected.
-\caption@addmargin@hsize=\dimen167
-\caption@addmargin@linewidth=\dimen168
+\caption@addmargin@hsize=\dimen169
+\caption@addmargin@linewidth=\dimen170
 ) (c:/texlive/2023/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
  (c:/texlive/2023/texmf-dist/tex/generic/iftex/ifvtex.sty
@@ -529,15 +538,15 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@cnth=\count314
 \Gm@cntv=\count315
 \c@Gm@tempcnt=\count316
-\Gm@bindingoffset=\dimen169
-\Gm@wd@mp=\dimen170
-\Gm@odd@mp=\dimen171
-\Gm@even@mp=\dimen172
-\Gm@layoutwidth=\dimen173
-\Gm@layoutheight=\dimen174
-\Gm@layouthoffset=\dimen175
-\Gm@layoutvoffset=\dimen176
-\Gm@dimlist=\toks30
+\Gm@bindingoffset=\dimen171
+\Gm@wd@mp=\dimen172
+\Gm@odd@mp=\dimen173
+\Gm@even@mp=\dimen174
+\Gm@layoutwidth=\dimen175
+\Gm@layoutheight=\dimen176
+\Gm@layouthoffset=\dimen177
+\Gm@layoutvoffset=\dimen178
+\Gm@dimlist=\toks31
 ) (c:/texlive/2023/texmf-dist/tex/latex/csquotes/csquotes.sty
 Package: csquotes 2022-09-14 v5.2n context-sensitive quotations (JAW)
 \csq@reset=\count317
@@ -546,7 +555,7 @@ Package: csquotes 2022-09-14 v5.2n context-sensitive quotations (JAW)
 \csq@qlevel=\count320
 \csq@maxlvl=\count321
 \csq@tshold=\count322
-\csq@ltx@everypar=\toks31
+\csq@ltx@everypar=\toks32
  (c:/texlive/2023/texmf-dist/tex/latex/csquotes/csquotes.def
 File: csquotes.def 2022-09-14 v5.2n csquotes generic definitions (JAW)
 )
@@ -611,14 +620,14 @@ Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 \blx@sectionciteorderinternal@0=\count364
 \blx@entrysetcounter=\count365
 \blx@biblioinstance=\count366
-\labelnumberwidth=\skip80
-\labelalphawidth=\skip81
-\biblabelsep=\skip82
-\bibitemsep=\skip83
-\bibnamesep=\skip84
-\bibinitsep=\skip85
-\bibparsep=\skip86
-\bibhang=\skip87
+\labelnumberwidth=\skip82
+\labelalphawidth=\skip83
+\biblabelsep=\skip84
+\bibitemsep=\skip85
+\bibnamesep=\skip86
+\bibinitsep=\skip87
+\bibparsep=\skip88
+\bibhang=\skip89
 \blx@bcfin=\read3
 \blx@bcfout=\write3
 \blx@langwohyphens=\language90
@@ -702,20 +711,20 @@ Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
 \c@savedoriglanguage=\count435
 \c@pageref=\count436
 \c@savedpageref=\count437
-\shorthandwidth=\skip88
-\shortjournalwidth=\skip89
-\shortserieswidth=\skip90
-\shorttitlewidth=\skip91
-\shortauthorwidth=\skip92
-\shorteditorwidth=\skip93
-\locallabelnumberwidth=\skip94
-\locallabelalphawidth=\skip95
-\localshorthandwidth=\skip96
-\localshortjournalwidth=\skip97
-\localshortserieswidth=\skip98
-\localshorttitlewidth=\skip99
-\localshortauthorwidth=\skip100
-\localshorteditorwidth=\skip101
+\shorthandwidth=\skip90
+\shortjournalwidth=\skip91
+\shortserieswidth=\skip92
+\shorttitlewidth=\skip93
+\shortauthorwidth=\skip94
+\shorteditorwidth=\skip95
+\locallabelnumberwidth=\skip96
+\locallabelalphawidth=\skip97
+\localshorthandwidth=\skip98
+\localshortjournalwidth=\skip99
+\localshortserieswidth=\skip100
+\localshorttitlewidth=\skip101
+\localshortauthorwidth=\skip102
+\localshorteditorwidth=\skip103
 Package biblatex Info: Trying to load compatibility code...
 Package biblatex Info: ... file 'blx-compat.def' found.
  (c:/texlive/2023/texmf-dist/tex/latex/biblatex/blx-compat.def
@@ -793,7 +802,7 @@ Package: expl3 2024-01-04 L3 programming layer (loader)
  (c:/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count449
-\l__pdf_internal_box=\box57
+\l__pdf_internal_box=\box59
 ))
 Package biblatex Info: ... and expl3
 (biblatex)             2024-01-04 L3 programming layer (loader) 
@@ -816,15 +825,15 @@ Class scrreprt Warning: Usage of package `titlesec' together
 
 (c:/texlive/2023/texmf-dist/tex/latex/titlesec/titlesec.sty
 Package: titlesec 2023/10/27 v2.16 Sectioning titles
-\ttl@box=\box58
-\beforetitleunit=\skip102
-\aftertitleunit=\skip103
-\ttl@plus=\dimen177
-\ttl@minus=\dimen178
-\ttl@toksa=\toks32
-\titlewidth=\dimen179
-\titlewidthlast=\dimen180
-\titlewidthfirst=\dimen181
+\ttl@box=\box60
+\beforetitleunit=\skip104
+\aftertitleunit=\skip105
+\ttl@plus=\dimen179
+\ttl@minus=\dimen180
+\ttl@toksa=\toks33
+\titlewidth=\dimen181
+\titlewidthlast=\dimen182
+\titlewidthfirst=\dimen183
 
 
 Package titlesec Warning: Non standard sectioning command \section
@@ -871,122 +880,129 @@ Class scrreprt Warning: Usage of package `tocloft' together
 (c:/texlive/2023/texmf-dist/tex/latex/tocloft/tocloft.sty
 Package: tocloft 2017/08/31 v2.3i parameterised ToC, etc., typesetting
 Package tocloft Info: The document has chapter divisions on input line 51.
-\cftparskip=\skip104
-\cftbeforetoctitleskip=\skip105
-\cftaftertoctitleskip=\skip106
-\cftbeforepartskip=\skip107
-\cftpartnumwidth=\skip108
-\cftpartindent=\skip109
-\cftbeforechapskip=\skip110
-\cftchapindent=\skip111
-\cftchapnumwidth=\skip112
-\cftbeforesecskip=\skip113
-\cftsecindent=\skip114
-\cftsecnumwidth=\skip115
-\cftbeforesubsecskip=\skip116
-\cftsubsecindent=\skip117
-\cftsubsecnumwidth=\skip118
-\cftbeforesubsubsecskip=\skip119
-\cftsubsubsecindent=\skip120
-\cftsubsubsecnumwidth=\skip121
-\cftbeforeparaskip=\skip122
-\cftparaindent=\skip123
-\cftparanumwidth=\skip124
-\cftbeforesubparaskip=\skip125
-\cftsubparaindent=\skip126
-\cftsubparanumwidth=\skip127
-\cftbeforeloftitleskip=\skip128
-\cftafterloftitleskip=\skip129
-\cftbeforefigskip=\skip130
-\cftfigindent=\skip131
-\cftfignumwidth=\skip132
+\cftparskip=\skip106
+\cftbeforetoctitleskip=\skip107
+\cftaftertoctitleskip=\skip108
+\cftbeforepartskip=\skip109
+\cftpartnumwidth=\skip110
+\cftpartindent=\skip111
+\cftbeforechapskip=\skip112
+\cftchapindent=\skip113
+\cftchapnumwidth=\skip114
+\cftbeforesecskip=\skip115
+\cftsecindent=\skip116
+\cftsecnumwidth=\skip117
+\cftbeforesubsecskip=\skip118
+\cftsubsecindent=\skip119
+\cftsubsecnumwidth=\skip120
+\cftbeforesubsubsecskip=\skip121
+\cftsubsubsecindent=\skip122
+\cftsubsubsecnumwidth=\skip123
+\cftbeforeparaskip=\skip124
+\cftparaindent=\skip125
+\cftparanumwidth=\skip126
+\cftbeforesubparaskip=\skip127
+\cftsubparaindent=\skip128
+\cftsubparanumwidth=\skip129
+\cftbeforeloftitleskip=\skip130
+\cftafterloftitleskip=\skip131
+\cftbeforefigskip=\skip132
+\cftfigindent=\skip133
+\cftfignumwidth=\skip134
 \c@lofdepth=\count450
 \c@lotdepth=\count451
-\cftbeforelottitleskip=\skip133
-\cftafterlottitleskip=\skip134
-\cftbeforetabskip=\skip135
-\cfttabindent=\skip136
-\cfttabnumwidth=\skip137
+\cftbeforelottitleskip=\skip135
+\cftafterlottitleskip=\skip136
+\cftbeforetabskip=\skip137
+\cfttabindent=\skip138
+\cfttabnumwidth=\skip139
 ))
-Package hyperref Info: Option `plainpages' set `false' on input line 81.
-Package hyperref Info: Option `colorlinks' set `false' on input line 81.
-Package hyperref Info: Option `breaklinks' set `true' on input line 81.
-Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 81.
-Package hyperref Info: Option `bookmarksopen' set `true' on input line 81.
-LaTeX Font Info:    Trying to load font information for T1+bch on input line 86.
+Package hyperref Info: Option `plainpages' set `false' on input line 82.
+Package hyperref Info: Option `colorlinks' set `false' on input line 82.
+Package hyperref Info: Option `breaklinks' set `true' on input line 82.
+Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 82.
+Package hyperref Info: Option `bookmarksopen' set `true' on input line 82.
+LaTeX Font Info:    Trying to load font information for T1+bch on input line 87.
  (c:/texlive/2023/texmf-dist/tex/latex/psnfss/t1bch.fd
 File: t1bch.fd 2004/10/18 font definitions for T1/bch.
-) (./thesis.aux)
+) (./thesis.aux
+
+LaTeX Warning: Label `fig:ablation_bias_accuracy' multiply defined.
+
+
+LaTeX Warning: Label `fig:ablation_bias_fairness' multiply defined.
+
+)
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 86.
-LaTeX Font Info:    ... okay on input line 86.
-Package scrbase Info: activating english \abstractname on input line 86.
-Package scrbase Info: activating english \partname on input line 86.
-Package scrbase Info: activating english \chaptername on input line 86.
-Package scrbase Info: activating english \appendixname on input line 86.
-Package scrbase Info: activating english \figurename on input line 86.
-Package scrbase Info: activating english \tablename on input line 86.
-Package scrbase Info: activating english \contentsname on input line 86.
-Package scrbase Info: activating english \listfigurename on input line 86.
-Package scrbase Info: activating english \listtablename on input line 86.
-Package scrbase Info: activating english \bibname on input line 86.
-Package scrbase Info: activating english \indexname on input line 86.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+Package scrbase Info: activating english \abstractname on input line 87.
+Package scrbase Info: activating english \partname on input line 87.
+Package scrbase Info: activating english \chaptername on input line 87.
+Package scrbase Info: activating english \appendixname on input line 87.
+Package scrbase Info: activating english \figurename on input line 87.
+Package scrbase Info: activating english \tablename on input line 87.
+Package scrbase Info: activating english \contentsname on input line 87.
+Package scrbase Info: activating english \listfigurename on input line 87.
+Package scrbase Info: activating english \listtablename on input line 87.
+Package scrbase Info: activating english \bibname on input line 87.
+Package scrbase Info: activating english \indexname on input line 87.
  (c:/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count452
-\scratchdimen=\dimen182
-\scratchbox=\box59
+\scratchdimen=\dimen184
+\scratchbox=\box61
 \nofMPsegments=\count453
 \nofMParguments=\count454
-\everyMPshowfont=\toks33
+\everyMPshowfont=\toks34
 \MPscratchCnt=\count455
-\MPscratchDim=\dimen183
+\MPscratchDim=\dimen185
 \MPnumerator=\count456
 \makeMPintoPDFobject=\count457
-\everyMPtoPDFconversion=\toks34
+\everyMPtoPDFconversion=\toks35
 ) (c:/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
  (c:/texlive/2023/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-LaTeX Info: Redefining \microtypecontext on input line 86.
-Package microtype Info: Applying patch `item' on input line 86.
-Package microtype Info: Applying patch `toc' on input line 86.
-Package microtype Info: Applying patch `eqnum' on input line 86.
-Package microtype Info: Applying patch `footnote' on input line 86.
-Package microtype Info: Applying patch `verbatim' on input line 86.
+LaTeX Info: Redefining \microtypecontext on input line 87.
+Package microtype Info: Applying patch `item' on input line 87.
+Package microtype Info: Applying patch `toc' on input line 87.
+Package microtype Info: Applying patch `eqnum' on input line 87.
+Package microtype Info: Applying patch `footnote' on input line 87.
+Package microtype Info: Applying patch `verbatim' on input line 87.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 86.
+LaTeX Info: Redefining \showhyphens on input line 87.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
  (c:/texlive/2023/texmf-dist/tex/latex/microtype/mt-bch.cfg
 File: mt-bch.cfg 2007/03/03 v1.5 microtype config. file: Bitstream Charter (RS)
 )
-Package hyperref Info: Link coloring OFF on input line 86.
+Package hyperref Info: Link coloring OFF on input line 87.
  (./thesis.out) (./thesis.out)
 \@outlinefile=\write4
 \openout4 = `thesis.out'.
@@ -998,7 +1014,7 @@ Class scrreprt Info: loading recommended package `bookmark'.
 (scrreprt)           `bookmarkpackage=false' before \begin{document} and
 (scrreprt)           you can avoid this message adding:
 (scrreprt)             \usepackage{bookmark}
-(scrreprt)           before \begin{document} on input line 86.
+(scrreprt)           before \begin{document} on input line 87.
  (c:/texlive/2023/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
  (c:/texlive/2023/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
@@ -1059,10 +1075,10 @@ Package biblatex Info: Data encoding 'utf8' specified.
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'thesis.bbl' found.
  (./thesis.bbl)
-Package biblatex Info: Reference section=0 on input line 86.
-Package biblatex Info: Reference segment=0 on input line 86.
-Package scrbase Info: activating english \figurename on input line 93.
-Package scrbase Info: activating english \tablename on input line 94.
+Package biblatex Info: Reference section=0 on input line 87.
+Package biblatex Info: Reference segment=0 on input line 87.
+Package scrbase Info: activating english \figurename on input line 94.
+Package scrbase Info: activating english \tablename on input line 95.
  (./content/titlepages.tex
 <gfx/AI4.png, id=4, 2283.53125pt x 832.10875pt>
 File: gfx/AI4.png Graphic file (type png)
@@ -1151,7 +1167,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 ] [8]
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <20.74> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 112.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 113.
  (./thesis.toc
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <10.95> not available
 (Font)              Font shape `T1/lmss/bx/n' tried instead on input line 2.
@@ -1223,7 +1239,19 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-[5]) (./content/chapter-background.tex [6]
+[5]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 60.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 60.
+
+Overfull \hbox (1.26799pt too wide) in paragraph at lines 60--67
+ [][] 
+ []
+
+LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <10> not available
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 67.
+) (./content/chapter-background.tex [6]
 chapter 3.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1236,41 +1264,48 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-LaTeX Font Info:    Trying to load font information for TS1+bch on input line 25.
+LaTeX Font Info:    Trying to load font information for TS1+bch on input line 24.
 (c:/texlive/2023/texmf-dist/tex/latex/psnfss/ts1bch.fd
 File: ts1bch.fd 2004/10/18 font definitions for TS1/bch.
 ) [7
 
 
-] [8{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [9]
+]
+<gfx/bpmn.png, id=233, 1321.93875pt x 2499.3375pt>
+File: gfx/bpmn.png Graphic file (type png)
+<use gfx/bpmn.png>
+Package pdftex.def Info: gfx/bpmn.png  used on input line 42.
+(pdftex.def)             Requested size: 395.45181pt x 747.67139pt.
 
-LaTeX Warning: Citation 'perceptron' on page 10 undefined on input line 143.
+
+LaTeX Warning: Float too large for page by 100.22786pt on input line 45.
 
 
-LaTeX Warning: Citation 'perceptron_limited' on page 10 undefined on input line 156.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[10{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+[8{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [9]
 
- [11] [12]
+LaTeX Warning: Citation 'perceptron' on page 10 undefined on input line 151.
 
-LaTeX Warning: Citation 'trees_structure' on page 13 undefined on input line 290.
+
+LaTeX Warning: Citation 'perceptron_limited' on page 10 undefined on input line 164.
+
+[10{c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [11] [12]
+
+LaTeX Warning: Citation 'trees' on page 13 undefined on input line 298.
 
 [13]
 Underfull \vbox (badness 1226) has occurred while \output is active []
 
  [14]
 
-LaTeX Warning: Citation 'gini' on page 15 undefined on input line 372.
+LaTeX Warning: Citation 'gini' on page 15 undefined on input line 380.
 
 [15]
 
-LaTeX Warning: Citation 'ccp' on page 16 undefined on input line 415.
+LaTeX Warning: Citation 'ccp' on page 16 undefined on input line 423.
 
-
-LaTeX Warning: Citation 'dem_parity' on page 16 undefined on input line 433.
-
-[16]) (./content/chapter-methodology.tex [17] [18
+) (./content/chapter-methodology.tex [16] [17 <./gfx/bpmn.png>] [18
 
 
 ]
@@ -1287,60 +1322,59 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              that will remove this deprecated code.
 
 
-LaTeX Warning: Citation 'implementation' on page 19 undefined on input line 13.
-
-
-LaTeX Warning: Citation 'simulated_logs' on page 19 undefined on input line 21.
-
-
-LaTeX Warning: Reference `fig:simulated_model' on page 19 undefined on input line 33.
+LaTeX Warning: Citation 'implementation' on page 19 undefined on input line 12.
 
 [19]
-
-LaTeX Warning: Reference `sec:evaluation' on page 20 undefined on input line 49.
-
-
-LaTeX Warning: Reference `fig:preprocessing' on page 20 undefined on input line 83.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [20]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [21]
-
-LaTeX Warning: Citation 'keras' on page 22 undefined on input line 130.
+<gfx/showcase.png, id=332, 2098.84125pt x 816.04875pt>
+File: gfx/showcase.png Graphic file (type png)
+<use gfx/showcase.png>
+Package pdftex.def Info: gfx/showcase.png  used on input line 47.
+(pdftex.def)             Requested size: 395.45181pt x 153.75587pt.
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Warning: Reference `sec:evaluation' on page 20 undefined on input line 63.
+
+[20 <./gfx/showcase.png>]
+
+LaTeX Warning: Reference `fig:preprocessing' on page 21 undefined on input line 97.
+
+[21]
+
+LaTeX Warning: Citation 'keras' on page 22 undefined on input line 144.
+
+
+Underfull \vbox (badness 4859) has occurred while \output is active []
 
  [22]
 
-LaTeX Warning: Citation 'knowledge_distillation' on page 23 undefined on input line 164.
+LaTeX Warning: Citation 'knowledge_distillation' on page 23 undefined on input line 178.
 
 
-LaTeX Warning: Citation '' on page 23 undefined on input line 178.
+LaTeX Warning: Citation '' on page 23 undefined on input line 192.
 
 
-LaTeX Warning: Citation '' on page 23 undefined on input line 178.
+LaTeX Warning: Citation '' on page 23 undefined on input line 192.
 
 
-Overfull \hbox (39.5745pt too wide) in paragraph at lines 177--182
+Overfull \hbox (39.5745pt too wide) in paragraph at lines 191--196
 []\T1/bch/m/n/10.95 (-20) Although in re-cent stud-ies more so-phis-ti-cated white-box mod-els such as [[]],
  []
 
+[23]
 
-LaTeX Warning: Citation 'sklearn' on page 23 undefined on input line 199.
-
-[23] [24]
-
-LaTeX Warning: Citation 'fine_tuning' on page 25 undefined on input line 271.
+LaTeX Warning: Citation 'sklearn' on page 24 undefined on input line 213.
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1430) has occurred while \output is active []
 
- [25]) (./content/chapter-evaluation.tex [26]
+ [24]
+
+LaTeX Warning: Citation 'fine_tuning' on page 25 undefined on input line 285.
+
+[25] [26]) (./content/chapter-evaluation.tex [27] [28
+
+
+]
 chapter 5.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1353,13 +1387,33 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
+[29] [30]
+<gfx/cancer_screening.png, id=419, 1430.34375pt x 2589.675pt>
+File: gfx/cancer_screening.png Graphic file (type png)
+<use gfx/cancer_screening.png>
+Package pdftex.def Info: gfx/cancer_screening.png  used on input line 77.
+(pdftex.def)             Requested size: 338.72804pt x 613.27603pt.
 
-LaTeX Warning: Citation '10_fold' on page 27 undefined on input line 34.
 
-[27
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<gfx/bpi_accuracy.png, id=420, 722.7pt x 433.62pt>
+File: gfx/bpi_accuracy.png Graphic file (type png)
+<use gfx/bpi_accuracy.png>
+Package pdftex.def Info: gfx/bpi_accuracy.png  used on input line 95.
+(pdftex.def)             Requested size: 193.77356pt x 116.26514pt.
+<gfx/bpi_fairness.png, id=421, 722.7pt x 433.62pt>
+File: gfx/bpi_fairness.png Graphic file (type png)
+<use gfx/bpi_fairness.png>
+Package pdftex.def Info: gfx/bpi_fairness.png  used on input line 101.
+(pdftex.def)             Requested size: 193.77356pt x 116.26514pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+) (./content/chapter-ablation.tex [31] [32 <./gfx/cancer_screening.png>] [33 <./gfx/bpi_accuracy.png> <./gfx/bpi_fairness.png>] [34
 
 
-]) (./content/chapter-conclusion.tex [28]
+]
 chapter 6.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1372,24 +1426,101 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
+<gfx/ablation_bias_accuracy.png, id=450, 722.7pt x 433.62pt>
+File: gfx/ablation_bias_accuracy.png Graphic file (type png)
+<use gfx/ablation_bias_accuracy.png>
+Package pdftex.def Info: gfx/ablation_bias_accuracy.png  used on input line 21.
+(pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
+<gfx/ablation_bias_fairness.png, id=451, 722.7pt x 435.7881pt>
+File: gfx/ablation_bias_fairness.png Graphic file (type png)
+<use gfx/ablation_bias_fairness.png>
+Package pdftex.def Info: gfx/ablation_bias_fairness.png  used on input line 28.
+(pdftex.def)             Requested size: 355.9042pt x 214.60861pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<gfx/ablation_attributes_accuracy.png, id=452, 722.7pt x 433.62pt>
+File: gfx/ablation_attributes_accuracy.png Graphic file (type png)
+<use gfx/ablation_attributes_accuracy.png>
+Package pdftex.def Info: gfx/ablation_attributes_accuracy.png  used on input line 45.
+(pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
+[35 <./gfx/ablation_bias_accuracy.png>]
+File: gfx/ablation_bias_fairness.png Graphic file (type png)
+<use gfx/ablation_bias_fairness.png>
+Package pdftex.def Info: gfx/ablation_bias_fairness.png  used on input line 52.
+(pdftex.def)             Requested size: 355.9042pt x 214.60861pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<gfx/ablation_decision.png, id=464, 2198.2125pt x 876.27374pt>
+File: gfx/ablation_decision.png Graphic file (type png)
+<use gfx/ablation_decision.png>
+Package pdftex.def Info: gfx/ablation_decision.png  used on input line 61.
+(pdftex.def)             Requested size: 395.45181pt x 157.62886pt.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 65.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 65.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<gfx/ablation_decisions_accuracy.png, id=465, 722.7pt x 433.62pt>
+File: gfx/ablation_decisions_accuracy.png Graphic file (type png)
+<use gfx/ablation_decisions_accuracy.png>
+Package pdftex.def Info: gfx/ablation_decisions_accuracy.png  used on input line 71.
+(pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<gfx/ablation_decisions_fairness.png, id=466, 722.7pt x 435.7881pt>
+File: gfx/ablation_decisions_fairness.png Graphic file (type png)
+<use gfx/ablation_decisions_fairness.png>
+Package pdftex.def Info: gfx/ablation_decisions_fairness.png  used on input line 78.
+(pdftex.def)             Requested size: 355.9042pt x 214.60861pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+) (./content/chapter-conclusion.tex [36 <./gfx/ablation_bias_fairness.png> <./gfx/ablation_attributes_accuracy.png>] [37 <./gfx/ablation_decision.png>] [38 <./gfx/ablation_decisions_accuracy.png> <./gfx/ablation_decisions_fairness.png>]
+chapter 7.
+
+Class scrreprt Warning: Redefinition of \@makechapterhead detected.
+(scrreprt)              Note: KOMA-Script does use styles for commands like
+(scrreprt)              \chapter. Currently it internally still provides and
+(scrreprt)              uses \@makechapterhead, but a completely different
+(scrreprt)              definition compared to the standard classes.
+(scrreprt)              So redefining or using internal \@makechapterhead
+(scrreprt)              by users or package authors may already break
+(scrreprt)              KOMA-Script and will not work with a coming version,
+(scrreprt)              that will remove this deprecated code.
+
+
+LaTeX Warning: Citation 'aia' on page 39 undefined on input line 21.
+
 
 Underfull \vbox (badness 2626) has occurred while \output is active []
 
- [29
+ [39
 
 
-] [30]
+]
+Underfull \vbox (badness 2970) has occurred while \output is active []
+
+ [40]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [31]
+ [41]
 
-LaTeX Warning: Citation 'wasserstein' on page 32 undefined on input line 116.
+LaTeX Warning: Citation 'wasserstein' on page 42 undefined on input line 116.
 
-[32]
+[42]
 
-LaTeX Warning: Reference `sec:bpi' on page 33 undefined on input line 152.
+LaTeX Warning: Citation 'trees' on page 43 undefined on input line 144.
 
-[33]) [34]
+
+LaTeX Warning: Reference `sec:bpi' on page 43 undefined on input line 152.
+
+[43]) [44]
 chapter without number
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1402,7 +1533,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 138.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 140.
 (c:/texlive/2023/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -1410,43 +1541,37 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 138.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 138.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 138.
- [35
+ [45
 
 
 
 
 ]
 
-Package biblatex Warning: Type 'online' not found on input line 139.
+Package biblatex Warning: Type 'online' not found on input line 141.
 
 
 Package biblatex Warning: 'prefixnumbers' option to '\printbibliography' is no longer supported.
 (biblatex)                Please use 'labelprefix' option to '\newrefcontext'.
 
 
-LaTeX Warning: Empty bibliography on input line 139.
+LaTeX Warning: Empty bibliography on input line 141.
 
-[36] (./thesis.lof)
+[46] (./thesis.lof)
 \tf@lof=\write6
 \openout6 = `thesis.lof'.
 
- [37
+ [47
 
 
-] [38
+] [48
 
 
 ] (./thesis.lot)
 \tf@lot=\write7
 \openout7 = `thesis.lot'.
 
- [39] [40
+ [49] [50
 
 
 ] (./content/declaration.tex
@@ -1461,10 +1586,10 @@ Class scrreprt Warning: Redefinition of \@makeschapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [41
+) [51
 
 
-] [42
+] [52
 
 ] (./thesis.aux)
  ***********
@@ -1474,6 +1599,9 @@ L3 programming layer <2024-01-04>
 
 
 LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
@@ -1487,18 +1615,18 @@ Package logreq Info: Writing requests to 'thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 28840 strings out of 474166
- 521490 string characters out of 5749518
+ 29120 strings out of 474166
+ 527324 string characters out of 5749518
  1939542 words of memory out of 5000000
- 50184 multiletter control sequences out of 15000+600000
- 692672 words of font info for 316 fonts, out of 8000000 for 9000
+ 50371 multiletter control sequences out of 15000+600000
+ 713426 words of font info for 364 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,13n,131p,10972b,2303s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvb.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvr.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvri.pfb><c:/texlive/2023/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on thesis.pdf (52 pages, 470149 bytes).
+Output written on thesis.pdf (62 pages, 1126544 bytes).
 PDF statistics:
- 876 PDF objects out of 1000 (max. 8388607)
- 772 compressed objects within 8 object streams
- 210 named destinations out of 1000 (max. 500000)
- 67582 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 960 PDF objects out of 1000 (max. 8388607)
+ 823 compressed objects within 9 object streams
+ 229 named destinations out of 1000 (max. 500000)
+ 82429 words of extra memory for PDF output out of 89155 (max. 10000000)
 

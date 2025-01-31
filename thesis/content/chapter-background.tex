@@ -2,12 +2,10 @@
 \chapter{Background}
 This chapter will go over definitions and background knowledge
 necessary for understanding the methodology and evaluation presented in later chapters.
-It will adress fundamentals of PBPM, go over the basics of neural networks and decision trees,
+It will adress fundamentals of Business Process Management, go over the basics of neural networks and decision trees,
 and explain how fairness is quantified in this thesis.
 
-\section{Predictive Business Process Monitoring}
-\textbf{Predictive Business Process Monitoring} (PBPM) is a field that focuses on analyzing
-and forecasting the progression of ongoing business processes based on historical data. 
+\section{Business Process Management}
 \textbf{Business processes} represent structured sets of activities
 or tasks undertaken by organizations to achieve specific objectives,
 such as processing customer orders, managing inventory or onboarding new employees.
@@ -19,24 +17,33 @@ In order to provide visualization for stakeholders,
 business processes are often portrayed in the form of \textbf{process models}.
 These capture the sequence and flow in a formalized representation
 and are generally created using the standardized
-\textbf{Business Process Model and Notation},
-which we will also use a simplified subset of \cite{bpmn}:
+\textbf{Business Process Model and Notation (BPMN)} \cite{bpmn},
+which we will also use a simplified subset of:
+
 \begin{itemize}
 \item \textbf{Activities} are represented as rectangles with rounded corners,
 denoting the individual tasks or operations within the process.
 \item \textbf{Gateways} are depicted as diamonds containing a cross,
 and they are used to control divergence and convergence in the workflow.
 These indicate either decision points or the merging of paths.
-In this thesis, decisions are considered to be exclusive,
+We will exclusively consider exclusive decisions,
 so only one of the paths can be chosen.
 \item \textbf{Events} are shown as circles,
 representing the initiation and completion of the process.
 Specifically, the start event,
 depicted as a circle with a narrow border, marks the beginning of the process
 and the end event, depicted as a circle with a bold border, signifies the process's conclusion.
-\item \textbf{Sequence Flow} is represented by lines with arrowheads
+\item \textbf{Sequence Flow} is represented by lines with solid arrowheads
 and is used to show the order that activities will be performed in.
 \end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{gfx/bpmn.png}
+    \caption{Example of a process model in BPMN detailing the cancer screening process in a hospital.}
+    \label{fig:bpmn_example}
+\end{figure}
+
 
 % TODO img: example
 
@@ -71,21 +78,22 @@ Considering that a trace describes the life-cycle of a single case $c$,
 all events belonging to a trace have the same attribute values $s$.
 A \textbf{prefix} with length $l'$ is a portion of such a trace with length $l$,
 consisting of the first $l'$ events, with $l' < l$.
-Lastly, the \textbf{event log} is a finite collection of traces belonging to the same process.
+Finally, an \textbf{event log} is a finite collection of traces belonging to the same process.
 
 %TODO: table example traces for example model
 
-\subsection{Prediction Tasks}
-When utilizing these event logs for PBPM,
-there are multiple tasks one could consider taking on,
-such as predicting the remaining time of a case or determining its final outcome.
+\subsection{Predictive Business Process Monitoring}
+\textbf{Predictive Business Process Monitoring} (PBPM) is a field that focuses on analyzing
+and forecasting the progression of ongoing business processes
+based on historical data stored in the form of event logs. 
+This includes tasks such as predicting the remaining time of a case or determining its final outcome.
 These predictions play a crucial role in enabling organizations to optimize operations,
 allocate resources effectively, and preempt potential issues.
 In this thesis, we will take a closer look specifically at \textbf{next activity prediction},
 where the objective is to forecast the subsequent activity in an ongoing case.
 Formally, given a prefix $e_1, ..., e_{l'}$ of observed events,
 the goal is to predict the activity label $a_{l'+1}$ of the next event
-$e_{l'+1} = (a_{l'+1}, c_{l'+1}, s_{l'+1}, t_{l'+1})$.
+$e_{l'+1}$.
 
 The task of next activity prediction is categorized as a classification problem.
 \textbf{Classification tasks} aim to predict discrete categories,
@@ -278,7 +286,7 @@ backpropagation enables the network to learn from data and improve its predictio
 
 \section{Decision Trees}
 \label{sec:dt}
-Similarly to NNs, we will also use \textbf{Decision Trees} (DT) \cite{trees} as a predictor for next activity prediction.
+Similarly to NNs, we will also use \textbf{Decision Trees} (DT) \cite{decision_trees} as a predictor for next activity prediction.
 One of their most significant strengths lies in their transparency and interpretability,
 especially when compared to more opaque models like NNs.
 And despite their lack of an inherent mechanism for handling sequential dependencies,
@@ -287,7 +295,7 @@ making them a suitable choice for in this thesis.
 
 \subsection{Tree Structure and Key Components}
 In order to understand DTs, we will first go over the structure and key components of a tree in general.
-\cite{trees_structure}
+\cite{trees}
 A tree $T$ is a special type of directed graph, defined as $T=(V,E)$,
 where $V$ is the finite set of \textbf{nodes} and $E \subset V \times V$ is the set of directed \textbf{edges}.
 When two nodes $u,v \in V$ are connected by an edged $(u,v) \in E$,
@@ -321,7 +329,7 @@ When a node has two children, we will assume a fixed distinction into a left chi
 Having presented the necessary definitions,
 we will now take a closer look at how DTs work internally.
 In this thesis, input data for DTs will have the same shape as the input for NNs.
-Therefore a sample $x = (x_1, ..., x_n)$ is a vector containing $n$ numerical features.
+Therefore an input sample $x = (x_1, ..., x_n)$ is a vector containing $n$ numerical features.
 When predicting the next activity $y$ for such a sample $x$, the nodes of the DT serve different roles:
 
 The root node is the starting point for all decision processes.
@@ -413,35 +421,3 @@ One effective approach to pruning is \textbf{cost-complexity pruning},
 which balances the trade-off between a tree's complexity and its predictive accuracy.
 % TODO: explain the method
 \cite{ccp}
-
-\section{Fairness}
-As machine learning systems are increasingly deployed in high-stakes applications,
-both neural networks and decision trees must be scrutinized for potential biases in their prediction.
-This concern highlights the importance of having quantitative measures
-for assessing and comparing models to ensure that they meet fairness criteria
-alongside performance metrics.
-
-Quantitative \textbf{group fairness} metrics offer a way to assess whether a machine learning model's predictions
-are equitable across different groups within the population.
-For PBPM, these metrics help ensure that predictions, such as the next activity or outcome in a business process,
-do not favor one group over another based on sensitive attributes.
-\textbf{Sensitive attributes} refer to characteristics of individuals or groups
-that are typically protected by laws or ethical guidelines due to their potential to lead to biased or discriminatory treatment,
-such as gender, ethnicity, age, disability status, etc.
-
-%TODO: dem parity in discrimination aware decision tree
-In this thesis, we utilize on one of the most prevalent fairness metrics, \textbf{demographic parity} \cite{dem_parity},
-which quantifies the disparity in positive prediction rates across different demographic groups defined by sensitive attributes. 
-Let $y$ be the prediction of the model, that is either categorized as positive for $y = 1$ or negative for $y = 0$.
-Moreover let $S$ be a sensitive attribute whose values can be split into the demographic groups $s_1$ and $s_2$.
-Then, the demographic parity difference \textit{DPD} for the groups $s_1$, $s_2$ regarding outcome $y$
-is calculated as the absolute difference between the probabilities of receiving a positive outcome for two demographic groups:
-\begin{align}
-  \textit{DPD}(y, s_1, s_2) = |P(y = 1 |S = s_1) - P(y = 1 |S = s_2)|
-\end{align}
-where $P(y = 1 |S = s_i), i \in {1,2}$ is estimated by letting the predictive model classify
-all test samples a
-A smaller \textit{DPD} indicates that the model's predictions are more equitable across groups,
-while a larger \textit{DPD} signals a potential bias in the model's predictions.
-
-% TODO: img of example for lending firm, 

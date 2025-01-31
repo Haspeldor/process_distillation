@@ -207,9 +207,6 @@ def process_data_padded(df, categorical_attributes, numerical_attributes, max_se
     return input_sequences, target_sequences, categorical_data, numerical_data
 
 
-#TODO: leaking test info for minmax
-#TODO: 10-fold
-#TODO: split case by case
 def process_df(df, categorical_attributes, numerical_attributes, n_gram=3):
     """Processes dataframe data for neural network training"""
     # keep only specified attributes
@@ -399,30 +396,12 @@ def mine_bpm(file_name, folder_name):
     pm4py.save_vis_bpmn(bpmn_diagram, os.path.join(output_dir, "bpmn.png"), format='png')
     print("--------------------------------------------------------------------------------------------------")
 
-def load_bpi_2012():
-    input_file = "raw_data/bpi_2012.xes"
-    log = pm4py.read_xes(input_file)
 
-    # Filter and save BPIC12-O (events starting with "O_")
-    log_o = [trace for trace in log if any(event["concept:name"].startswith("O_") for event in trace)]
-    pm4py.write_xes(log_o, "bpi_2012_o.xes")
-
-    # Filter and save BPIC12-W (events starting with "W_")
-    log_w = [trace for trace in log if any(event["concept:name"].startswith("W_") for event in trace)]
-    pm4py.write_xes(log_w, "bpi_2012_w.xes")
-
-    # Filter and save BPIC12-WC (W_ events with lifecycle "complete")
-    log_wc = [
-        trace for trace in log_w
-        if any(event["concept:name"].startswith("W_") and event["lifecycle:transition"] == "complete" for event in trace)
-    ]
-    pm4py.write_xes(log_wc, "bpi_2012_wc.xes")
-
-
-def k_fold_cross_validation(df, categorical_attributes, numerical_attributes, n_gram=3, k=10):
+def k_fold_cross_validation(df, categorical_attributes, numerical_attributes, critical_decisions, n_gram=3, k=10):
     # Ensure the attributes are sorted consistently
     categorical_attributes.sort()
     numerical_attributes.sort()
+    numerical_thresholds = {}
 
     # Group by case_id for consistent splitting
     grouped = df.groupby('case_id')
@@ -464,10 +443,19 @@ def k_fold_cross_validation(df, categorical_attributes, numerical_attributes, n_
                                          categorical_attributes, numerical_attributes, n_gram)
         X_test, y_test = transform_samples(test_df, activity_encoder, attribute_encoders, numerical_scalers,
                                        categorical_attributes, numerical_attributes, n_gram, train=False)
+
+        # get the thresholds for the numerical attributes
+        for decision in critical_decisions:
+            if len(decision.attributes) == 1:
+                attribute = decision.attributes[0]
+                if attribute in numerical_attributes:
+                    threshold = numerical_scalers[attribute].transform([[decision.threshold]])
+                    numerical_thresholds[attribute] = threshold[0][0]
+
         
         print(f"Fold {fold + 1}: Train samples = {len(X_train)}, Test samples = {len(X_test)}")
-        print(X_train[:10])
-        yield X_train, y_train, X_test, y_test
+        print(numerical_thresholds)
+        yield X_train, y_train, X_test, y_test, numerical_thresholds
 
 
 def transform_samples(df, activity_encoder, attribute_encoders, numerical_scalers,

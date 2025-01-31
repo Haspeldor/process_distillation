@@ -4,52 +4,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def plot_shapley(enriched_accuracy_values, modified_accuracy_values, folder_name, file_name):
-    img_folder = os.path.join("img", folder_name)
-    os.makedirs(img_folder, exist_ok=True)
-    
-    data = {
-        'Enriched': np.array(enriched_accuracy_values),
-        'Modified': np.array(modified_accuracy_values)
-    }
-    
-    # Calculate mean and standard deviation
-    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
-    print("Accuracy Statistics:")
-    for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
-    
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
-    for i, (name, values) in enumerate(data.items()):
-        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.2f}, σ={stats[name][1]:.3f})',
-                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
-    
-    # Add titles and labels
-    plt.title(f'Shapley Score of {folder_name}', fontsize=16, fontweight='bold')
-    plt.xlabel('Shapley', fontsize=14)
-    plt.ylabel('Density', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
-    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
-    
-    # Save the plot
-    plt.tight_layout()
-    image_path = os.path.join('img', folder_name, file_name)
-    plt.savefig(image_path)
-    plt.close()
-
 def plot_all_parity(stat_par, folder_name):
     for (feature, event), value in stat_par.items():
-        title = f"Statistical Parity of {feature}, {event} for {folder_name}"
-        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Statistical Parity")
+        title = f"Demographic Parity of {feature}, {event} for {folder_name}"
+        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Demographic Parity")
 
 def plot_all_fairness(stat_par, disp_imp, folder_name):
     for (feature, event), value in stat_par.items():
-        title = f"Statistical Parity of {feature}, {event} for {folder_name}"
-        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Statistical Parity")
+        title = f"Demographic Parity of {feature}, {event} for {folder_name}"
+        plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Demographic Parity")
     for (feature, event), value in disp_imp.items():
         title = f"Disparate Impact of {feature}, {event} for {folder_name}"
         plot_distribution(value["Base"], value["Enriched"], value["Modified"], folder_name, title, "Disparate Impact")
@@ -79,7 +42,7 @@ def plot_distribution(base_values, enriched_values, modified_values, folder_name
     stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
     print(f"{title} Statistics:")
     for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.2f}, Std Dev = {std:.3f}")
+        print(f"{name}: Mean = {mean:.3f}, Std Dev = {std:.3f}")
     
     # Create the plot
     plt.figure(figsize=(10, 6))
@@ -100,44 +63,6 @@ def plot_distribution(base_values, enriched_values, modified_values, folder_name
     # Save the plot
     plt.tight_layout()
     image_path = os.path.join('img', folder_name, title)
-    plt.savefig(image_path)
-    plt.close()
-
-def plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name):
-    img_folder = os.path.join("img", folder_name)
-    os.makedirs(img_folder, exist_ok=True)
-    
-    data = {
-        'Base': np.array(base_accuracy_values),
-        'Enriched': np.array(enriched_accuracy_values),
-        'Modified': np.array(modified_accuracy_values)
-    }
-    
-    # Calculate mean and standard deviation
-    stats = {name: (np.mean(values), np.std(values)) for name, values in data.items()}
-    print("Accuracy Statistics:")
-    for name, (mean, std) in stats.items():
-        print(f"{name}: Mean = {mean:.3f}, Std Dev = {std:.3f}")
-    
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Define custom colors
-    for i, (name, values) in enumerate(data.items()):
-        sns.kdeplot(values, label=f'{name} (μ={stats[name][0]:.2f}, σ={stats[name][1]:.3f})',
-                    color=colors[i], fill=True, alpha=0.6, linewidth=2)
-    
-    # Add titles and labels
-    plt.title(f'Accuracy Distribution of {folder_name}', fontsize=16, fontweight='bold')
-    plt.xlabel('Accuracy', fontsize=14)
-    plt.ylabel('Density', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
-    plt.legend(fontsize=12, title='Legend', title_fontsize='13')
-    
-    # Save the plot
-    plt.tight_layout()
-    image_path = os.path.join('img', folder_name, f"accuracy.png")
     plt.savefig(image_path)
     plt.close()
 
@@ -217,3 +142,42 @@ def plot_attributes(df: pd.DataFrame, rules: list, folder_name: str):
         image_path = os.path.join('img', folder_name, f"{attribute}.png")
         plt.savefig(image_path)
         plt.close()
+
+def plot_ablation(x_values, base_metrics, enriched_metrics, modified_metrics, title, x_label, y_label, folder_name):
+    # Define custom colors
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+    
+    # Prepare data for statistical summaries
+    data = {
+        'Base': np.array(base_metrics),
+        'Enriched': np.array(enriched_metrics),
+        'Modified': np.array(modified_metrics)
+    }
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Plot each line with customized styles
+    for i, (name, values) in enumerate(data.items()):
+        plt.plot(x_values, values, label=f'{name}',
+                 color=colors[i], marker=['o', 's', '^'][i], linestyle=['-', '--', '-.'][i],
+                 linewidth=2, markersize=8, alpha=0.9)
+    
+    # Add titles, labels, and grid
+    plt.title(title, fontsize=16, fontweight='bold')
+    plt.xlabel(x_label, fontsize=14)
+    plt.ylabel(y_label, fontsize=14)
+    plt.xticks(ticks=x_values, labels=x_values, fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    
+    # Add legend with title
+    plt.legend(fontsize=12, title='Legend', title_fontsize=13, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
+    
+    # Adjust layout and show the plot
+    plt.tight_layout()
+    img_folder = os.path.join("img", folder_name)
+    os.makedirs(img_folder, exist_ok=True)
+    image_path = os.path.join('img', folder_name, f"{title}.png")
+    plt.savefig(image_path)
+    plt.close()

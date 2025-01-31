@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 import numpy as np
 import json
+import copy
+
 from collections import Counter
 from sklearn.metrics import accuracy_score
 from sklearn.tree import _tree
@@ -33,6 +35,15 @@ class DecisionTreeClassifier:
         else:
             self.class_names = class_names
 
+    def count_nodes(self):
+        """Count the total number of nodes in the decision tree."""
+        def _count_nodes_recursive(node):
+            if node is None:
+                return 0
+            # Count the current node + recursively count left and right children
+            return 1 + _count_nodes_recursive(node.left) + _count_nodes_recursive(node.right)
+
+        return _count_nodes_recursive(self.root)
 
     def fit(self, X, y):
         """Builds the decision tree from the training data."""
@@ -63,14 +74,14 @@ class DecisionTreeClassifier:
         if node.output is not None:
             # Print the class name if it's a leaf node
             class_name = self.class_names[node.output] if self.class_names is not None else node.output
-            print(f"{indent}|--- [{node.node_id}] class: {class_name}")
+            print(f"{indent}|--- [{node.node_id}] class: {class_name} [{node.num_samples}]")
         else:
             feature_name = self.feature_names[node.feature_index] if self.feature_names is not None else f"Feature {node.feature_index}"
             # Print the current decision rule for the left child (<= threshold)
-            print(f"{indent}|--- [{node.node_id}] ({feature_name}) <= {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
+            print(f"{indent}|--- [{node.node_id}] ({feature_name}) <= {node.threshold:.2f}{removed_features_str}{collected_class_names_str} [{node.num_samples}]")
             self._print_sub_tree(node.left, depth + 1, indent + "|   ")
             # Print the current decision rule for the right child (> threshold)
-            print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str}")
+            print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str} [{node.num_samples}]")
             self._print_sub_tree(node.right, depth + 1, indent + "|   ")
 
     def _grow_tree(self, X, y, depth=0, removed_features=[], recursive_removal=True):
@@ -394,7 +405,7 @@ class DecisionTreeClassifier:
                             output.append(node.node_id)
                             return output
                     else:
-                        if set(possible_events) <= set(decision.possible_events):
+                        if set(possible_events) >= set(decision.possible_events):
                             output.append(node.node_id)
                             return output
 
@@ -594,3 +605,38 @@ def sklearn_to_custom_tree(sklearn_tree, feature_names=None, class_names=None, f
     custom_tree.root = build_node(0,0)
     
     return custom_tree
+
+
+def copy_decision_tree(tree):
+    if tree is None:
+        return None
+    
+    # Create a new DecisionTreeClassifier object
+    new_tree = DecisionTreeClassifier(
+        id_counter=tree.id_counter,
+        max_depth=tree.max_depth,
+        feature_names=copy.deepcopy(tree.feature_names),
+        feature_indices=copy.deepcopy(tree.feature_indices),
+        class_names=copy.deepcopy(tree.class_names)
+    )
+    
+    def copy_node(node):
+        if node is None:
+            return None
+        
+        return Node(
+            node_id=node.node_id,
+            feature_index=node.feature_index,
+            threshold=node.threshold,
+            num_samples=node.num_samples,
+            removed_features=copy.deepcopy(node.removed_features),
+            left=copy_node(node.left),
+            right=copy_node(node.right),
+            output=node.output,
+            depth=node.depth
+        )
+
+    # Copy the root node
+    new_tree.root = copy_node(tree.root)
+    
+    return new_tree
