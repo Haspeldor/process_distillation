@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex thesis-example"] 1733305837.38769 "thesis-example.aux" "thesis-example.bbl" "thesis-example" 1733305851.08966 0
+["bibtex thesis-example"] 1733305837.38769 "thesis-example.aux" "thesis-example.bbl" "thesis-example" 1739130429.62854 0
   "./bib-refs.bib" 1731926914 1444 df5e0232ab47ba780bd2bd7db5ff9c6d ""
-  "./thesis-example-blx.bib" 1733305848 344 7ec594f64641610ba88fc26026c450c9 ""
+  "./thesis-example-blx.bib" 1739130427 344 7ec594f64641610ba88fc26026c450c9 ""
   "c:/texlive/2023/texmf-dist/bibtex/bst/biblatex/biblatex.bst" 1705486039 65484 b7949c47a88ed6dca66ebc7a04577312 ""
-  "thesis-example.aux" 1733305848 17177 6e1f14e2b0ae2a794b429e88bb49334a "pdflatex"
+  "thesis-example.aux" 1739130427 17177 6e1f14e2b0ae2a794b429e88bb49334a "pdflatex"
   (generated)
   "thesis-example.bbl"
   "thesis-example.blg"
   (rewritten before read)
-["pdflatex"] 1733305844.62119 "c:/Users/Haspe/OneDrive - Universität Bayreuth/master_arbeit/example_tex/thesis-example.tex" "thesis-example.pdf" "thesis-example" 1733305851.09068 0
+["pdflatex"] 1739130422.45302 "c:/Users/Haspe/OneDrive - Universität Bayreuth/master_arbeit/example_tex/thesis-example.tex" "thesis-example.pdf" "thesis-example" 1739130429.62968 0
   "c:/Users/Haspe/OneDrive - Universität Bayreuth/master_arbeit/example_tex/thesis-example.tex" 1731926914 5360 e58dd9e05a9d998a06e990d9dfc07aa0 ""
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/base/8r.enc" 1705488856 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1705495330 2375 baa924870cfb487815765f9094cf3728 ""
@@ -189,7 +189,7 @@
   "c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1705507589 5035139 e8cdab388a5f122f6094769190400852 ""
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1705507859 8218974 92e644d47654057a1cff9034bae59bae ""
   "c:/texlive/2023/texmf.cnf" 1705507560 713 e69b156964470283e0530f5060668171 ""
-  "cleanthesis.sty" 1731926914 21462 89853193c91c37639b58f4e05fc0bcf0 ""
+  "cleanthesis.sty" 1739130421 21385 338d0a6d0a0cb0a11069c7bb268b4b82 ""
   "content/abstract.tex" 1733305816 242 6c7064412fe0dc3bf71ce151100053e1 ""
   "content/chapter-concepts.tex" 1731926915 549 64b10f697391b8930482a66ce7b64399 ""
   "content/chapter-conclusion.tex" 1731926915 319 222e1c65de35b8c9ff0123fff9cab059 ""
@@ -200,14 +200,14 @@
   "content/titlepages.tex" 1731926915 2229 597b80dca8952002fe879a0f342aaa27 ""
   "gfx/AI4.png" 1731926915 123560 3dc6cccaabfd3ee7599a34839db74041 ""
   "gfx/Clean-Thesis-Figure.pdf" 1731926915 711511 0ce0e7f6a49a55167f1404f6bdeb670b ""
-  "thesis-example.aux" 1733305848 17177 6e1f14e2b0ae2a794b429e88bb49334a "pdflatex"
+  "thesis-example.aux" 1739130427 17177 6e1f14e2b0ae2a794b429e88bb49334a "pdflatex"
   "thesis-example.bbl" 1733305838 5871 aa60d97e0197e8ad649916cf325e9da0 "bibtex thesis-example"
-  "thesis-example.lof" 1733305848 546 71db4f773b31c57c8154433fd18cb236 "pdflatex"
-  "thesis-example.lot" 1733305848 150 7460b00ca4c2d98f724b7acc062e00fd "pdflatex"
-  "thesis-example.out" 1733305847 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "thesis-example.run.xml" 1733305848 2650 9f3581483efea42b38f6b1e5957be7bc "pdflatex"
+  "thesis-example.lof" 1739130427 546 71db4f773b31c57c8154433fd18cb236 "pdflatex"
+  "thesis-example.lot" 1739130427 150 7460b00ca4c2d98f724b7acc062e00fd "pdflatex"
+  "thesis-example.out" 1739130425 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "thesis-example.run.xml" 1739130427 2650 9f3581483efea42b38f6b1e5957be7bc "pdflatex"
   "thesis-example.tex" 1731926914 5360 e58dd9e05a9d998a06e990d9dfc07aa0 ""
-  "thesis-example.toc" 1733305848 1976 86a9c570a32005a6a9ec342f866ebf8d "pdflatex"
+  "thesis-example.toc" 1739130427 1976 86a9c570a32005a6a9ec342f866ebf8d "pdflatex"
   (generated)
   "thesis-example-blx.bib"
   "thesis-example.aux"

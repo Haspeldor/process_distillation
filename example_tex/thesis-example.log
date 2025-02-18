@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  4 DEC 2024 10:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  9 FEB 2025 20:47
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -748,7 +748,7 @@ Class scrreprt Warning: Usage of package `titlesec' together
 (scrreprt)              and several others to re-configure section
 (scrreprt)              headings.
 (scrreprt)              Nevertheless, using requested
-(scrreprt)              package `titlesec' on input line 527.
+(scrreprt)              package `titlesec' on input line 525.
 
 (c:/texlive/2023/texmf-dist/tex/latex/titlesec/titlesec.sty
 Package: titlesec 2023/10/27 v2.16 Sectioning titles
@@ -802,7 +802,7 @@ Class scrreprt Warning: Usage of package `tocloft' together
 (scrreprt)              `part', `section', `subsection',
 (scrreprt)              `subsubsection', `paragraph' and `subparagraph'.
 (scrreprt)              Nevertheless, using requested
-(scrreprt)              package `tocloft' on input line 633.
+(scrreprt)              package `tocloft' on input line 631.
 
 (c:/texlive/2023/texmf-dist/tex/latex/tocloft/tocloft.sty
 Package: tocloft 2017/08/31 v2.3i parameterised ToC, etc., typesetting
@@ -1337,10 +1337,10 @@ Package logreq Info: Writing requests to 'thesis-example.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 27847 strings out of 474166
- 508631 string characters out of 5749518
+ 27846 strings out of 474166
+ 508627 string characters out of 5749518
  1937542 words of memory out of 5000000
- 49468 multiletter control sequences out of 15000+600000
+ 49467 multiletter control sequences out of 15000+600000
  681897 words of font info for 211 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,13n,131p,10985b,2010s stack positions out of 10000i,1000n,20000p,200000b,200000s

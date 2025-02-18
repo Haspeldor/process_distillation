@@ -40,6 +40,76 @@
     \field{year}{2017}
   \endentry
 
+  \entry{process_transformer}{article}{}
+    \name{author}{3}{}{%
+      {{hash=BZA}{%
+         family={Bukhsh},
+         familyi={B\bibinitperiod},
+         given={Zaharah\bibnamedelima A},
+         giveni={Z\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SA}{%
+         family={Saeed},
+         familyi={S\bibinitperiod},
+         given={Aaqib},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=DRM}{%
+         family={Dijkman},
+         familyi={D\bibinitperiod},
+         given={Remco\bibnamedelima M},
+         giveni={R\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BZA+1}
+    \strng{fullhash}{BZASADRM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{BSD21}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{title}{Processtransformer: Predictive business process monitoring with transformer network}
+    \field{journaltitle}{arXiv preprint arXiv:2104.00721}
+    \field{year}{2021}
+  \endentry
+
+  \entry{lstm}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=CM}{%
+         family={Camargo},
+         familyi={C\bibinitperiod},
+         given={Manuel},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=DM}{%
+         family={Dumas},
+         familyi={D\bibinitperiod},
+         given={Marlon},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=GRO}{%
+         family={Gonz{\'a}lez-Rojas},
+         familyi={G\bibinithyphendelim R\bibinitperiod},
+         given={Oscar},
+         giveni={O\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{CM+1}
+    \strng{fullhash}{CMDMGRO1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{CDGR19}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{booktitle}{Business Process Management: 17th International Conference, BPM 2019, Vienna, Austria, September 1--6, 2019, Proceedings 17}
+    \field{pages}{286\bibrangedash 302}
+    \field{title}{Learning accurate LSTM models of business processes}
+    \field{year}{2019}
+  \endentry
+
   \entry{fairness_ml}{article}{}
     \name{author}{2}{}{%
       {{hash=CS}{%
@@ -96,6 +166,97 @@
     \field{year}{2023}
   \endentry
 
+  \entry{keras}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=CF}{%
+         family={Chollet},
+         familyi={C\bibinitperiod},
+         given={FranÃ§ois},
+         giveni={F\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {GitHub}%
+    }
+    \strng{namehash}{CF1}
+    \strng{fullhash}{CF1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Cho15}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{howpublished}{\url{https://github.com/fchollet/keras}}
+    \field{title}{Keras}
+    \field{year}{2015}
+  \endentry
+
+  \entry{aia}{article}{}
+    \name{author}{1}{}{%
+      {{hash=CE}{%
+         family={Commission},
+         familyi={C\bibinitperiod},
+         given={European},
+         giveni={E\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CE1}
+    \strng{fullhash}{CE1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Com21}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{title}{Proposal for a Regulation Laying Down Harmonized Rules on Artificial Intelligence (Artificial Intelligence Act)}
+    \verb{url}
+    \verb https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52021PC02
+    \verb 06
+    \endverb
+    \field{journaltitle}{COM/2021/206 final}
+    \field{year}{2021}
+  \endentry
+
+  \entry{trees}{book}{}
+    \name{author}{4}{}{%
+      {{hash=CTH}{%
+         family={Cormen},
+         familyi={C\bibinitperiod},
+         given={Thomas\bibnamedelima H.},
+         giveni={T\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+      {{hash=LCE}{%
+         family={Leiserson},
+         familyi={L\bibinitperiod},
+         given={Charles\bibnamedelima E.},
+         giveni={C\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=RRL}{%
+         family={Rivest},
+         familyi={R\bibinitperiod},
+         given={Ronald\bibnamedelima L.},
+         giveni={R\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=SC}{%
+         family={Stein},
+         familyi={S\bibinitperiod},
+         given={Clifford},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {MIT Press}%
+    }
+    \strng{namehash}{CTH+1}
+    \strng{fullhash}{CTHLCERRLSC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Cor+09}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{edition}{3rd}
+    \field{title}{Introduction to Algorithms}
+    \field{year}{2009}
+  \endentry
+
   \entry{fairness_overview}{article}{}
     \name{author}{3}{}{%
       {{hash=DAM}{%
@@ -133,6 +294,34 @@
     \field{volume}{31}
     \field{journaltitle}{Production and Operations Management}
     \field{year}{2022}
+  \endentry
+
+  \entry{bpi_2012}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=vDB}{%
+         prefix={van},
+         prefixi={v\bibinitperiod},
+         family={Dongen},
+         familyi={D\bibinitperiod},
+         given={Boudewijn},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {4TU.ResearchData}%
+    }
+    \strng{namehash}{DBv1}
+    \strng{fullhash}{DBv1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Don12}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{howpublished}{\url{https://doi.org/10.4121/uuid:3926db30-f712-4394-aebc-75976070e91f}}
+    \field{note}{dataset}
+    \field{title}{BPI Challenge 2012}
+    \field{version}{1}
+    \field{year}{2012}
   \endentry
 
   \entry{demographic_parity}{inproceedings}{}
@@ -182,26 +371,6 @@
     \field{pages}{214\bibrangedash 226}
     \field{title}{Fairness Through Awareness}
     \field{year}{2012}
-  \endentry
-
-  \entry{gdpr}{misc}{}
-    \name{author}{1}{}{%
-      {{hash=E}{%
-         family={{European Union}},
-         familyi={E\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{E1}
-    \strng{fullhash}{E1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelalpha}{{Eur}16}
-    \field{sortinit}{E}
-    \field{sortinithash}{E}
-    \field{howpublished}{\url{https://eur-lex.europa.eu/eli/reg/2016/679/oj}}
-    \field{note}{Accessed: 2025-01-12}
-    \field{title}{{General Data Protection Regulation (GDPR), Regulation (EU) 2016/679}}
-    \field{year}{2016}
   \endentry
 
   \entry{soft_decision_tree}{article}{}
@@ -295,6 +464,168 @@
     \field{year}{2014}
   \endentry
 
+  \entry{fairness_distribution}{article}{}
+    \name{author}{7}{}{%
+      {{hash=HX}{%
+         family={Han},
+         familyi={H\bibinitperiod},
+         given={Xiaotian},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=JZ}{%
+         family={Jiang},
+         familyi={J\bibinitperiod},
+         given={Zhimeng},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=JH}{%
+         family={Jin},
+         familyi={J\bibinitperiod},
+         given={Hongye},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=LZ}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Zirui},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=ZN}{%
+         family={Zou},
+         familyi={Z\bibinitperiod},
+         given={Na},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=WQ}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Qifan},
+         giveni={Q\bibinitperiod},
+      }}%
+      {{hash=HX}{%
+         family={Hu},
+         familyi={H\bibinitperiod},
+         given={Xia},
+         giveni={X\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HX+1}
+    \strng{fullhash}{HXJZJHLZZNWQHX1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Han+23}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{title}{Retiring Delta DP: New Distribution-Level Metrics for Demographic Parity}
+    \field{journaltitle}{arXiv preprint arXiv:2301.13443}
+    \field{year}{2023}
+  \endentry
+
+  \entry{equalized_odds}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HM}{%
+         family={Hardt},
+         familyi={H\bibinitperiod},
+         given={Moritz},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PE}{%
+         family={Price},
+         familyi={P\bibinitperiod},
+         given={Eric},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={Srebro},
+         familyi={S\bibinitperiod},
+         given={Nati},
+         giveni={N\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HM+1}
+    \strng{fullhash}{HMPESN1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{HPS16}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{title}{Equality of opportunity in supervised learning}
+    \field{volume}{29}
+    \field{journaltitle}{Advances in neural information processing systems}
+    \field{year}{2016}
+  \endentry
+
+  \entry{backpropagation}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HGE}{%
+         family={Hinton},
+         familyi={H\bibinitperiod},
+         given={Geoffrey\bibnamedelima E.},
+         giveni={G\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=RDE}{%
+         family={Rumelhart},
+         familyi={R\bibinitperiod},
+         given={David\bibnamedelima E.},
+         giveni={D\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=WRJ}{%
+         family={Williams},
+         familyi={W\bibinitperiod},
+         given={Ronald\bibnamedelima J.},
+         giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HGE+1}
+    \strng{fullhash}{HGERDEWRJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{HRW86}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \verb{doi}
+    \verb 10.1038/323533a0
+    \endverb
+    \field{pages}{533\bibrangedash 536}
+    \field{title}{Learning representations by back-propagating errors}
+    \field{volume}{323}
+    \field{journaltitle}{Nature}
+    \field{year}{1986}
+  \endentry
+
+  \entry{knowledge_distillation}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HG}{%
+         family={Hinton},
+         familyi={H\bibinitperiod},
+         given={Geoffrey},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=VO}{%
+         family={Vinyals},
+         familyi={V\bibinitperiod},
+         given={Oriol},
+         giveni={O\bibinitperiod},
+      }}%
+      {{hash=DJ}{%
+         family={Dean},
+         familyi={D\bibinitperiod},
+         given={Jeff},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HG+1}
+    \strng{fullhash}{HGVODJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{HVD15}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{title}{Distilling the Knowledge in a Neural Network}
+    \field{journaltitle}{arXiv preprint arXiv:1503.02531}
+    \field{year}{2015}
+  \endentry
+
   \entry{fairness_decision_tree}{inproceedings}{}
     \name{author}{3}{}{%
       {{hash=KF}{%
@@ -331,6 +662,27 @@
     \field{pages}{869\bibrangedash 874}
     \field{title}{Discrimination Aware Decision Tree Learning}
     \field{year}{2010}
+  \endentry
+
+  \entry{adam}{article}{}
+    \name{author}{1}{}{%
+      {{hash=KDP}{%
+         family={Kingma},
+         familyi={K\bibinitperiod},
+         given={Diederik\bibnamedelima P},
+         giveni={D\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KDP1}
+    \strng{fullhash}{KDP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Kin14}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{title}{Adam: A method for stochastic optimization}
+    \field{journaltitle}{arXiv preprint arXiv:1412.6980}
+    \field{year}{2014}
   \endentry
 
   \entry{k_fold}{article}{}
@@ -427,6 +779,43 @@
     \field{year}{2024}
   \endentry
 
+  \entry{knowledge_distillation_trees}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=LX}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Xuan},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=WX}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Xiaoguang},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=MS}{%
+         family={Matwin},
+         familyi={M\bibinitperiod},
+         given={Stan},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \list{organization}{1}{%
+      {IEEE}%
+    }
+    \strng{namehash}{LX+1}
+    \strng{fullhash}{LXWXMS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{LWM18}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{booktitle}{2018 IEEE International Conference on Data Mining Workshops (ICDMW)}
+    \field{pages}{905\bibrangedash 912}
+    \field{title}{Improving the interpretability of deep neural networks with knowledge distillation}
+    \field{year}{2018}
+  \endentry
+
   \entry{hospital_billing}{misc}{}
     \name{author}{1}{}{%
       {{hash=MF}{%
@@ -480,6 +869,119 @@
     \field{year}{2024}
   \endentry
 
+  \entry{sklearn}{article}{}
+    \name{author}{16}{}{%
+      {{hash=PF}{%
+         family={Pedregosa},
+         familyi={P\bibinitperiod},
+         given={Fabian},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=VG}{%
+         family={Varoquaux},
+         familyi={V\bibinitperiod},
+         given={GaÃ«l},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Gramfort},
+         familyi={G\bibinitperiod},
+         given={Alexandre},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MV}{%
+         family={Michel},
+         familyi={M\bibinitperiod},
+         given={Vincent},
+         giveni={V\bibinitperiod},
+      }}%
+      {{hash=TB}{%
+         family={Thirion},
+         familyi={T\bibinitperiod},
+         given={Bertrand},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=GO}{%
+         family={Grisel},
+         familyi={G\bibinitperiod},
+         given={Olivier},
+         giveni={O\bibinitperiod},
+      }}%
+      {{hash=BM}{%
+         family={Blondel},
+         familyi={B\bibinitperiod},
+         given={Mathieu},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PP}{%
+         family={Prettenhofer},
+         familyi={P\bibinitperiod},
+         given={Philipp},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=WR}{%
+         family={Weiss},
+         familyi={W\bibinitperiod},
+         given={Ronald},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=DV}{%
+         family={Dubourg},
+         familyi={D\bibinitperiod},
+         given={Vicky},
+         giveni={V\bibinitperiod},
+      }}%
+      {{hash=VJ}{%
+         family={Vanderplas},
+         familyi={V\bibinitperiod},
+         given={Jacob},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=PA}{%
+         family={Passos},
+         familyi={P\bibinitperiod},
+         given={Alvaro},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CD}{%
+         family={Cournapeau},
+         familyi={C\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=BM}{%
+         family={Brucher},
+         familyi={B\bibinitperiod},
+         given={Matthieu},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PM}{%
+         family={Perrot},
+         familyi={P\bibinitperiod},
+         given={Matthieu},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=DÃ}{%
+         family={Duchesnay},
+         familyi={D\bibinitperiod},
+         given={Ã‰ric},
+         giveni={Ã\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{PF+1}
+    \strng{fullhash}{PFVGGAMVTBGOBMPPWRDVVJPACDBMPMDÃ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Ped+11}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{pages}{2825\bibrangedash 2830}
+    \field{title}{Scikit-learn: Machine Learning in Python}
+    \field{volume}{12}
+    \field{journaltitle}{Journal of Machine Learning Research}
+    \field{year}{2011}
+  \endentry
+
   \entry{simulated_logs}{article}{}
     \name{author}{4}{}{%
       {{hash=PT}{%
@@ -519,6 +1021,39 @@
     \field{title}{A Collection of Simulated Event Logs for Fairness Assessment in Process Mining}
     \field{journaltitle}{arXiv preprint arXiv:2306.11453}
     \field{year}{2023}
+  \endentry
+
+  \entry{fine_tuning}{article}{}
+    \name{author}{2}{}{%
+      {{hash=PSJ}{%
+         family={Pan},
+         familyi={P\bibinitperiod},
+         given={Sinno\bibnamedelima Jialin},
+         giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=YQ}{%
+         family={Yang},
+         familyi={Y\bibinitperiod},
+         given={Qiang},
+         giveni={Q\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {IEEE}%
+    }
+    \strng{namehash}{PSJYQ1}
+    \strng{fullhash}{PSJYQ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{PY09}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{number}{10}
+    \field{pages}{1345\bibrangedash 1359}
+    \field{title}{A Survey on Transfer Learning}
+    \field{volume}{22}
+    \field{journaltitle}{IEEE Transactions on Knowledge and Data Engineering}
+    \field{year}{2009}
   \endentry
 
   \entry{ipm}{article}{}

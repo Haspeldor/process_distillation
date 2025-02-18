@@ -9,10 +9,10 @@ import pm4py
 from typing import List, Dict
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, LabelEncoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from trace_generator import Event, Case, TraceGenerator
 from tqdm import tqdm 
+from plotting import plot_attributes
 
 from main import print_samples
 
@@ -43,7 +43,7 @@ def load_xes_to_df(file_name, folder_name=None, num_cases=None):
     df = df[columns]
     df = df.loc[:, ~df.columns.duplicated()]
     if num_cases:
-        df = df[df['case_id'].isin(df['case_id'].unique()[:num_cases])]
+        df = df[df['case_id'].isin(df['case_id'].unique()[-num_cases:])]
     df = process_df_timestamps(df)
     if folder_name:
         save_data(df, folder_name, "df.pkl")
@@ -364,7 +364,7 @@ def enrich_df(df: pd.DataFrame, rules: list, folder_name: str):
         df[attribute] = df['case_id'].map(values)
     
     # plot these for evaluation of the success
-    #plot_attributes(df, rules, folder_name)
+    plot_attributes(df, rules, folder_name)
 
     return df
 
@@ -453,6 +453,7 @@ def k_fold_cross_validation(df, categorical_attributes, numerical_attributes, cr
                     numerical_thresholds[attribute] = threshold[0][0]
 
         
+
         print(f"Fold {fold + 1}: Train samples = {len(X_train)}, Test samples = {len(X_test)}")
         print(numerical_thresholds)
         yield X_train, y_train, X_test, y_test, numerical_thresholds

@@ -10,24 +10,23 @@ but an overview can be found in \cite{fairness_ml}.
 Comparatively, the existing literature related to fairness specifically in PBPM is quite limited,
 although many foundational concepts and challenges concerning fairness can be transferred
 from general ML, as proposed in \cite{fairness_overview}.
-Accordingly, the following section will focus on reviewing approaches
+Accordingly, we will focus on reviewing approaches
 that have explicitly been adapted into the field of PBPM.
 
-\section{Fairness in Predictive Business Process Monitoring}
-%TODO: not how it works...
 \cite{fairness_foundation} represents one of the initial efforts to incorporate fairness into PBPM.
-This approach employs discrimination-aware decision trees \cite{fairness_decision_tree},
-which extend traditional decision trees by adding fairness constraints during the split-selection process.
-These constraints penalize splits influenced by sensitive attributes,
-ensuring that decisions are less biased. 
-To further enhance fairness,
-a relabeling technique is employed, where outcome classes of the leaf nodes are adjusted
-to reduce the discriminatory impact of sensitive attributes with minimal loss in predictive accuracy.
-This technique is similar to our methodology as described in section \ref{sec:modification},
-there is however a key difference:
+This approach utilizes discrimination-aware decision trees,
+which extend traditional decision trees by introducing fairness constraints.
+Specifically, when the model's predictions exceed a certain threshold of unfairness,
+i.e. when they are disproportionately influenced by sensitive attributes like race or gender,
+a relabeling technique is applied.
+This relabeling adjusts the predictions of the model in a way,
+such that the discriminatory impact of sensitive attributes is reduced,
+while keeping the loss in predictive accuracy as small as possible.
+Although this technique is similar to our methodology as described in section \ref{sec:modification},
+there is a key difference:
 The relabeling in this method is performed automatically,
-based on the assumption that all bias is undesirable and should be eliminated.
-In contrast, our approach emphasizes human stakeholder involvement to decide which biases are unwanted,
+based on the assumption that all bias is undesirable and should be eliminated regardless of the context.
+In contrast, our approach emphasizes the involvement of domain expert to decide which biases are unwanted,
 allowing for the preservation of nuanced, context-dependent correlations.
 
 In \cite{fairness_adversarial},
@@ -53,24 +52,28 @@ However, similar to the other approaches presented before,
 the uniform elimination of biases may inadvertently remove desirable correlations,
 potentially affecting the utility of the predictive model in certain contexts.
 
-%width: 11.75
 \begin{table}[h!]
-\centering
-\footnotesize
-\begin{tabular}{|>{\raggedright\arraybackslash}p{1.25cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{2.3cm}|>{\raggedright\arraybackslash}p{3cm}|}
-\hline
-\textbf{Work} & \textbf{Proposed Method} & \textbf{Predictive Model} & \textbf{Fairness Definition} & \textbf{Datasets} \\ \hline
-\cite{fairness_foundation} & Discrimination-Aware Decision Trees & Decision Trees & Demographic Parity & Hospital Billing Log \\ \hline
-\cite{fairness_adversarial} & Adversarial Learning & FCNN, LSTM & Shapley Values, Equalized Odds & BPI Challenge 2013, Simulated Logs \\ \hline
-\cite{fairness_independence} & Independence through Composite Loss & LSTM & Demographic Parity, ABPC, ABCC & Simulated Logs \\ \hline
-\end{tabular}
-\caption{Comparison of Related Work}
-\label{tab:related_work_comparison}
+    \centering
+    \scriptsize
+    \renewcommand{\arraystretch}{1.8} % Set default row spacing for data rows
+    \setlength{\tabcolsep}{6pt}
+    \begin{tabular}{>{\centering\arraybackslash}c | c | c | c }
+        \toprule
+        \textbf{Work} & \textbf{Predictive Model} & \textbf{Fairness Metrics} & \textbf{Datasets} \\
+        \midrule
+        \cite{fairness_foundation} & Decision Trees \cite{trees} & \makecell{Demographic Parity \cite{demographic_parity}} & \makecell{Hospital Billing Log \cite{hospital_billing}} \\
+        \midrule
+        \cite{fairness_adversarial} & \makecell{Fully-connected \\ Neural Networks \cite{backpropagation}, \\ LSTM \cite{lstm}} & \makecell{Shapley Values \cite{shapley}, \\ Equalized Odds \cite{equalized_odds}} & \makecell{BPI Challenge 2013 \cite{bpi_2012}, \\ Simulated Logs \cite{simulated_logs}} \\
+        \midrule
+        \cite{fairness_independence} & LSTM \cite{lstm} & \makecell{Demographic Parity \cite{demographic_parity}, \\ ABPC and ABCC \cite{fairness_distribution}} & \makecell{Simulated Logs \cite{simulated_logs}} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of related work, highlighting different utilized predictive models, fairness metrics, and datasets.}
+    \label{tab:related_work_comparison}
 \end{table}
 
-\section{Conclusion}
-Current approaches to fairness in PBPM have made significant strides
+In conclusion, current approaches to fairness in PBPM have made significant strides
 but remain somewhat limited by their automated and uniform treatment of bias.
 A shift toward an approach that puts more control into the hands of domain experts 
-presents a promising direction for achieving more context-sensitive models,
+presents a promising direction for creating more context-sensitive models,
 that achieve better performance while still making context-based fair decisions.

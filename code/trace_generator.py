@@ -181,26 +181,7 @@ def build_process_model(model_name) -> ProcessModel:
     print("building process model:")
     process_model = ProcessModel()
 
-    if model_name == "model_1":
-        process_model.add_categorical_attribute("gender", [("male", 0.45), ("female", 0.45), ("diverse", 0.1)])
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("casual background check")
-        process_model.add_activity("exhaustive background check")
-        process_model.add_activity("end")
-        process_model.add_transition("start", "casual background check", conditions={
-            ("gender", "male"): 0.8,
-            ("gender", "female"): 0.3,  
-            ("gender", "diverse"): 0.0 
-        })
-        process_model.add_transition("start", "exhaustive background check", conditions={
-            ("gender", "male"): 0.2,
-            ("gender", "female"): 0.7,  
-            ("gender", "diverse"): 1.0 
-        })
-        process_model.add_transition("casual background check", "end", conditions={})
-        process_model.add_transition("exhaustive background check", "end", conditions={})
-
-    elif model_name == "showcase":
+    if model_name == "showcase":
         process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
         process_model.add_activity("register patient", start_activity=True)
         process_model.add_activity("regular treatment")
@@ -217,54 +198,10 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_transition("regular treatment", "bill patient", conditions={})
         process_model.add_transition("expert treatment", "bill patient", conditions={})
 
-    elif model_name == "model_2":
-        process_model.add_categorical_attribute("gender", [("male", 0.45), ("female", 0.45), ("diverse", 0.1)])
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("talk to applicant")
-        process_model.add_activity("casual background check")
-        process_model.add_activity("exhaustive background check")
-        process_model.add_activity("accept request")
-        process_model.add_activity("reject request")
-        process_model.add_activity("end")
-        process_model.add_transition("start", "talk to applicant", conditions={})
-        process_model.add_transition("talk to applicant", "casual background check", conditions={
-            ("gender", "male"): 0.8,
-            ("gender", "female"): 0.3,  
-            ("gender", "diverse"): 0.0 
-        })
-        process_model.add_transition("talk to applicant", "exhaustive background check", conditions={
-            ("gender", "male"): 0.2,
-            ("gender", "female"): 0.7,  
-            ("gender", "diverse"): 1.0 
-        })
-        process_model.add_transition("casual background check", "accept request", conditions={
-            ("gender", "male"): 0.8,
-            ("gender", "female"): 0.6,  
-            ("gender", "diverse"): 0.3 
-        })
-        process_model.add_transition("casual background check", "reject request", conditions={
-            ("gender", "male"): 0.2,
-            ("gender", "female"): 0.4,  
-            ("gender", "diverse"): 0.7 
-        })
-        process_model.add_transition("exhaustive background check", "accept request", conditions={
-            ("gender", "male"): 0.7,
-            ("gender", "female"): 0.5,  
-            ("gender", "diverse"): 0.3 
-        })
-        process_model.add_transition("exhaustive background check", "reject request", conditions={
-            ("gender", "male"): 0.3,
-            ("gender", "female"): 0.5,  
-            ("gender", "diverse"): 0.7 
-        })
-        process_model.add_transition("accept request", "end", conditions={})
-        process_model.add_transition("reject request", "end", conditions={})
-
-    elif model_name == "cc":
+    elif model_name == "cs_test":
         process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
-        process_model.add_categorical_attribute("problems", [("true", 0.5), ("false", 0.5)])
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("register")
+        process_model.add_numerical_attribute("age", mean=45, stddev=10, min_val=20, max_val=85, int=True)
+        process_model.add_activity("register", start_activity=True)
         process_model.add_activity("asses eligibility")
         process_model.add_activity("collect history")
         process_model.add_activity("prostate screening")
@@ -274,16 +211,15 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_activity("inform prevention")
         process_model.add_activity("bill patient")
         process_model.add_activity("refuse screening")
-        process_model.add_activity("end")
         process_model.add_transition("start", "register", conditions={})
         process_model.add_transition("register", "asses eligibility", conditions={})
         process_model.add_transition("asses eligibility", "collect history", conditions={
-            ("gender", "male"): 0.7,
-            ("gender", "female"): 0.3,  
+            ("gender", "male"): 1,
+            ("gender", "female"): 0,  
         })
         process_model.add_transition("asses eligibility", "refuse screening", conditions={
-            ("gender", "male"): 0.3,
-            ("gender", "female"): 0.7,  
+            ("gender", "male"): 0,
+            ("gender", "female"): 1,  
         })
         process_model.add_transition("collect history", "prostate screening", conditions={
             ("gender", "male"): 1,
@@ -294,63 +230,31 @@ def build_process_model(model_name) -> ProcessModel:
             ("gender", "female"): 1,  
         })
         process_model.add_transition("prostate screening", "explain diagnosis", conditions={
-            ("problems", "true"): 0.7,
-            ("problems", "false"): 0.3,  
+            ("age", (">", 60)): 0.7,
+            ("age", ("<=", 60)): 0.3,  
         })
         process_model.add_transition("prostate screening", "inform prevention", conditions={
-            ("problems", "true"): 0.7,
-            ("problems", "false"): 0.3,  
+            ("age", (">", 60)): 0.3,
+            ("age", ("<=", 60)): 0.7,  
         })
         process_model.add_transition("mammary screening", "explain diagnosis", conditions={
-            ("problems", "true"): 0.7,
-            ("problems", "false"): 0.3,  
+            ("age", (">", 60)): 0.7,
+            ("age", ("<=", 60)): 0.3,  
         })
         process_model.add_transition("mammary screening", "inform prevention", conditions={
-            ("problems", "true"): 0.3,
-            ("problems", "false"): 0.7,  
+            ("age", (">", 60)): 0.3,
+            ("age", ("<=", 60)): 0.7,  
         })
         process_model.add_transition("explain diagnosis", "discuss options", conditions={})
         process_model.add_transition("discuss options", "bill patient", conditions={})
         process_model.add_transition("inform prevention", "bill patient", conditions={})
-        process_model.add_transition("bill patient", "end", conditions={})
-        process_model.add_transition("refuse screening", "end", conditions={})
         process_model.add_critical_decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False)
         process_model.add_critical_decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True)
 
-    elif model_name == "cc_enriched":
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("register")
-        process_model.add_activity("asses eligibility")
-        process_model.add_activity("collect history")
-        process_model.add_activity("prostate screening")
-        process_model.add_activity("mammary screening")
-        process_model.add_activity("explain diagnosis")
-        process_model.add_activity("discuss options")
-        process_model.add_activity("inform prevention")
-        process_model.add_activity("bill patient")
-        process_model.add_activity("refuse screening")
-        process_model.add_activity("end")
-        process_model.add_transition("start", "register", conditions={})
-        process_model.add_transition("register", "asses eligibility", conditions={})
-        process_model.add_transition("asses eligibility", "collect history", conditions={})
-        process_model.add_transition("asses eligibility", "refuse screening", conditions={})
-        process_model.add_transition("collect history", "prostate screening", conditions={})
-        process_model.add_transition("collect history", "mammary screening", conditions={})
-        process_model.add_transition("prostate screening", "explain diagnosis", conditions={})
-        process_model.add_transition("prostate screening", "inform prevention", conditions={})
-        process_model.add_transition("mammary screening", "explain diagnosis", conditions={})
-        process_model.add_transition("mammary screening", "inform prevention", conditions={})
-        process_model.add_transition("explain diagnosis", "discuss options", conditions={})
-        process_model.add_transition("discuss options", "bill patient", conditions={})
-        process_model.add_transition("inform prevention", "bill patient", conditions={})
-        process_model.add_transition("bill patient", "end", conditions={})
-        process_model.add_transition("refuse screening", "end", conditions={})
-
-    elif model_name == "cc_n":
+    elif model_name == "cs":
         process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
-        process_model.add_numerical_attribute("age", mean=40, stddev=15, min_val=10, max_val=95, int=True)
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("register")
+        process_model.add_numerical_attribute("age", mean=45, stddev=10, min_val=20, max_val=85, int=True)
+        process_model.add_activity("register", start_activity=True)
         process_model.add_activity("asses eligibility")
         process_model.add_activity("collect history")
         process_model.add_activity("prostate screening")
@@ -360,7 +264,6 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_activity("inform prevention")
         process_model.add_activity("bill patient")
         process_model.add_activity("refuse screening")
-        process_model.add_activity("end")
         process_model.add_transition("start", "register", conditions={})
         process_model.add_transition("register", "asses eligibility", conditions={})
         process_model.add_transition("asses eligibility", "collect history", conditions={
@@ -398,8 +301,6 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_transition("explain diagnosis", "discuss options", conditions={})
         process_model.add_transition("discuss options", "bill patient", conditions={})
         process_model.add_transition("inform prevention", "bill patient", conditions={})
-        process_model.add_transition("bill patient", "end", conditions={})
-        process_model.add_transition("refuse screening", "end", conditions={})
         process_model.add_critical_decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False)
         process_model.add_critical_decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True)
 
@@ -408,10 +309,8 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_activity("end")
 
     elif model_name == "ablation_num_attributes":
-        process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
-        process_model.add_numerical_attribute("age", mean=40, stddev=15, min_val=10, max_val=95, int=True)
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("register")
+        process_model.add_numerical_attribute("age", mean=45, stddev=10, min_val=20, max_val=85, int=True)
+        process_model.add_activity("register", start_activity=True)
         process_model.add_activity("asses eligibility")
         process_model.add_activity("collect history")
         process_model.add_activity("prostate screening")
@@ -421,7 +320,6 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_activity("inform prevention")
         process_model.add_activity("bill patient")
         process_model.add_activity("refuse screening")
-        process_model.add_activity("end")
         process_model.add_transition("start", "register", conditions={})
         process_model.add_transition("register", "asses eligibility", conditions={})
         process_model.add_transition("prostate screening", "explain diagnosis", conditions={
@@ -443,13 +341,11 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_transition("explain diagnosis", "discuss options", conditions={})
         process_model.add_transition("discuss options", "bill patient", conditions={})
         process_model.add_transition("inform prevention", "bill patient", conditions={})
-        process_model.add_transition("bill patient", "end", conditions={})
-        process_model.add_transition("refuse screening", "end", conditions={})
 
     elif model_name == "ablation_strength":
-        process_model.add_numerical_attribute("age", mean=40, stddev=15, min_val=10, max_val=95, int=True)
-        process_model.add_activity("start", start_activity=True)
-        process_model.add_activity("register")
+        process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
+        process_model.add_numerical_attribute("age", mean=45, stddev=10, min_val=20, max_val=85, int=True)
+        process_model.add_activity("register", start_activity=True)
         process_model.add_activity("asses eligibility")
         process_model.add_activity("collect history")
         process_model.add_activity("prostate screening")
@@ -459,7 +355,6 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_activity("inform prevention")
         process_model.add_activity("bill patient")
         process_model.add_activity("refuse screening")
-        process_model.add_activity("end")
         process_model.add_transition("start", "register", conditions={})
         process_model.add_transition("register", "asses eligibility", conditions={})
         process_model.add_transition("collect history", "prostate screening", conditions={
@@ -489,8 +384,6 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_transition("explain diagnosis", "discuss options", conditions={})
         process_model.add_transition("discuss options", "bill patient", conditions={})
         process_model.add_transition("inform prevention", "bill patient", conditions={})
-        process_model.add_transition("bill patient", "end", conditions={})
-        process_model.add_transition("refuse screening", "end", conditions={})
         process_model.add_critical_decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False)
         process_model.add_critical_decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True)
 
@@ -501,7 +394,7 @@ def build_process_model(model_name) -> ProcessModel:
 def get_rules(folder_name):
     rules = []
 
-    if folder_name == "bpi_A":
+    if folder_name == "bpi_2012":
         rules = [
             {
                 'subsequence': [''],
@@ -551,10 +444,10 @@ def get_rules(folder_name):
                 'attribute': 'age',
                 'distribution': {
                     'type': 'normal',
-                    'mean': 45,
-                    'std': 10,
+                    'mean': 50,
+                    'std': 15,
                     'min': 20,
-                    'max': 85
+                    'max': 100
                 }
             },
             {
@@ -573,10 +466,10 @@ def get_rules(folder_name):
                 'attribute': 'age',
                 'distribution': {
                     'type': 'normal',
-                    'mean': 45,
-                    'std': 10,
+                    'mean': 50,
+                    'std': 15,
                     'min': 20,
-                    'max': 85
+                    'max': 100
                 }
             },
             {
@@ -708,139 +601,22 @@ def get_rules(folder_name):
                 }
             },
         ]
-    elif folder_name == "hb_enriched":
-        rules = [
-            {
-                'subsequence': [],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 40,
-                    'std': 10,
-                    'min': 20,
-                    'max': 85
-                }
-            },
-            {
-                'subsequence': ['CHANGE DIAGN'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 50,
-                    'std': 10,
-                    'min': 20,
-                    'max': 85
-                }
-            },
-            {
-                'subsequence': ['CODE NOK'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 85,
-                    'std': 5,
-                    'min': 20,
-                    'max': 100
-                }
-            }
-        ]
-    elif folder_name == "hb_enriched_gender":
-        rules = [
-            {
-                'subsequence': [],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.6995), ("female", 0.2995), ("non conforming", 0.001)]
-                }
-            },
-            {
-                'subsequence': ['CHANGE DIAGN'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.295), ("female", 0.695), ("non conforming", 0.01)]
-                }
-            },
-            {
-                'subsequence': ['CODE NOK'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.1), ("female", 0.1), ("non conforming", 0.8)]
-                }
-            },
-        ]
-    elif folder_name == "cc_enriched":
-        rules = [
-            {
-                'subsequence': ['refuse screening'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0.4), ("female", 0.6)]
-                }
-            },
-            {
-                'subsequence': ['prostate screening'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 1), ("female", 0)]
-                }
-            },
-            {
-                'subsequence': ['mammary screening'],
-                'attribute': 'gender',
-                'distribution': {
-                    'type': 'discrete',
-                    'values': [("male", 0), ("female", 1)]
-                }
-            },
-            {
-                'subsequence': [],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 40,
-                    'std': 15,
-                    'min': 20,
-                    'max': 100
-                }
-            },
-            {
-                'subsequence': ['explain diagnosis'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 50,
-                    'std': 15,
-                    'min': 20,
-                    'max': 100
-                }
-            },
-            {
-                'subsequence': ['inform prevention'],
-                'attribute': 'age',
-                'distribution': {
-                    'type': 'normal',
-                    'mean': 30,
-                    'std': 15,
-                    'min': 20,
-                    'max': 100
-                }
-            }
-        ]
          
     return rules
+
+def get_base_attributes(folder_name):
+    if "bpi" in folder_name:
+        return [], ["case:AMOUNT_REQ", "time_delta"]
+    elif "cs" in folder_name:
+        return [], ["age", "time_delta"]
+    else:
+        return [], ["time_delta"]
+
 
 def get_attributes(folder_name):
     categorical_attributes = []
     numerical_attributes = ["time_delta"]
 
-    if folder_name == "cc_n":
-        categorical_attributes = ["gender"]
-        numerical_attributes = ["age"]
     if folder_name == "showcase":
         categorical_attributes = ["gender"]
         numerical_attributes = ["time_delta"]
@@ -856,6 +632,9 @@ def get_attributes(folder_name):
     elif folder_name == "cc_enriched":
         categorical_attributes = ["gender"]
         numerical_attributes = ["age"]
+    elif "cs" in folder_name:
+        categorical_attributes = ["gender"]
+        numerical_attributes = ["age", "time_delta"]
     elif "bpi" in folder_name:
         categorical_attributes = ["gender"]
         numerical_attributes = ["case:AMOUNT_REQ", "time_delta"]
@@ -881,35 +660,20 @@ def get_attributes(folder_name):
 def get_critical_decisions(folder_name):
     critical_decisions = []
 
-    if "hiring" in folder_name:
-        critical_decisions.append(Decision(attributes=["case:age", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Application Rejected"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["case:yearsOfEducation"], possible_events=["Application Rejected"], to_remove=False))
-    elif folder_name == "showcase":
+    if folder_name == "showcase":
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["expert treatment", "regular treatment"], to_remove=True, previous="register patient"))
-    elif "hospital" in folder_name:
-        critical_decisions.append(Decision(attributes=["case:private_insurance", "case:underlying_condition", "case:citizen", "case:german speaking", "case:gender"], possible_events=["Expert Examination"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["case:age"], possible_events=["Expert Examination"], to_remove=False))
-    elif "cc_n" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
-    elif "cc_enriched" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False))
-    elif "hb_enriched_gender" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False), previous="NEW")
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True))
-    elif "hb_enriched" in folder_name:
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False), previous="NEW")
+    elif "cs" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True, previous="asses eligibility"))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False, previous="collect history"))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["discuss options", "inform prevention"], to_remove=False, previous="prostate screening", threshold=60))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["discuss options", "inform prevention"], to_remove=False, previous="mammary screening", threshold=60))
     elif "hb_" in folder_name:
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW"))
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE"))
         critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW", threshold=85))
         critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE", threshold=85))
-    elif folder_name == "bpi":
+    elif "bpi_" in folder_name:
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=False, previous="A_FINALIZED"))
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=True, previous="A_PARTLYSUBMITTED"))
-    elif "bpi_" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=True, previous="A_FINALIZED"))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=False, previous="A_PARTLYSUBMITTED"))
     
     return critical_decisions

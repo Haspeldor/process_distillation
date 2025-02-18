@@ -1,10 +1,17 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {2.1}{\ignorespaces Comparison of Related Work}}{6}{table.caption.11}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Comparison of related work, highlighting different utilized predictive models, fairness metrics, and datasets.}}{4}{table.caption.10}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Event log for the patient treatment process shown in Figure \ref {fig:bpmn_example}, containing only the case attribute}}{7}{table.caption.16}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Tables portraying the one-hot encoding of the previous activities (top left) and genders (top right), as well as the input-output mappings for some samples from the model presented in Figure \ref {fig:showcase} (bottom). }}{24}{table.caption.40}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Evaluation of accuracy and demographic parity for the four versions of the \textit {Hospital Billing} log. The attributes \textit {age} and \textit {gender} are annotated based on whether they introduce a bias (+) or not (-). The reported values represent the mean ($\mu $) and standard deviation ($\sigma $) across validation folds, expressed as $\mu \pm \sigma $.}}{37}{table.caption.55}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Evaluation of accuracy and demographic parity for the \textit {cancer screening} log (cs), the \textit {BPI Challgenge 2012} log (bpi\_2012) and two versions of the \textit {Hospital Billing} log, where only the attribute \textit {age} introduces a bias (hb\_age) and only the attribute \textit {gender} introduces a bias (hb\_gender). The reported values represent the mean ($\mu $) and standard deviation ($\sigma $) across validation folds, expressed as $\mu \pm \sigma $. }}{39}{table.caption.58}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Evaluation of accuracy and demographic parity for varying bias strengths. The reported values represent the mean ($\mu $) and standard deviation ($\sigma $) across validation folds, expressed as $\mu \pm \sigma $. }}{42}{table.caption.63}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Evaluation of accuracy and demographic parity for a varying amount of sensitive attributes. The reported values represent the mean ($\mu $) and standard deviation ($\sigma $) across validation folds, expressed as $\mu \pm \sigma $. }}{44}{table.caption.66}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Evaluation of accuracy and demographic parity for a varying amount of biased decisions. The reported values represent the mean ($\mu $) and standard deviation ($\sigma $) across validation folds, expressed as $\mu \pm \sigma $. }}{46}{table.caption.70}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

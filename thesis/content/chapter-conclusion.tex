@@ -1,7 +1,6 @@
 % !TEX root = ../thesis.tex
 %
 \chapter{Conclusions}
-% TODO give overview over results in table
 This chapter provides an overview of the key implications derived from our results,  
 discusses the limitations of our approach,  
 and outlines potential directions for future research. 
@@ -18,7 +17,7 @@ while preserving beneficial ones, highlighting the need for a more nuanced under
 
 From a practical perspective, ensuring fairness in machine learning models is increasingly important,
 especially in light of legal and regulatory frameworks such as
-the European Union's General Data Protection Regulation \cite{gdpr} or the Artificial Intelligence Act \cite{aia}.  
+the European Union's Artificial Intelligence Act \cite{aia}.  
 These regulations emphasize the need for machine learning systems to be transparent,
 unbiased, and equitable in their decision-making processes.  
 Our method offers a practical way to incorporate fairness into the model development pipeline,
@@ -97,6 +96,7 @@ preserving positive biases requires domain experts to carefully examine and adju
 In practice, this means that our approach is likely to be more labor-intensive
 and consequently more cost-intensive than comparable methods.
 
+
 \section{Future Work}
 Besides addressing the challenges we listed in the previous section \ref{sec:limitations},
 future research could expand on this thesis in several directions.
@@ -110,12 +110,10 @@ Furthermore, including timestamp data, such as time deltas for each event rather
 could provide a richer temporal context and potentially improve the predictive capabilities of the models as well.
 
 \subsection*{Fairness Metrics}
-%TODO: WASSERSTEIN????
 Our evaluation exclusively utilized demographic parity as a fairness metric, which, while straightforward,
 can be imprecise for numerical data due to its dependence on predefined thresholds.
-Future studies could explore distribution-based metrics such as the Wasserstein distance \cite{wasserstein},
-as utilized in \cite{fairness_independence}, which better capture fairness across continuous attributes
-by comparing entire distributions rather than relying on single thresholds.
+Future studies could explore threshold-independent metrics,
+as utilized in \cite{fairness_independence}, which better capture fairness across continuous attributes.
 
 Other approaches to group fairness, such as Shapley values \cite{shapley} as used in \cite{fairness_adversarial},
 are worth investigating due to their ability to provide a attribution-based perspective on bias.
@@ -165,6 +163,12 @@ To adress this, future research should investigate how correlations involving se
 appear in the distilled decision trees and develop methods to communicate information about such correlations
 to end-users in a clear and transparent manner.
 
+\subsection*{Alternative Classifiers}
+The proposed methodology is not inherently tied to neural networks and could potentially be applied in a model-agnostic manner.
+Future research should explore the impact of using different black-box models,
+such as transformer-based architectures \cite{process_transformer},
+to assess whether the approach generalizes well across different classifier types.
+
 \subsection*{Comparisons to Related Work}
 In this thesis, we evaluated our approach solely against a fully fair and a fully biased model.
 However, future work should include comparisons with alternative fairness methods in PBPM,
@@ -174,6 +178,3 @@ prediction tasks, or evaluation metrics used by these other approaches.
 Nonetheless, such comparisons would offer a more comprehensive view
 of the relative strengths and weaknesses of various methods,
 helping to position our approach within the broader landscape of fairness in PBPM.
-
-
-%TODO: different black box - transformer

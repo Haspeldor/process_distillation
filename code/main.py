@@ -18,6 +18,7 @@ from tensorflow.keras.layers import LayerNormalization, Dropout, MultiHeadAttent
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier as SklearnDecisionTreeClassifier
 from sklearn.tree import export_text
@@ -74,13 +75,12 @@ def train_nn(X_train, y_train, folder_name=None, model_name="nn.keras"):
 
 def train_sklearn_dt(X_train, y_train):
     print("training decision tree:")
-    # TODO: try various ccp
     #dt = SklearnDecisionTreeClassifier(max_depth=10, min_samples_leaf=5)
     #dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5)
     #dt = SklearnDecisionTreeClassifier(max_depth=10, max_leaf_nodes=50, min_samples_leaf=5, ccp_alpha=0.001)
     #dt = SklearnDecisionTreeClassifier(max_depth=10, min_samples_leaf=5, ccp_alpha=0.001)
     #dt = SklearnDecisionTreeClassifier(min_samples_leaf=5, ccp_alpha=0.001)
-    dt = SklearnDecisionTreeClassifier(ccp_alpha=0.01)
+    dt = SklearnDecisionTreeClassifier(ccp_alpha=0.001)
     dt.fit(X_train, y_train)
     print("--------------------------------------------------------------------------------------------------")
     return dt
@@ -88,6 +88,8 @@ def train_sklearn_dt(X_train, y_train):
 def train_dt(X_train, y_train, folder_name=None, model_name=None, feature_names=None, feature_indices=None, class_names=None):
     dt = train_sklearn_dt(X_train, y_train)
     dt = sklearn_to_custom_tree(dt, feature_names=feature_names, class_names=class_names, feature_indices=feature_indices)
+    num_nodes = dt.count_nodes()
+    dt.id_counter = num_nodes
     if model_name:
         save_dt(dt, folder_name, model_name)
     print("--------------------------------------------------------------------------------------------------")
@@ -190,6 +192,7 @@ def calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X, critical
                         X_filtered = X[filter_mask]
                         y_filtered = y[name][filter_mask]
                         protected_attribute = X_filtered[:, feature_index]
+                        #print(f"{event}, {feature_names[feature_index]}")
                         stat_par, disp_imp = get_fairness_metrics(y_filtered, protected_attribute, event_index, feature_names[feature_index], numerical_thresholds)
 
                         disp_imp_results[outer_key][name] = disp_imp
@@ -210,6 +213,7 @@ def get_fairness_metrics(y, protected_attribute, event_index, feature_name, nume
     y_binary = np.zeros_like(y)
     y_binary[y == event_index] = 1
     total_amount = np.sum(y_binary == 1)
+    amount = np.sum((y_binary == 1) & (protected_attribute == 1))
     if total_amount < 1:
         return 0, 1
 
@@ -238,6 +242,8 @@ def get_fairness_metrics(y, protected_attribute, event_index, feature_name, nume
         disp_impact = selection_rate_unprivileged / selection_rate_privileged
 
     stat_parity = abs(selection_rate_unprivileged - selection_rate_privileged)
+    #print(f"stat. parity: {stat_parity}, amount: {amount} out of {total_amount}, privileged: {np.sum(protected_attribute == 1)}, unprivileged: {np.sum(protected_attribute == 1)}")
+    #print(f"selection_rate_unprivileged: {selection_rate_unprivileged}, selection_rate_privileged: {selection_rate_privileged}")
     return stat_parity, disp_impact
 
 
@@ -249,7 +255,7 @@ def evaluate_dt(dt, X_test, y_test):
     print("")
     dt.visualize()
     print("")
-    dt.print_tree_metrics(X_test, y_test, dt.root)
+    #dt.print_tree_metrics(X_test, y_test, dt.root)
     print("--------------------------------------------------------------------------------------------------")
 
 def distill_nn(nn, X):
@@ -589,18 +595,34 @@ def run_modify(folder_name, node_ids=[], console_output=True, retrain=False):
     return dt_distilled
 
 def run_demo(folder_name, n_gram=3, num_cases=1000, preprocessing=False):
-    run_ablation_decisions()
+    #run_enrichment("hb_+age_+gender")
+    run_enrichment("bpi_2012")
     sys.exit()
-    run_4_cases()
-    male_shapley_scores = load_data(folder_name, "male_shapley_scores.pkl")
-    female_shapley_scores = load_data(folder_name, "female_shapley_scores.pkl")
-    male_shapley_scores_modified = load_data(folder_name, "male_shapley_scores_modified.pkl")
-    female_shapley_scores_modified = load_data(folder_name, "female_shapley_scores_modified.pkl")
-    plot_shapley(male_shapley_scores, male_shapley_scores_modified, folder_name, "shapley_male.png")
-    plot_shapley(female_shapley_scores, female_shapley_scores_modified, folder_name, "shapley_female.png")
+    #pd.set_option('display.max_rows', None)
+    df = load_data("hb_-age_-gender", "df.pkl")
+    #filtered_df = df[df['age'] > 86]
+    print(df)
+
+
+def evaluate_all():
+    #folder_names = ["cs", "hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender", "bpi_2012"]
+    folder_names = ["hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender"]
+
+    for folder_name in folder_names:
+        run_k_fold(folder_name, folds=5, n_gram=3)
+
+def ablation_all():
+    run_ablation_bias()
+    run_ablation_attributes()
+    run_ablation_decisions()
+
+def load_all():
+    load_cs()
+    load_bpi_A()
+    load_hb()
 
 def load_bpi_A():
-    folder_name = "bpi_A"
+    folder_name = "bpi_2012"
     df = load_xes_to_df("bpi_2012.xes")
     df = df[df['activity'].str.startswith('A_')]
     rules = get_rules(folder_name)
@@ -608,29 +630,22 @@ def load_bpi_A():
     print(df.head(20))
     save_data(df, folder_name, "df.pkl")
 
+def load_cs():
+    process_model = build_process_model("cs")
+    trace_generator = TraceGenerator(process_model=process_model)
+    cases = trace_generator.generate_traces(num_cases=10000)
+    df = cases_to_dataframe(cases)
+    print(df.head(20))
+    save_data(df, "cs", "df.pkl")
 
-def evaluate_all():
-    folder_names = ["cs", "hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender", "bpi"]
-    retrain_options = [True, False]
-
-    for folder_name in folder_names:
-        for retrain_option in retrain_options:
-            run_k_fold(folder_name, folds=5, n_gram=3, retrain=retrain_option, finetune_mode=None)
-
-    run_ablation_bias()
-    run_ablation_attributes()
-    run_ablation_decisions()
-    run_ablation_decisions_biased()
-
-
-def run_4_cases():
+def load_hb():
     folder_names = ["hb_-age_-gender", "hb_-age_+gender", "hb_+age_-gender", "hb_+age_+gender"]
 
     for folder_name in folder_names:
-        load_xes_to_df("hospital_billing", folder_name=folder_name)
+        load_xes_to_df("hospital_billing", folder_name=folder_name, num_cases=20000)
         run_enrichment(folder_name)
-        #run_k_fold(folder_name)
-
+        df = load_data(folder_name, "df.pkl")
+        print(df.head(20))
 
 def run_enrichment(folder_name):
     print("Running enrichment...")
@@ -641,19 +656,16 @@ def run_enrichment(folder_name):
     save_data(df, folder_name, "df.pkl")
 
 
-def run_k_fold(folder_name, folds=5, n_gram=3, retrain=True, finetune_mode=None):
+def run_k_fold(folder_name, folds=5, n_gram=3):
     df = load_data(folder_name, "df.pkl")
     categorical_attributes, numerical_attributes = get_attributes(folder_name)
-    if "bpi" in folder_name:
-        categorical_attributes_base, numerical_attributes_base = [], ["case:AMOUNT_REQ", "time_delta"]
-    else:
-        categorical_attributes_base, numerical_attributes_base = get_attributes("")
+    categorical_attributes_base, numerical_attributes_base = get_base_attributes(folder_name)
     base_attributes = categorical_attributes_base + numerical_attributes_base
     critical_decisions = get_critical_decisions(folder_name)
-    k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=folds, n_gram=n_gram, retrain=retrain, finetune_mode=finetune_mode, folder_name=folder_name)
+    k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=folds, n_gram=n_gram, folder_name=folder_name)
 
 
-def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, retrain=True, finetune_mode=None, folder_name=None):
+def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, modify_mode="retrain", finetuning_mode=None, folder_name=None):
     base_accuracy_values = []
     enriched_accuracy_values = []
     modified_accuracy_values = []
@@ -670,6 +682,7 @@ def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_
     folds = k_fold_cross_validation(df, categorical_attributes, numerical_attributes, critical_decisions, n_gram=3, k=folds)
 
     for i, (X_train, y_train, X_test, y_test, numerical_thresholds) in tqdm(enumerate(folds), desc="evaluating model:"):
+        #print_samples(100, X_train, y_train, class_names, feature_names, numerical_attributes)
         # evaluating the base model
         X_train_base = remove_attribute_features(X_train, feature_indices, base_attributes)
         X_test_base = remove_attribute_features(X_test, feature_indices, base_attributes)
@@ -700,10 +713,15 @@ def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_
         nn_modified.set_weights(nn_enriched.get_weights())
         if nodes_to_remove:
             print(f"Removing nodes: {nodes_to_remove}")
-            if retrain:
+            if modify_mode == "retrain":
                 y_encoded = np.argmax(y_train, axis=1)
-                for node_id in nodes_to_remove:
-                    dt_distilled.delete_node(X_train, y_encoded, node_id)
+                # repeat retraining up to 3 times
+                for _ in range(3):
+                    for node_id in nodes_to_remove:
+                        dt_distilled.delete_node(X_train, y_encoded, node_id)
+                    nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+                    if not nodes_to_remove:
+                        break
             else:
                 for node_id in nodes_to_remove:
                     dt_distilled.delete_branch(node_id)
@@ -712,8 +730,8 @@ def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_
             y_modified = to_categorical(y_modified, num_classes=len(dt_distilled.class_names))
 
             # finetuning and evaluating the changed model
-            if finetune_mode:
-                nn_modified = finetune_nn(nn_modified, X_train, y_modified, y_distilled=y_distilled, y_distilled_tree=y_distilled_tree, X_test=X_test, y_test=y_test, mode=finetune_mode)
+            if finetuning_mode is not None:
+                nn_modified = finetune_nn(nn_modified, X_train, y_modified, y_distilled=y_distilled, y_distilled_tree=y_distilled_tree, X_test=X_test, y_test=y_test, mode=finetuning_mode)
             else:
                 nn_modified = finetune_all(nn_modified, X_train, y_modified, y_distilled_tree, y_distilled, X_test, y_test)
             modified_accuracy = evaluate_nn(nn_modified, X_test, y_test)
@@ -750,9 +768,17 @@ def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_
         plot_all_parity(stat_par_results, folder_name)
     return base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, stat_par_results
 
+def run_ablation(folder_name):
+    if folder_name == "ablation_bias":
+        run_ablation_bias()
+    elif folder_name == "ablation_attributes":
+        run_ablation_attributes()
+    elif folder_name == "ablation_decisions":
+        run_ablation_decisions()
 
 
 def run_ablation_decisions():
+    folder_name = "ablation_decisions"
     numerical_attributes = ["time_delta"]
     base_attributes = ["time_delta"]
     bias = 0.7
@@ -764,10 +790,16 @@ def run_ablation_decisions():
     base_fairness = []
     enriched_fairness = []
     modified_fairness = []
+    base_accuracies_std = []
+    enriched_accuracies_std = []
+    modified_accuracies_std = []
+    base_fairness_std = []
+    enriched_fairness_std = []
+    modified_fairness_std = []
 
-    for num_decisions in np.arange(4, 7):
+    for num_decisions in np.arange(0, 11, 2):
         if num_decisions == 0:
-            num_decisions = 2
+            num_decisions = 1
         print(f"Analyzing num_decisions: {num_decisions}")
         critical_decisions = []
         categorical_attributes = ["a_0"]
@@ -786,8 +818,6 @@ def run_ablation_decisions():
         process_model.add_transition("B_0", "C_0", conditions=conditions_top)
         process_model.add_transition("B_0", "D_0", conditions=conditions_bottom)
         critical_decisions.append(Decision(attributes=["a_0"], possible_events=["A_0", "B_0"], to_remove=True, previous="start"))
-        activity_name_c = ""
-        activity_name_d = ""
 
         for n in range(1, num_decisions):
             activity_name_a = f"A_{n}"
@@ -819,14 +849,17 @@ def run_ablation_decisions():
             critical_decisions.append(Decision(attributes=[attribute_name], possible_events=[activity_name_a, activity_name_b], to_remove=True, previous=previous_activity_name_c))
             critical_decisions.append(Decision(attributes=[attribute_name], possible_events=[activity_name_a, activity_name_b], to_remove=True, previous=previous_activity_name_d))
 
-        process_model.add_transition(activity_name_c, "end", conditions={})
-        process_model.add_transition(activity_name_d, "end", conditions={})
+        last_activity_name_c = f"C_{num_decisions-1}"
+        last_activity_name_d = f"D_{num_decisions-1}"
+
+        process_model.add_transition(last_activity_name_c, "end", conditions={})
+        process_model.add_transition(last_activity_name_d, "end", conditions={})
 
         trace_generator = TraceGenerator(process_model=process_model)
-        cases = trace_generator.generate_traces(num_cases=1000)
+        cases = trace_generator.generate_traces(num_cases=10000)
         df = cases_to_dataframe(cases)
         
-        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, retrain=False, finetune_mode=None, folder_name=None)
+        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, modify_mode="cut", folder_name=None)
 
         x_values.append(num_decisions)
         base_accuracies.append(np.mean(base_accuracy))
@@ -835,19 +868,40 @@ def run_ablation_decisions():
         fairness = {"Base": [], "Enriched": [], "Modified": []}
         for n in range(num_decisions):
             fairness_n = stat_par_results[(f"a_{n} = A", f"A_{n}")]
+            print(fairness_n["Modified"])
             fairness["Base"].append(np.mean(fairness_n["Base"]))
             fairness["Enriched"].append(np.mean(fairness_n["Enriched"]))
             fairness["Modified"].append(np.mean(fairness_n["Modified"]))
         base_fairness.append(np.mean(np.array(fairness["Base"])))
         enriched_fairness.append(np.mean(np.array(fairness["Enriched"])))
         modified_fairness.append(np.mean(np.array(fairness["Modified"])))
+        base_accuracies_std.append(np.std(base_accuracy))
+        enriched_accuracies_std.append(np.std(enriched_accuracy))
+        modified_accuracies_std.append(np.std(modified_accuracy))
+        base_fairness_std.append(np.std(fairness["Base"]))
+        enriched_fairness_std.append(np.std(fairness["Enriched"]))
+        modified_fairness_std.append(np.std(fairness["Modified"]))
+
+    save_data(base_accuracies, folder_name, "base_accuracies")
+    save_data(enriched_accuracies, folder_name, "enriched_accuracies")
+    save_data(modified_accuracies, folder_name, "modified_accuracies")
+    save_data(base_fairness, folder_name, "base_fairness")
+    save_data(enriched_fairness, folder_name, "enriched_fairness")
+    save_data(modified_fairness, folder_name, "modified_fairness")
+    save_data(base_accuracies_std, folder_name, "base_accuracies_std")
+    save_data(enriched_accuracies_std, folder_name, "enriched_accuracies_std")
+    save_data(modified_accuracies_std, folder_name, "modified_accuracies_std")
+    save_data(base_fairness_std, folder_name, "base_fairness_std")
+    save_data(enriched_fairness_std, folder_name, "enriched_fairness_std")
+    save_data(modified_fairness_std, folder_name, "modified_fairness_std")
 
     x_values = np.array(x_values)
     x_values *= 2
-    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Number of Decisions", "Number of Decisions", "Accuracy", "ablation_decisions_biased")
-    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Number of Decisions", "Number of Decisions", "Demographic Parity", "ablation_decisions_biased")
+    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Number of Decisions", "Number of Decisions", "Accuracy", "ablation_decisions")
+    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Number of Decisions", "Number of Decisions", "Demographic Parity", "ablation_decisions")
 
 def run_ablation_attributes():
+    folder_name = "ablation_attributes"
     numerical_attributes = ["time_delta", "age"]
     base_attributes = ["time_delta", "age"]
 
@@ -858,8 +912,14 @@ def run_ablation_attributes():
     base_fairness = []
     enriched_fairness = []
     modified_fairness = []
+    base_accuracies_std = []
+    enriched_accuracies_std = []
+    modified_accuracies_std = []
+    base_fairness_std = []
+    enriched_fairness_std = []
+    modified_fairness_std = []
 
-    for num_attributes in np.arange(0, 21, 5):
+    for num_attributes in np.arange(0, 11, 2):
         if num_attributes == 0:
             num_attributes = 1
         print(f"Analyzing num_attributes: {num_attributes}")
@@ -883,8 +943,7 @@ def run_ablation_attributes():
                 (attribute_name, "B"): bias,  
             })
 
-            flip = random.randint(0,1)
-            if flip:
+            if n % 2 == 1:
                 bias = 1-bias
 
             process_model.add_transition("collect history", "prostate screening", conditions={
@@ -900,7 +959,7 @@ def run_ablation_attributes():
         cases = trace_generator.generate_traces(num_cases=10000)
         df = cases_to_dataframe(cases)
         
-        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, retrain=False, finetune_mode=None, folder_name=None)
+        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, modify_mode="cut", folds=5, n_gram=3, folder_name=None)
 
         x_values.append(num_attributes)
         base_accuracies.append(np.mean(base_accuracy))
@@ -915,12 +974,31 @@ def run_ablation_attributes():
         base_fairness.append(np.mean(np.array(fairness["Base"])))
         enriched_fairness.append(np.mean(np.array(fairness["Enriched"])))
         modified_fairness.append(np.mean(np.array(fairness["Modified"])))
+        base_accuracies_std.append(np.std(base_accuracy))
+        enriched_accuracies_std.append(np.std(enriched_accuracy))
+        modified_accuracies_std.append(np.std(modified_accuracy))
+        base_fairness_std.append(np.std(fairness["Base"]))
+        enriched_fairness_std.append(np.std(fairness["Enriched"]))
+        modified_fairness_std.append(np.std(fairness["Modified"]))
+
+    save_data(base_accuracies, folder_name, "base_accuracies")
+    save_data(enriched_accuracies, folder_name, "enriched_accuracies")
+    save_data(modified_accuracies, folder_name, "modified_accuracies")
+    save_data(base_fairness, folder_name, "base_fairness")
+    save_data(enriched_fairness, folder_name, "enriched_fairness")
+    save_data(modified_fairness, folder_name, "modified_fairness")
+    save_data(base_accuracies_std, folder_name, "base_accuracies_std")
+    save_data(enriched_accuracies_std, folder_name, "enriched_accuracies_std")
+    save_data(modified_accuracies_std, folder_name, "modified_accuracies_std")
+    save_data(base_fairness_std, folder_name, "base_fairness_std")
+    save_data(enriched_fairness_std, folder_name, "enriched_fairness_std")
+    save_data(modified_fairness_std, folder_name, "modified_fairness_std")
 
     plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Number of Attributes", "Number of Attributes", "Accuracy", "ablation_attributes")
     plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Number of Attributes", "Number of Attributes", "Demographic Parity", "ablation_attributes")
 
-
 def run_ablation_bias():
+    folder_name = "ablation_bias"
     critical_decisions = []
     critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True, previous="asses eligibility"))
     critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False, previous="collect history"))
@@ -935,6 +1013,12 @@ def run_ablation_bias():
     base_fairness = []
     enriched_fairness = []
     modified_fairness = []
+    base_accuracies_std = []
+    enriched_accuracies_std = []
+    modified_accuracies_std = []
+    base_fairness_std = []
+    enriched_fairness_std = []
+    modified_fairness_std = []
 
     for bias in np.arange(0.5, 1.05, 0.05):
         print(f"Analyzing Bias strength: {bias}")
@@ -951,7 +1035,7 @@ def run_ablation_bias():
         cases = trace_generator.generate_traces(num_cases=10000)
         df = cases_to_dataframe(cases)
         
-        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, retrain=False, finetune_mode=None, folder_name=None)
+        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, folder_name=None)
 
         x_values.append(bias)
         base_accuracies.append(np.mean(base_accuracy))
@@ -962,9 +1046,54 @@ def run_ablation_bias():
         base_fairness.append(np.mean(fairness["Base"]))
         enriched_fairness.append(np.mean(fairness["Enriched"]))
         modified_fairness.append(np.mean(fairness["Modified"]))
+        base_accuracies_std.append(np.std(base_accuracy))
+        enriched_accuracies_std.append(np.std(enriched_accuracy))
+        modified_accuracies_std.append(np.std(modified_accuracy))
+        base_fairness_std.append(np.std(fairness["Base"]))
+        enriched_fairness_std.append(np.std(fairness["Enriched"]))
+        modified_fairness_std.append(np.std(fairness["Modified"]))
 
-    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Bias Strength", "Bias", "Accuracy", "ablation_bias")
-    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Bias Strength", "Bias", "Demographic Parity", "ablation_bias")
+    save_data(base_accuracies, folder_name, "base_accuracies")
+    save_data(enriched_accuracies, folder_name, "enriched_accuracies")
+    save_data(modified_accuracies, folder_name, "modified_accuracies")
+    save_data(base_fairness, folder_name, "base_fairness")
+    save_data(enriched_fairness, folder_name, "enriched_fairness")
+    save_data(modified_fairness, folder_name, "modified_fairness")
+    save_data(base_accuracies_std, folder_name, "base_accuracies_std")
+    save_data(enriched_accuracies_std, folder_name, "enriched_accuracies_std")
+    save_data(modified_accuracies_std, folder_name, "modified_accuracies_std")
+    save_data(base_fairness_std, folder_name, "base_fairness_std")
+    save_data(enriched_fairness_std, folder_name, "enriched_fairness_std")
+    save_data(modified_fairness_std, folder_name, "modified_fairness_std")
+
+    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Bias Strength", "Bias", "Accuracy", folder_name, override_x_ticks=False)
+    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Bias Strength", "Bias", "Demographic Parity", folder_name, override_x_ticks=False)
+
+def run_results(folder_name):
+    base_accuracies = load_data(folder_name, "base_accuracies")
+    enriched_accuracies = load_data(folder_name, "enriched_accuracies")
+    modified_accuracies = load_data(folder_name, "modified_accuracies")
+    
+    base_fairness = load_data(folder_name, "base_fairness")
+    enriched_fairness = load_data(folder_name, "enriched_fairness")
+    modified_fairness = load_data(folder_name, "modified_fairness")
+    
+    base_accuracies_std = load_data(folder_name, "base_accuracies_std")
+    enriched_accuracies_std = load_data(folder_name, "enriched_accuracies_std")
+    modified_accuracies_std = load_data(folder_name, "modified_accuracies_std")
+    
+    base_fairness_std = load_data(folder_name, "base_fairness_std")
+    enriched_fairness_std = load_data(folder_name, "enriched_fairness_std")
+    modified_fairness_std = load_data(folder_name, "modified_fairness_std")
+
+    for i in range(len(base_accuracies)):
+        print(f"    {i} &  {str(f'{base_accuracies[i]:.3f}').lstrip('0')} $\\pm$ {str(f'{base_accuracies_std[i]:.3f}').lstrip('0')} &"
+            f"  {str(f'{modified_accuracies[i]:.3f}').lstrip('0')} $\\pm$ {str(f'{modified_accuracies_std[i]:.3f}').lstrip('0')} &"
+            f"  {str(f'{enriched_accuracies[i]:.3f}').lstrip('0')} $\\pm$ {str(f'{enriched_accuracies_std[i]:.3f}').lstrip('0')} &"
+            f"  {str(f'{base_fairness[i]:.3f}').lstrip('0')} $\\pm$ {str(f'{base_fairness_std[i]:.3f}').lstrip('0')} &"
+            f"  {str(f'{modified_fairness[i]:.3f}').lstrip('0')} $\\pm$ {str(f'{modified_fairness_std[i]:.3f}').lstrip('0')} &"
+            f"  {str(f'{enriched_fairness[i]:.3f}').lstrip('0')} $\\pm$ {str(f'{enriched_fairness_std[i]:.3f}').lstrip('0')} \\\\")
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -972,7 +1101,7 @@ def main():
     parser.add_argument('--file_name', type=str, default=None, help='Name of the file to use (default: None)')
     parser.add_argument('--folder_name', type=str, default=None, help='Name of the folder to use (default: same as model_name)')
     parser.add_argument('--finetune_mode', choices=['simple', 'changed', 'changed_complete', 'weighted'], type=str, default=None, help='Mode used for fine tuning')
-    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'i', 'k', 'm', 'p', 't'], default='c',
+    parser.add_argument('--mode', choices=['a', 'c', 'd', 'e', 'f', 'k', 'm', 'p', 't'], default='c',
                         help="Choose 'complete' to run full pipeline or 'preprocessed' to use preprocessed data (default: complete)")
     parser.add_argument('--n_gram', type=int, default=3, help='Value for n-gram (default: 3)')
     parser.add_argument('--num_cases', type=int, default=1000, help='Number of cases to process (default: 1000)')
@@ -993,7 +1122,7 @@ def main():
     
     # Check which mode is selected and run the corresponding function
     if args.mode == 'a':
-        run_analysis(args.folder_name)
+        run_ablation(args.folder_name)
     elif args.mode == 'c':
         run_complete(args.folder_name, model_name=args.model_name, file_name=args.file_name, n_gram=args.n_gram, num_cases=args.num_cases, preprocessing=args.preprocessing, train_base=args.train_base, enrichment=args.enrichment, retrain=args.retrain)
     elif args.mode == 'd':
@@ -1002,10 +1131,8 @@ def main():
         run_enrichment(args.folder_name)
     elif args.mode == 'f':
         run_finetuning(args.folder_name)
-    elif args.mode == 'i':
-        run_interactive()
     elif args.mode == 'k':
-        run_k_fold(args.folder_name, retrain=args.retrain, finetune_mode=args.finetune_mode)
+        run_k_fold(args.folder_name)
     elif args.mode == 'm':
         run_modify(args.folder_name, node_ids=args.node_ids, retrain=args.retrain)
     elif args.mode == 'p':

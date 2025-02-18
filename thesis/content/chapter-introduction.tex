@@ -5,7 +5,6 @@
 \section{Motivation}
 Machine learning (ML) has become a pivotal tool in decision-making processes across numerous domains,
 including healthcare, finance and hiring.
-%TODO write about law in europe
 However, as these models increasingly influence critical decisions,
 questions about their fairness and the ethical implications of their use have come to the forefront.
 Fairness in ML concerns the equitable treatment of individuals or groups,
@@ -21,8 +20,7 @@ exhibited significant gender bias,
 favoring male candidates due to biases in historical hiring data,
 leading to its eventual scrapping. \cite{amazon_bias}
 
-These challenges of fairness and bias are not confined to traditional applications
-but also extend to the field of predictive business process monitoring (PBPM).
+These challenges of fairness and bias also extend to the field of predictive business process monitoring (PBPM).
 Here, ML models play an integral role in making decisions,
 whether by predicting outcomes, allocating resources, or streamlining operations.
 Addressing fairness in this context requires careful consideration of bias's dual nature.
@@ -33,23 +31,20 @@ In the domain of healthcare, gender differences in biological and hormonal facto
 are crucial for determining effective treatments and drug prescriptions.
 However, the same attribute might lead to discriminatory outcomes in unrelated contexts,
 such as predicting whether a patient's request for treatment will be approved.
-This duality highlights the complexity of fairness in ML: biases that are helpful
-in one scenario can become harmful in another.
 
 A significant obstacle in addressing this issue is the inherent opacity of ML models.
 Many models, especially complex ones such as deep neural networks,
-operate as "black boxes" that produce predictions without providing insight into how those predictions are made.
-This lack of interpretability makes it challenging for human stakeholders and domain experts
-to identify whether a model's reliance on a sensitive attribute aligns with ethical and operational goals. 
+produce predictions without providing insight into how those predictions are made.
+This lack of interpretability makes it challenging for stakeholders and domain experts
+to identify whether a model's reliance on a sensitive attribute aligns with ethical guidelines. 
 This presents a dilemma:
 either leaving potentially harmful biases unchecked to avoid significantly compromising
 the model's predictive performance,
-or removing sensitive attributes entirely from the model's input.
+or removing the influence of the sensitive attributes entirely from the model.
 The latter approach, while intended to prevent discrimination, can lead to suboptimal predictions,
 especially when the sensitive attributes carry critical information relevant to the task.
 
 \section{Problem Statement}
-%TODO: better definition of problem
 To address this challenge,
 this thesis proposes an approach based on knowledge distillation.
 Knowledge distillation involves transferring the encapsulated knowledge from a complex model to a simpler,
@@ -61,10 +56,6 @@ which in turn enables the identification of inherent biases in the model.
 Specifically for the proposed approach,
 the distilled representation is modified to remove the unwanted bias
 by adjusting the way sensitive attributes influence the representation's decision-making process.
-This modified version of the representation is then used to relabel the training data,
-creating a refined dataset that reflects the desired fairness characteristics.
-Finally, the original model is fine-tuned using this new, bias-adjusted training data,
-allowing it to learn from the corrected representation and ultimately make more equitable predictions.
 
 The goal of this approach is twofold:
 to make the ML model fairer by eliminating the biases that result in unfair treatment
@@ -77,26 +68,11 @@ but also aligned with given ethical standards and societal expectations.
 Building on the problem statement,
 the second chapter provides insight into existing research
 concerning the field of bias reduction and fairness in PBPM,
-while highlighting the gaps this thesis aims to address.
-
-The third chapter provides background information essential for understanding the research.
-It introduces PBPM,
-explains the ML models used in this thesis
-and discusses fairness in ML.
-
-The fourth chapter details the methodology employed in the thesis.
-It describes the process of data gathering and preprocessing, with a focus on handling bias causing attributes.
-The chapter then explains how the initial ML model is trained,
-followed by the application of knowledge distillation to create an interpretable representation of the model,
-which can then be modified to address unwanted biases.
-The methodology further includes how the predictions of the modified representation 
-can be used to finetune the model to improve fairness, while maintaining accuracy.
-
-TODO
-The fifth chapter presents the evaluation of the proposed approach.
-This chapter defines the metrics used for evaluation and includes empirical results from multiple case studies.
-
-TODO
+while highlighting the gaps we aim to address.
+The third chapter provides background information essential for understanding the thesis.
+The fourth chapter details our employed methodology.
+The fifth chapter presents the evaluation of the proposed approach,
+including empirical results from multiple case studies.
 The final chapter concludes the thesis by summarizing the findings
 and discussing their implications for fairness in ML.
 It acknowledges the limitations of the research and offers suggestions for future work.

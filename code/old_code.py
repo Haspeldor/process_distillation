@@ -445,3 +445,114 @@ def plot_accuracy(base_accuracy_values, enriched_accuracy_values, modified_accur
     image_path = os.path.join('img', folder_name, f"accuracy.png")
     plt.savefig(image_path)
     plt.close()
+
+def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, modify_mode="retrain", finetuning_mode="changed_complete", folder_name=None):
+    base_accuracy_values = []
+    enriched_accuracy_values = []
+    modified_accuracy_values = []
+    node_counts = []
+    stat_par_results = {}
+    class_names = sorted(df["activity"].unique().tolist() + ["<PAD>"])
+    attribute_pools = create_attribute_pools(df, categorical_attributes)
+    feature_names = create_feature_names(class_names, attribute_pools, numerical_attributes, n_gram)
+    feature_indices = create_feature_indices(class_names, attribute_pools, numerical_attributes, n_gram)
+    print(class_names)
+    print(feature_names)
+    print(feature_indices)
+
+    folds = k_fold_cross_validation(df, categorical_attributes, numerical_attributes, critical_decisions, n_gram=3, k=folds)
+
+    for i, (X_train, y_train, X_test, y_test, numerical_thresholds) in tqdm(enumerate(folds), desc="evaluating model:"):
+        # evaluating the base model
+        X_train_base = remove_attribute_features(X_train, feature_indices, base_attributes)
+        X_test_base = remove_attribute_features(X_test, feature_indices, base_attributes)
+        nn_base = train_nn(X_train_base, y_train)
+        base_accuracy = evaluate_nn(nn_base, X_test_base, y_test)
+        base_accuracy_values.append(base_accuracy)
+
+        # evaluating the enriched model
+        nn_enriched = train_nn(X_train, y_train)
+        y_distilled = nn_enriched.predict(X_train)
+        y_encoded = np.argmax(y_distilled, axis=1)
+
+        dt_distilled = train_dt(X_train, y_encoded, class_names=class_names, feature_names=feature_names, feature_indices=feature_indices)
+        enriched_accuracy = evaluate_nn(nn_enriched, X_test, y_test)
+        enriched_accuracy_values.append(enriched_accuracy)
+
+        evaluate_dt(dt_distilled, X_test, y_test)
+        num_nodes = dt_distilled.count_nodes()
+        node_counts.append(num_nodes)
+
+        # modifying the distilled model
+        nodes_to_remove = dt_distilled.find_nodes_to_remove(critical_decisions)
+        y_distilled_tree = dt_distilled.predict(X_train)
+        y_distilled_tree = to_categorical(y_distilled_tree, num_classes=len(dt_distilled.class_names))
+
+        # prepare modified model
+        nn_modified = clone_model(nn_enriched)
+        nn_modified.set_weights(nn_enriched.get_weights())
+        nn_modified_cut = clone_model(nn_enriched)
+        nn_modified_cut.set_weights(nn_enriched.get_weights())
+        nn_modified_retrain = clone_model(nn_enriched)
+        nn_modified_retrain.set_weights(nn_enriched.get_weights())
+        if nodes_to_remove:
+            print(f"Removing nodes: {nodes_to_remove}")
+            dt_distilled_retrain = dt_distilled
+            dt_distilled_cut = copy_decision_tree(dt_distilled)
+            y_encoded = np.argmax(y_train, axis=1)
+            for node_id in nodes_to_remove:
+                dt_distilled_retrain.delete_node(X_train, y_encoded, node_id)
+                #evaluate_dt(dt_distilled_retrain, X_test, y_test)
+                dt_distilled_cut.delete_branch(node_id)
+            evaluate_dt(dt_distilled_retrain, X_test, y_test)
+            y_modified_cut = dt_distilled_cut.predict(X_train)
+            y_modified_cut = to_categorical(y_modified_cut, num_classes=len(dt_distilled.class_names))
+            y_modified_retrain = dt_distilled_retrain.predict(X_train)
+            y_modified_retrain = to_categorical(y_modified_retrain, num_classes=len(dt_distilled.class_names))
+
+            # finetuning and evaluating the best changed model
+            nn_modified_cut = finetune_all(nn_modified_cut, X_train, y_modified_cut, y_distilled_tree, y_distilled, X_test, y_test)
+            nn_modified_retrain = finetune_all(nn_modified_retrain, X_train, y_modified_retrain, y_distilled_tree, y_distilled, X_test, y_test)
+            accuracy_cut = evaluate_nn(nn_modified_cut, X_test, y_test)
+            accuracy_retrain = evaluate_nn(nn_modified_retrain, X_test, y_test)
+            print(f"Accuracy Cut: {accuracy_cut}, Accuracy Retrain: {accuracy_retrain}")
+            if accuracy_cut > accuracy_retrain:
+                print("Picking cut tree!")
+                nn_modified = nn_modified_cut
+                modified_accuracy = accuracy_cut
+            else:
+                print("Picking retrained tree!")
+                nn_modified = nn_modified_retrain
+                modified_accuracy = accuracy_retrain
+        else:
+            print(f"No nodes to remove!")
+            modified_accuracy = enriched_accuracy
+        modified_accuracy_values.append(modified_accuracy)
+
+        print(f"base accuracy: {base_accuracy}, enriched accuracy: {enriched_accuracy}, modified accuracy: {modified_accuracy}")
+        calculate_fairness(nn_modified, X_test, critical_decisions, feature_indices, class_names, feature_names)
+        stat_par_result, _ = calculate_comparable_fairness(nn_base, nn_enriched, nn_modified, X_test, critical_decisions, feature_indices, class_names, feature_names, base_attributes, numerical_thresholds)
+        for outer_key, outer_value in stat_par_result.items():
+            if i == 0:
+                stat_par_results[outer_key] = {}
+            for inner_key, inner_value in outer_value.items():
+                if i == 0:
+                    stat_par_results[outer_key][inner_key] = []
+                stat_par_results[outer_key][inner_key].append(inner_value)
+        print("--------------------------------------------------------------------------------------------------")
+
+    node_counts_array = np.array(node_counts)
+    average_nodes = np.mean(node_counts_array)
+    std_dev_nodes = np.std(node_counts_array)
+    print(f"Average number of nodes: {average_nodes:.2f}")
+    print(f"Standard deviation of nodes: {std_dev_nodes:.2f}")
+    if folder_name:
+        save_data(node_counts_array, folder_name, "node_counts.pkl")
+        save_data(base_accuracy_values, folder_name, "base_accuracy_values.pkl")
+        save_data(enriched_accuracy_values, folder_name, "enriched_accuracy_values.pkl")
+        save_data(modified_accuracy_values, folder_name, "modified_accuracy_values.pkl")
+        save_data(stat_par_results, folder_name, "stat_par_results.pkl")
+        title = f"Accuracy Distribution of {folder_name}"
+        plot_distribution(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name, title, "Accuracy")
+        plot_all_parity(stat_par_results, folder_name)
+    return base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, stat_par_results

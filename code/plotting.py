@@ -143,7 +143,7 @@ def plot_attributes(df: pd.DataFrame, rules: list, folder_name: str):
         plt.savefig(image_path)
         plt.close()
 
-def plot_ablation(x_values, base_metrics, enriched_metrics, modified_metrics, title, x_label, y_label, folder_name):
+def plot_ablation(x_values, base_metrics, enriched_metrics, modified_metrics, title, x_label, y_label, folder_name, override_x_ticks=True):
     # Define custom colors
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
     
@@ -167,7 +167,10 @@ def plot_ablation(x_values, base_metrics, enriched_metrics, modified_metrics, ti
     plt.title(title, fontsize=16, fontweight='bold')
     plt.xlabel(x_label, fontsize=14)
     plt.ylabel(y_label, fontsize=14)
-    plt.xticks(ticks=x_values, labels=x_values, fontsize=12)
+    if override_x_ticks:
+        plt.xticks(ticks=x_values, labels=x_values, fontsize=12)
+    else:
+        plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
     plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
     

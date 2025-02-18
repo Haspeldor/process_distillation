@@ -19,56 +19,19 @@ seitenverteilung:
 aknowledgements:
     - personen und chatgpt angeben
 
-erweiterungen:
-    - fairness
-        - shapley score
-            - andere bibliotheken
-            - erklärungsansatz
-        - threshold independent:
-            - vorteil bei numerischen attributen
-    - variationen im experiment: anzahl attribute / anzahl entscheidungen mit bias / stärke des bias / mehr datensätze
-        - je nachdem wie umfangreich sehr hoher aufwand
-    - variation in der pipeline: hyperparameter und loss-/aktivierungsfunktion des modells / art und weise der baummodifikation
-    - korrelierte attribute:
-        - vorhanden beim bpi mit gender und amount_req 
-    - transformer als baseline
-        - überschaubarer aufwand
-        - mehr, falls zu hohe accuracy
-
-
 fragen:
-    - retrain/cutting berichten: future work
-    - finetuning: future work
-    - 5 fold ok?
-    - tabelle mit 2 attributes?
-    - ablation bias strength: beide punkte varieren?
-    - ablation attribute: anzahl?
-    - ablation decisions: mit/ohne bias belassen
-    - farbe in bpmn
 
-
-- formal problem statement later
-
-- failure cases, wann funktioniert
-    - erklrungen/verallgemeinerungen
-    - denkbare fixes
-- methodik
-    - zahlen vergleichen?
-    - 
-- related work:
-    - used event logs
-    - prediction goal
-    - ML architecture
-    - metriken
-- results:
-    - pipeline nicht nach accuracy optimieren
-    - verhältnis aussagekräftig
-    - ablation: wie viel einfluss haben komponenten
-        - für einen log ausreichend, simuliert
-        - bias
-        - anzahl attribute/entscheidungen
-    - implications for theory and practise
-- out of scope:
-    - korrelationen
-    - event level
-    - evtl. ML models
+todo:
+- abstract
+- background
+    - adam smasher
+- evaluation
+    - discussions
+- ablation
+    - discussion
+- images check
+- tables check
+- citations check
+- ref check
+- appendix: DFG
+- layout for BPMN

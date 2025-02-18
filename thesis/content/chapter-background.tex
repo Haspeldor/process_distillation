@@ -23,11 +23,10 @@ which we will also use a simplified subset of:
 \begin{itemize}
 \item \textbf{Activities} are represented as rectangles with rounded corners,
 denoting the individual tasks or operations within the process.
-\item \textbf{Gateways} are depicted as diamonds containing a cross,
-and they are used to control divergence and convergence in the workflow.
-These indicate either decision points or the merging of paths.
-We will exclusively consider exclusive decisions,
-so only one of the paths can be chosen.
+\item \textbf{Gateways} are represented as diamond shapes with a cross inside and are used to manage the branching and merging of process flows.
+They serve as decision points where the workflow can split into different paths or converge back into a single path.
+In this thesis, we focus only on exclusive decision points, meaning that only one of the available paths can be taken at any given time.
+The probability of choosing each path will be explicitly annotated.
 \item \textbf{Events} are shown as circles,
 representing the initiation and completion of the process.
 Specifically, the start event,
@@ -39,13 +38,11 @@ and is used to show the order that activities will be performed in.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=\textwidth]{gfx/bpmn.png}
-    \caption{Example of a process model in BPMN detailing the cancer screening process in a hospital.}
+    \includegraphics[width=\textwidth]{gfx/showcase.png}
+    \caption{A simplified process model in BPMN describing the treatment of patients in a hospital.
+    The branches of the gateway are annotated with transition probabilities based on the case attribute \textit{gender}.}
     \label{fig:bpmn_example}
 \end{figure}
-
-
-% TODO img: example
 
 \subsection{Event Log Data}
 \label{sec:event_log}
@@ -80,11 +77,35 @@ A \textbf{prefix} with length $l'$ is a portion of such a trace with length $l$,
 consisting of the first $l'$ events, with $l' < l$.
 Finally, an \textbf{event log} is a finite collection of traces belonging to the same process.
 
-%TODO: table example traces for example model
+\begin{table}[h!]
+    \centering
+    \scriptsize
+    \renewcommand{\arraystretch}{1.2}
+    \setlength{\tabcolsep}{6pt}
+    \begin{tabular}{>{\centering\arraybackslash}m{1.2cm} | m{3cm} | m{3.5cm} | m{1.5cm}}
+        \toprule
+        \textbf{Case ID} & \textbf{Activity} & \textbf{Timestamp} & \textbf{Gender} \\
+        \midrule
+        1 & Register Patient & 2025-02-08 09:15:00 & Male \\
+        1 & Expert Treatment & 2025-02-08 09:30:00 & Male \\
+        1 & Bill Patient & 2025-02-08 09:45:00 & Male \\
+        \midrule
+        2 & Register Patient & 2025-02-08 10:05:00 & Female \\
+        2 & Regular Treatment & 2025-02-08 10:20:00 & Female \\
+        2 & Bill Patient & 2025-02-08 10:35:00 & Female \\
+        \midrule
+        3 & Register Patient & 2025-02-08 11:00:00 & Male \\
+        3 & Expert Treatment & 2025-02-08 11:15:00 & Male \\
+        3 & Bill Patient & 2025-02-08 11:30:00 & Male \\
+        \bottomrule
+    \end{tabular}
+    \caption{Event log for the patient treatment process shown in Figure \ref{fig:bpmn_example}, containing only the case attribute}
+    \label{tab:event_log}
+\end{table}
 
 \subsection{Predictive Business Process Monitoring}
-\textbf{Predictive Business Process Monitoring} (PBPM) is a field that focuses on analyzing
-and forecasting the progression of ongoing business processes
+\textbf{Predictive Business Process Monitoring (PBPM)} is a field that focuses on analyzing
+and forecasting the progression of ongoing business processes,
 based on historical data stored in the form of event logs. 
 This includes tasks such as predicting the remaining time of a case or determining its final outcome.
 These predictions play a crucial role in enabling organizations to optimize operations,
@@ -95,9 +116,10 @@ Formally, given a prefix $e_1, ..., e_{l'}$ of observed events,
 the goal is to predict the activity label $a_{l'+1}$ of the next event
 $e_{l'+1}$.
 
-The task of next activity prediction is categorized as a classification problem.
-\textbf{Classification tasks} aim to predict discrete categories,
+The task of next activity prediction is categorized as a classification task.
+These \textbf{classification tasks} aim to predict discrete categories,
 such as determining which event will occur next or whether an outcome is positive or negative.
+Accordingly, we will refer to models used for next activity as \textbf{classifiers}.
 In contrast, \textbf{regression tasks} predict continuous values,
 such as estimating the remaining time for a process or the monetary amount of a transaction.
 
@@ -124,7 +146,7 @@ and decision trees as an example for a white box model.
 
 \section{Neural Networks}
 \label{sec:nn}
-In this thesis, \textbf{feedforward neural networks} (NN)
+In this thesis, \textbf{feedforward neural networks (NN)} 
 will be used as the main predictor for the task of next activity prediction.
 While these are not inherently designed for sequence data,
 such as traces in an event log, their simplicity and ease of training still makes them an attractive choice.
@@ -191,7 +213,6 @@ while balancing computational complexity and capacity.
 
 \subsection{Feedforward Algorithm}
 \label{sec:feedforward}
-%relu
 With the network architecture defined,
 the next step is to understand how input data is processed as it passes through the various layers.
 This process is governed by the \textbf{feedforward algorithm}.
@@ -205,21 +226,20 @@ Formally, the activiation $y_j^{(l)}$ of the $j$-th perceptron in the $l$-th lay
 is computed from the $m$ outputs $y_1^{(l-1)}, ..., y_m^{(l-1)}$ of the previous layer,
 using weight vector $w^{(l)} = (w_{1,j}^{(l)}, ..., w_{m,j}^{(l)})$, bias $b_j^{(l)}$
 and activation function $\sigma_j^{(l)}$ as follows:
-
 \begin{align}
 	y_j^{(l)} = \sigma\left(\left[\sum_{i = 1}^m w_{i,j}^{(l)} \cdot y_i^{(l-1)} \right] + b_j^{(l)}\right)
 \end{align}
+A commonly used activation function is the \textbf{Rectified Linear Unit (ReLU)} \cite{relu},  
+which is defined as $\text{ReLU}(z) = \max(0, z)$.
 
 In the output layer, the perceptrons are activated using the softmax function.
 Let $z_j^{(l')} = \left[\sum_{i = 1}^{m'} w_{i,j}^{(l')} \cdot y_i^{(l'-1)} \right] + b_j^{(l')}$ be 
 the weighted sum of inputs of the $j$-th perceptron in the output layer $L$ before activation.
 Then, given the total number of classes $k$, 
 the softmax activation $y_j^{(l')}$ for the $j$-th output perceptron is defined as:
-
 \begin{align}
   y_j^{(l')} = \frac{\exp(z_j^{(l')})}{\sum_{i=1}^k \exp(z_k^{(l')})}
 \end{align}
-
 The softmax activation ensures that the outputs $y_1^{(l')},...,y_k^{(l')}$
 form a valid probability distribution,
 with each value between 0 and 1 and their sum equal to 1.
@@ -232,57 +252,113 @@ combined with the non-linear transformations introduced by activation functions,
 makes it difficult to intuitively understand or trace how specific inputs lead to specific outputs.
 This lack of transparency is why we consider NNs to be black box models.
 
-\subsection{Backpropagation Algorithm}
-% TODO: adam
-% epochs
-% batch size
-% gradient descent
-% learn rate
-\label{sec:backpropagation}
-While the feedforward algorithm enables a neural network to compute predictions
-by propagating input data through its layers,
-this process alone does not modify the network's parameters.
-To improve the network's predictions and reduce errors,
-an optimization process is required.
-This is achieved through the \textbf{backpropagation algorithm},
-which employs the gradient descent optimization in order to
-iteratively update the model's weights and biases in the direction that reduces the error
-between the predicted and target outputs.
+\subsection{Backpropagation using the Adam Optimizer}  
+%TODO adam
+\label{sec:adam}  
 
-The training process relies on a dataset $S$ composed of \textbf{training samples},
-where each sample $(x,y) \in S$ consists of an input vector $x=(x_1,...,x_n)$ with $n$ numerical features
-and a corresponding target $y$.
-For our task of next activity prediction,
-$y$ is represented as a \textbf{one-hot encoded vector} $y = (y_1, ..., y_k)$,
-where $y_c = 1$ for the target class $c$, while $y_i = 0, i \neq c$ for all other classes.
-The number of classes $k$ corresponds to the amount of activities in the task.
+To enable the NN to make accurate predictions, its weights and biases must be adjusted based on training data.
+This process is achieved through the \textbf{backpropagation algorithm},
+which iteratively updates the network's parameters by minimizing a predefined loss function.
+In this thesis, we employ the \textbf{Adam optimizer} \cite{adam},
+a variant of gradient descent that adapts learning rates per parameter, improving stability and convergence speed.  
 
-The discrepancy between the predicted probability distribution $\hat{y} = (\hat{y}_1, ..., \hat{y}_k)$,
-generated by the network, and the target distribution $y = (y_1, ..., y_k)$
-is quantified using the \textbf{cross-entropy loss} $L$.
-When the target distribution $y$ is represented as a one-hot vector, the loss is given by:
+Training relies on a dataset \( S \) composed of \textbf{training samples},
+where each sample \( (x, y) \in S \) consists of an input vector \( x = (x_1, ..., x_n) \) with \( n \) numerical features and a corresponding target \( y \).
+For next activity prediction, \( y \) is represented as a \textbf{one-hot encoded vector} \( y = (y_1, ..., y_k) \),
+where \( y_c = 1 \) for the target class \( c \) and \( y_i = 0 \) for all other classes \( i \neq c \).
+The total number of classes \( k \) corresponds to the number of possible activities.  
 
-\begin{align} L = - \sum_{i=1}^C y_i \log(\hat{y}_i), \end{align}
+The discrepancy between the predicted probability distribution \( \hat{y} = (\hat{y}_1, ..., \hat{y}_k) \)
+and the target distribution \( y \) is quantified using the \textbf{cross-entropy loss} \( L \),
+which measures how well the predicted probabilities align with the correct class labels:  
+\begin{align}  
+L = - \sum_{i=1}^{k} y_i \log(\hat{y}_i).  
+\end{align}  
 
-The cross-entropy loss penalizes the network heavily when the predicted probability for the target class $c$ is low,
-encouraging the network to assign high probabilities to the correct classes.
+For every sample, training then proceeds in two main steps:  
+\begin{enumerate}  
+    \item \textbf{Forward pass:} The input \( x \) is propagated through the network using the \textbf{feedforward algorithm} (see Section \ref{sec:feedforward}), generating output probabilities \( \hat{y} \).
+    The loss function \( L \) is then computed based on these predictions and the target labels.  
+    \item \textbf{Backward pass:} The gradients of \( L \) with respect to the network's weights and biases are computed, starting from the output layer and moving backward through the hidden layers.
+    This process, known as gradient computation, relies on the chain rule of differentiation to propagate errors through the network.
+    The computed gradients indicate how each parameter should be adjusted to reduce the loss.  
+\end{enumerate}  
 
-Backpropagation operates in two main steps: the forward pass and the backward pass.
-In the forward pass,
-the input $x$ is propagated through the network to compute the predicted probabilities $\hat{y}$.
-The cross-entropy loss is then calculated using the predicted probabilities and the target labels.
+The parameter updates follow an optimization rule. Instead of standard gradient descent,  
+which updates weights using a fixed learning rate \( \eta \), we use Adam (\textbf{Adaptive Moment Estimation}),  
+which dynamically adjusts learning rates for each parameter by maintaining moving averages of past gradients.  
 
-The backward pass begins at the output layer,
-where the gradients of the loss function with respect to the network's predictions are directly computed
-based on the error calculated during the forward pass.
-These gradients are then propagated back through the hidden layers using the chain rule.
-At each layer, the gradients are used to update the weights and biases,
-moving them closer to their optimal values.
+In standard gradient descent, weights are updated as follows:  
 
-The forward and backward passes are repeated iteratively over the training dataset
-until the loss converges to a satisfactory level or a predefined number of epochs is reached.
-By iteratively refining the weights and biases,
-backpropagation enables the network to learn from data and improve its predictions over time.
+\begin{align}  
+    w_{t+1} = w_t - \eta \nabla L(w_t),  
+\end{align}  
+
+where \( \nabla L(w_t) \) is the gradient of the loss function with respect to weight \( w_t \).  
+However, using a fixed learning rate can lead to slow convergence or instability.  
+
+Adam addresses this by introducing two modifications:  
+
+1. **First-moment estimate (momentum term)**:  
+   Instead of using raw gradients, Adam computes an exponentially weighted moving average of past gradients:  
+
+   \begin{align}  
+       m_t &= \beta_1 m_{t-1} + (1 - \beta_1) \nabla L(w_t),  
+   \end{align}  
+
+   where \( \beta_1 \) (typically \( 0.9 \)) controls how much past gradients influence the update.  
+   This smooths updates and reduces oscillations.  
+
+2. **Second-moment estimate (adaptive scaling)**:  
+   To adaptively adjust learning rates, Adam maintains an exponentially weighted moving average of squared gradients:  
+
+   \begin{align}  
+       v_t &= \beta_2 v_{t-1} + (1 - \beta_2) (\nabla L(w_t))^2,  
+   \end{align}  
+
+   where \( \beta_2 \) (typically \( 0.999 \)) determines how much past squared gradients contribute.  
+   This prevents overly large updates in steep regions of the loss landscape.  
+
+Since both estimates are initially biased towards zero, Adam applies bias correction:  
+
+\begin{align}  
+    \hat{m}_t &= \frac{m_t}{1 - \beta_1^t}, \quad  
+    \hat{v}_t = \frac{v_t}{1 - \beta_2^t}.  
+\end{align}  
+
+The final weight update is computed as:  
+
+\begin{align}  
+    w_{t+1} &= w_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t,  
+\end{align}  
+
+where \( \epsilon \) (e.g., \( 10^{-8} \)) ensures numerical stability.  
+
+Unlike standard gradient descent, Adam automatically adjusts step sizes for each parameter,  
+leading to faster convergence and improved stability. This makes it particularly effective for deep neural networks.  
+
+
+The parameter updates follow an optimization rule. Instead of standard gradient descent, which updates weights using a fixed learning rate \( \eta \), we use Adam (\textbf{Adaptive Moment Estimation}),
+which adapts learning rates individually for each parameter by maintaining first and second moment estimates of the gradients. The update rule for a given weight \( w_t \) at iteration \( t \) is:  
+\begin{align}  
+    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) \nabla L(w_t),  \\  
+    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) (\nabla L(w_t))^2,  \\  
+    \hat{m}_t &= \frac{m_t}{1 - \beta_1^t}, \quad  
+    \hat{v}_t = \frac{v_t}{1 - \beta_2^t},  \\  
+    w_{t+1} &= w_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t.  
+\end{align}  
+Here, \( \beta_1 \) and \( \beta_2 \) are decay rates (typically set to \( 0.9 \) and \( 0.999 \), respectively), and \( \epsilon \) is a small constant for numerical stability.
+Unlike traditional gradient descent, Adam dynamically adjusts the step size for each parameter, improving convergence speed and robustness.  
+
+Training occurs over multiple \textbf{epochs}, where an epoch is a complete pass over the dataset.
+Instead of computing updates over the entire dataset at once, the data is divided into smaller \textbf{batches} of fixed size.
+Each batch is processed separately, computing gradients and updating weights.
+Using batches stabilizes training by reducing noise in gradient updates while maintaining computational efficiency.
+The process repeats for multiple epochs until convergence is reached, defined by a sufficiently low loss or a predefined number of epochs.  
+
+By iteratively refining weights and biases through backpropagation and Adam optimization,
+the NN learns to improve its predictions over time, minimizing classification errors while generalizing well to unseen data.  
+
 
 \section{Decision Trees}
 \label{sec:dt}
@@ -309,9 +385,11 @@ when they have at least one child, or \textbf{leaf nodes},
 when they have no children.
 Additionally, a node $r$ without parents, formally satisfying $\forall v \in V: (v,r) \notin E$,
 denotes the \textbf{root} of the tree.
-Accordingly, the \textbf{subtree} rooted at a node $v$ refers to the tree $T_v = (V_v, E_v)$,
+Accordingly, the \textbf{subtree rooted at node} $v$ refers to the tree $T_v = (V_v, E_v)$,
 where $V_v \subset V$ is the subset containing all descendants of $v$ 
 and $E_v \subset E$ the edges between $V_v$.
+In general, $T' = (V', E')$ is a \textbf{subtree of} $T = (V, E)$,
+if $V' \subset V$ and $E' \subset E$.
 Another essential property of a tree is its \textbf{depth},
 which measures the longest path from the root node to any of its leaf nodes.
 
@@ -341,7 +419,17 @@ This process continues recursively until the sample reaches a leaf node.
 Leaf nodes contain a label $y$, representing the outcomes of the decision process,
 in our case determining the predicted next activity.
 
-% TODO: img example tree and samples
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{gfx/decision_tree.png}
+    \caption{
+    A DT usable for next activity prediction in the process model shown in Figure \ref{fig:bpmn_example}.
+    Leaf nodes are depicted as regular rectangles, while internal nodes are shown with rounded corners.
+    Instead of raw feature indices and thresholds, the conditions used for splitting are expressed in natural language for better readability.
+    The previous activity \textit{<PAD>} is a placeholder, if no previous activity has occured yet.
+    }
+    \label{fig:decision_tree}
+\end{figure}
 
 Since the structure of a DT explicitly represents the decision-making process,
 it becomes immediately clear why they are widely regarded as white box models.
@@ -377,7 +465,7 @@ with all samples having a single target label,
 while $G(S) = 1 - \frac{1}{k}$ represents a maximally impure dataset
 where samples are evenly distributed among all $k$ target labels.
 Generally, a lower $G(S)$ implies a higher purity.
-\cite{gini}
+\cite{decision_trees}
 
 The training process begins at the root node,
 which is associated with the entire training dataset $S$.
@@ -408,16 +496,129 @@ the output at each leaf is determined through majority voting:
 the output label $y$ that occurs most frequently in the training samples
 associated with the leaf is selected as the predicted label.
 
+
 \subsection{Cost Complexity Pruning}
 Depending on the selected stopping criterion,
 the final DT may include subtrees with numerous nodes
 that contribute little to the tree's predictive value.
+This not only makes it more difficult to examine the tree's structures,
+but may also hurt the overall accuracy of the DT due to overfitting.
 To address this, pruning is a common technique used to simplify decision trees
-by removing unnecessary branches, ultimately improving the tree's performance and generalizability.
-Additionally, the reduced amount of nodes 
-will make the DT more easily interpretable for human stakeholders.
+by removing unnecessary branches, ultimately improving the tree's performance and interpretability.
 
-One effective approach to pruning is \textbf{cost-complexity pruning},
-which balances the trade-off between a tree's complexity and its predictive accuracy.
-% TODO: explain the method
-\cite{ccp}
+One effective approach to pruning is \textbf{minimal cost-complexity pruning} \cite{decision_trees}.
+This algorithm utilizes a complexity parameter $\alpha \ge 0$,
+which balances the trade-off between a tree's complexity and its predictive performance.
+Based on $\alpha$, the cost-complexity measure $C_{\alpha}$ of a given tree $T$ is defined as
+\begin{align}
+C_{\alpha}(T) = R(T) + \alpha |T|,
+\end{align}
+where $|T|$ is the number of leaf nodes in the tree, and $R(T)$ represents the total impurity of $T$,
+computed as the total sample-weighted Gini impurity of the leaf nodes in $T$.
+Minimal cost-complexity pruning finds the subtree $\bar{T}$ of $T$, such that the cost-complexity measure $C_{\alpha}(\bar{T})$ is minimized.
+Since $\alpha$ penalizes tree complexity, larger values lead to more aggressive pruning.
+
+The algorithm works by iteratively removing nodes from $T$.
+Every iteration starts with computing the effective cost-complexity value $\alpha_t$ for each internal node $t$ as
+\begin{align}
+\alpha_t = \frac{R(t) - R(T_t)}{|T_t| - 1},
+\end{align}
+where $T_t$ is the subtree rooted at $t$.
+
+The inner node $t$ with the smallest $\alpha_t$ is refered to as the weakest link in the tree.
+If $\alpha_t \le \alpha$, this node and its subtree are pruned, meaning all its child nodes are removed, and it becomes a leaf node.
+The pruning process continues iteratively until the minimal $\alpha_t$ in the remaining tree exceeds the predefined pruning parameter $\alpha$,
+ensuring that the final tree retains only splits that contribute meaningfully to impurity reduction.
+
+\section{Evaluation Metrics}
+Having introduced both NNs and DTs,
+we will go over the metrics we need to evaluate the performance of these models in our experiments.
+
+\subsection{Accuracy}
+Accuracy is a fundamental performance metric in machine learning
+that measures the proportion of correctly predicted instances relative to the total number of instances.
+For next activity prediction in PBPM,
+accuracy evaluates how well the model correctly predicts the upcoming event in a process trace.
+Given a set of predictions, the accuracy of the model is defined as:
+\begin{align}
+\text{Accuracy} = \frac{\text{\#(Correct predictions)}}{\text{\#(Total predictions)}}
+\end{align}
+
+
+\subsection{Demographic Parity}
+While accuracy is a crucial metric for assessing overall model performance,
+it does not account for potential biases in decision-making.
+This necessitates the inclusion of fairness-aware quantitative measures
+for assessing and comparing models to ensure that they meet fairness criteria
+alongside performance metrics.
+
+One possible perspective on discrimination is provided by \textbf{group fairness} metrics,
+which offer a way to assess whether a machine learning model's predictions are equitable across different groups within the population.
+In PBPM, these metrics help ensure that predictions, such as the next activity or outcome in a business process,
+do not favor one group over another based on sensitive attributes.
+These \textbf{sensitive attributes} refer to characteristics of individuals or groups
+that are typically protected by laws or ethical guidelines due to their potential to lead to biased or discriminatory treatment,
+such as gender, ethnicity, age, disability status, etc.
+
+In this thesis, we utilize on one of the most prevalent fairness metrics, \textbf{demographic parity} \cite{demographic_parity},
+which quantifies the disparity in positive prediction rates across different demographic groups. 
+Let $y$ be the prediction of the model, that is either categorized as positive for $y = 1$ or negative for $y = 0$.
+Moreover let $S$ be a sensitive attribute whose values can be split into the demographic groups $s_1$ and $s_2$.
+A model satisfies demographic parity if the probability of receiving a positive prediction $y = 1$
+is independent of the sensitive attribute $S$, meaning:
+\begin{align}
+P(y = 1 \mid S = s_1) = P(y = 1 \mid S = s_2)
+\end{align}
+Based on the definition of demographic parity, the discrimination can be measured as the difference in selection rates,
+commonly referred to as $\Delta \textit{DP}$, similar to how it is defined in \cite{fairness_foundation}:
+\begin{align}
+%\Delta \textit{DP} = \left\vert \frac{\#(\text{Samples} \mid y = 1, S = s_1)}{\#(\text{Samples} \mid S = s_1)} - \frac{\#(\text{Samples} \mid y = 1, S = s_2)}{\#(\text{Samples} \mid S = s_2)} \right\vert
+\Delta \textit{DP} = \left\vert P(y = 1 \mid S = s_1) - P(y = 1 \mid S = s_2) \right\vert
+\end{align}
+Since the true probabilities are unknown, they are estimated from the model's predictions for available samples,
+using the observed selection rates for each demographic group as:
+\begin{align}
+P(y = 1 \mid S = s_i) \approx \frac{\#(\text{Samples} \mid y = 1, S = s_i)}{\#(\text{Samples} \mid S = s_i)}, i \in \{1,2\}
+\end{align}
+$\Delta \textit{DP}$ ranges between the values 0 and 1.
+A smaller $\Delta \textit{DP}$ indicates that the model's predictions are more equitable across demographic groups,
+whereas a larger $\Delta \textit{DP}$ suggests a potential bias in the model's decision-making process.
+
+As an example, let's consider the process model shown in Figure \ref{fig:bpmn_example},
+where a gateway after the \textit{register patient} activity determines whether a patient
+is assigned to an \textit{expert examination} or a \textit{regular examination}.
+To evaluate whether a machine learning model makes fair predictions at this decision point,
+we can use samples where the previous activity was \textit{register patient}.
+These samples are split into demographic groups based on \textit{gender}, distinguishing between \textit{male} and \textit{female} patients.
+In this context, the positive prediction is defined as the assignment to \textit{expert examination}, while any other outcome is considered negative.
+
+Suppose the model assigns 70\% of male patients to \textit{expert examination} and 30\% of female patients to \textit{expert examination},
+as is done in the underlying process model.
+The $\Delta \textit{DP}$ is then computed as
+$\Delta \textit{DP} =
+\vert P(y = \textit{expert examination} \mid \textit{gender} = \textit{male}) - P(y = \textit{expert examination} \mid \textit{gender} = \textit{female}) \vert =
+\vert 0.7 - 0.3 \vert = 0.4$.
+
+This result reflects the disparity in selection rates, indicating that the model disproportionately assigns one of the demographic groups to expert examinations.
+By measuring and minimizing $\Delta \textit{DP}$,
+we aim to ensure that predictive models used in PBPM do not systematically favor one demographic group over another,
+thus improving fairness in the decision-making processes.
+
+
+\section{Formalized Problem Statement}
+Having cleared all the preliminaries, we can now present a formalized problem statement.
+Given a classifier $C_{\text{enriched}}$ for next activity prediction, which has access to all sensitive attributes,
+its predictions may inadvertently exhibit unfairness for certain decisions and demographic groups,
+as measured by demographic parity disparity ($\Delta \textit{DP}$).
+The objective of this thesis is to mitigate such unfairness while maintaining high predictive performance.
+
+To address this issue, we aim to derive a modified classifier $C_{\text{modified}}$
+that reduces the observed $\Delta \textit{DP}$ in $C_{\text{enriched}}$, thereby enhancing fairness in decision-making.
+However, this fairness enhancement should not come at the cost of excessive performance degradation.
+Therefore, $C_{\text{modified}}$ must achieve an accuracy greater than that of a baseline classifier $C_{\text{base}}$,
+which does not utilize any sensitive attributes and is, by design, demographically fair.
+
+The reduction of unfair demographic disparities is guided by domain-specific considerations,
+ensuring that only those disparities deemed unfair within the context of the process are addressed.
+This is achieved through a knowledge distillation approach, which enables a domain expert to analyze and refine the decision-making process of the model.
+The precise details of this methodology are outlined in the next chapter.

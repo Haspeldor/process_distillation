@@ -24,9 +24,8 @@ class Node:
 
 class DecisionTreeClassifier:
     
-    def __init__(self, id_counter=0, max_depth=10, feature_names=None, feature_indices=None, class_names=None):
+    def __init__(self, id_counter=0, feature_names=None, feature_indices=None, class_names=None):
         self.id_counter = id_counter
-        self.max_depth = max_depth
         self.root = None
         self.feature_names = feature_names
         self.feature_indices = feature_indices
@@ -84,7 +83,7 @@ class DecisionTreeClassifier:
             print(f"{indent}|--- [{node.node_id}] ({feature_name}) >  {node.threshold:.2f}{removed_features_str}{collected_class_names_str} [{node.num_samples}]")
             self._print_sub_tree(node.right, depth + 1, indent + "|   ")
 
-    def _grow_tree(self, X, y, depth=0, removed_features=[], recursive_removal=True):
+    def _grow_tree(self, X, y, depth=0, max_depth=None, removed_features=[], recursive_removal=True):
         """Recursively grows the decision tree."""
         num_samples, num_features = X.shape
         unique_classes = np.unique(y)
@@ -92,7 +91,7 @@ class DecisionTreeClassifier:
         self.id_counter += 1
 
         # Stop criteria
-        if len(unique_classes) == 1 or (self.max_depth is not None and depth >= self.max_depth) or len(removed_features) == num_features:
+        if len(unique_classes) == 1 or (max_depth is not None and depth >= max_depth) or len(removed_features) == num_features:
             return Node(node_id, num_samples=num_samples, output=self._majority_class(y), depth=depth, removed_features=removed_features)
 
         # Find the best split
@@ -104,8 +103,8 @@ class DecisionTreeClassifier:
         removed_features = removed_features if recursive_removal else []
         left_indices = X[:, best_feature] < best_threshold
         right_indices = X[:, best_feature] >= best_threshold
-        right_subtree = self._grow_tree(X[right_indices], y[right_indices], depth=depth+1, removed_features=removed_features)
-        left_subtree = self._grow_tree(X[left_indices], y[left_indices], depth=depth+1, removed_features=removed_features)
+        right_subtree = self._grow_tree(X[right_indices], y[right_indices], max_depth=max_depth, depth=depth+1, removed_features=removed_features)
+        left_subtree = self._grow_tree(X[left_indices], y[left_indices], max_depth=max_depth, depth=depth+1, removed_features=removed_features)
 
         return Node(node_id, num_samples=num_samples, feature_index=best_feature, threshold=best_threshold, left=left_subtree, right=right_subtree, depth=depth, removed_features=removed_features)
 
@@ -228,11 +227,13 @@ class DecisionTreeClassifier:
         new_removed_features = self._collect_used_feature_indices(node_to_delete)
         removed_features = sorted(list(set(old_removed_features + new_removed_features)))
         depth = node_to_delete.depth
+        max_depth = depth + get_max_depth(node_to_delete) - 1
+        print(f"Depth: {depth}, Max Depth: {max_depth}")
         node_id = node_to_delete.node_id
         
         # Regrow the tree from the point where the node was removed
         X_sub, y_sub = self._get_data_for_subtree(X, y, node_id)
-        new_sub_tree = self._grow_tree(X_sub, y_sub, depth=depth, removed_features=removed_features, recursive_removal=recursive_removal)
+        new_sub_tree = self._grow_tree(X_sub, y_sub, depth=depth, max_depth=max_depth, removed_features=removed_features, recursive_removal=recursive_removal)
         
         if direction == 'left':
             parent_node.left = new_sub_tree
@@ -445,7 +446,6 @@ def save_tree_to_json(tree, file_path):
     # Create a dictionary with both the tree and its classifier attributes
     tree_dict = {
         'root': node_to_dict(tree.root),
-        'max_depth': convert_to_python_type(tree.max_depth),
         'id_counter': convert_to_python_type(tree.id_counter),
         'feature_names': convert_to_python_type(tree.feature_names),
         'feature_indices': convert_to_python_type(tree.feature_indices),
@@ -482,7 +482,6 @@ def load_tree_from_json(file_path):
 
     # Create a new DecisionTreeClassifier instance and set the attributes
     tree = DecisionTreeClassifier(
-        max_depth=tree_dict.get('max_depth'),
         feature_names=tree_dict.get('feature_names'),
         feature_indices=tree_dict.get('feature_indices'),
         class_names=tree_dict.get('class_names'),
@@ -492,6 +491,15 @@ def load_tree_from_json(file_path):
     # Reconstruct the root node from the dictionary
     tree.root = dict_to_node(tree_dict['root'])
     return tree
+
+def get_max_depth(node):
+    if node is None:
+        return 0
+    
+    left_depth = get_max_depth(node.left)
+    right_depth = get_max_depth(node.right)
+    
+    return 1 + max(left_depth, right_depth)
 
 def get_deleted_nodes(dt_original, dt_modified):
     node_ids_original = set(dt_original.collect_node_ids())
@@ -595,7 +603,6 @@ def sklearn_to_custom_tree(sklearn_tree, feature_names=None, class_names=None, f
 
     # Initialize the custom decision tree
     custom_tree = DecisionTreeClassifier(
-        max_depth=sklearn_tree.get_depth(),
         feature_names=feature_names,
         class_names=class_names,
         feature_indices=feature_indices
@@ -614,7 +621,6 @@ def copy_decision_tree(tree):
     # Create a new DecisionTreeClassifier object
     new_tree = DecisionTreeClassifier(
         id_counter=tree.id_counter,
-        max_depth=tree.max_depth,
         feature_names=copy.deepcopy(tree.feature_names),
         feature_indices=copy.deepcopy(tree.feature_indices),
         class_names=copy.deepcopy(tree.class_names)

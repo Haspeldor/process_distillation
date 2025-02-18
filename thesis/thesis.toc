@@ -3,50 +3,50 @@
 \contentsline {section}{\numberline {1.1}Motivation}{1}{section*.6}%
 \contentsline {section}{\numberline {1.2}Problem Statement}{2}{section*.7}%
 \contentsline {section}{\numberline {1.3}Thesis Outline}{2}{section*.8}%
-\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Fairness in Predictive Business Process Monitoring}{5}{section*.10}%
-\contentsline {section}{\numberline {2.2}Conclusion}{6}{section*.12}%
-\contentsline {chapter}{\numberline {3}Background}{7}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Business Process Management}{7}{section*.14}%
-\contentsline {subsection}{\numberline {3.1.1}Business Process Model and Notation}{7}{section*.15}%
-\contentsline {subsection}{\numberline {3.1.2}Event Log Data}{8}{section*.17}%
-\contentsline {subsection}{\numberline {3.1.3}Predictive Business Process Monitoring}{8}{section*.18}%
-\contentsline {section}{\numberline {3.2}Black Box vs. White Box}{9}{section*.19}%
-\contentsline {section}{\numberline {3.3}Neural Networks}{9}{section*.20}%
-\contentsline {subsection}{\numberline {3.3.1}Perceptron}{10}{section*.21}%
-\contentsline {subsection}{\numberline {3.3.2}Network Architecture}{10}{section*.22}%
-\contentsline {subsection}{\numberline {3.3.3}Feedforward Algorithm}{11}{section*.23}%
-\contentsline {subsection}{\numberline {3.3.4}Backpropagation Algorithm}{12}{section*.24}%
-\contentsline {section}{\numberline {3.4}Decision Trees}{13}{section*.25}%
-\contentsline {subsection}{\numberline {3.4.1}Tree Structure and Key Components}{13}{section*.26}%
-\contentsline {subsection}{\numberline {3.4.2}Decision Process}{14}{section*.27}%
-\contentsline {subsection}{\numberline {3.4.3}Training Process}{15}{section*.28}%
-\contentsline {subsection}{\numberline {3.4.4}Cost Complexity Pruning}{16}{section*.29}%
-\contentsline {chapter}{\numberline {4}Methodology}{19}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Data Gathering}{19}{section*.31}%
-\contentsline {subsection}{\numberline {4.1.1}Event Log Simulation}{19}{section*.32}%
-\contentsline {subsection}{\numberline {4.1.2}Event Log Enrichment}{20}{section*.34}%
-\contentsline {section}{\numberline {4.2}Preprocessing}{20}{section*.35}%
-\contentsline {section}{\numberline {4.3}Training the Neural Network}{22}{section*.36}%
-\contentsline {section}{\numberline {4.4}Knowledge Distillation}{23}{section*.37}%
-\contentsline {section}{\numberline {4.5}Training the Decision Tree}{24}{section*.38}%
-\contentsline {section}{\numberline {4.6}Modification of the Decision Tree}{24}{section*.39}%
-\contentsline {section}{\numberline {4.7}Finetuning of the Model}{25}{section*.40}%
-\contentsline {chapter}{\numberline {5}Evaluation}{29}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Evaluation Metrics}{29}{section*.42}%
-\contentsline {subsection}{\numberline {5.1.1}Accuracy}{29}{section*.43}%
-\contentsline {subsection}{\numberline {5.1.2}Demographic Parity}{29}{section*.44}%
-\contentsline {section}{\numberline {5.2}Experimental Framework}{30}{section*.45}%
-\contentsline {section}{\numberline {5.3}Cancer Screening}{31}{section*.46}%
-\contentsline {section}{\numberline {5.4}Hospital Billing}{31}{section*.48}%
-\contentsline {section}{\numberline {5.5}BPI Challenge 2012}{31}{section*.49}%
-\contentsline {section}{\numberline {5.6}Discussion}{31}{section*.51}%
-\contentsline {chapter}{\numberline {6}Ablation Study}{35}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Bias Strength}{35}{section*.53}%
-\contentsline {section}{\numberline {6.2}Number of sensitive Attributes}{36}{section*.56}%
-\contentsline {section}{\numberline {6.3}Number of Biased Decisions}{36}{section*.59}%
-\contentsline {chapter}{\numberline {7}Conclusions}{39}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Implications for theory and practise}{39}{section*.64}%
-\contentsline {section}{\numberline {7.2}Limitations and Challenges}{40}{section*.65}%
-\contentsline {section}{\numberline {7.3}Future Work}{41}{section*.70}%
-\contentsline {chapter}{\nonumberline Bibliography}{45}{chapter*.76}%
+\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.2}%
+\contentsline {chapter}{\numberline {3}Background}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Business Process Management}{5}{section*.12}%
+\contentsline {subsection}{\numberline {3.1.1}Business Process Model and Notation}{5}{section*.13}%
+\contentsline {subsection}{\numberline {3.1.2}Event Log Data}{6}{section*.15}%
+\contentsline {subsection}{\numberline {3.1.3}Predictive Business Process Monitoring}{7}{section*.17}%
+\contentsline {section}{\numberline {3.2}Black Box vs. White Box}{8}{section*.18}%
+\contentsline {section}{\numberline {3.3}Neural Networks}{8}{section*.19}%
+\contentsline {subsection}{\numberline {3.3.1}Perceptron}{8}{section*.20}%
+\contentsline {subsection}{\numberline {3.3.2}Network Architecture}{9}{section*.21}%
+\contentsline {subsection}{\numberline {3.3.3}Feedforward Algorithm}{10}{section*.22}%
+\contentsline {subsection}{\numberline {3.3.4}Backpropagation using the Adam Optimizer}{11}{section*.23}%
+\contentsline {section}{\numberline {3.4}Decision Trees}{14}{section*.24}%
+\contentsline {subsection}{\numberline {3.4.1}Tree Structure and Key Components}{14}{section*.25}%
+\contentsline {subsection}{\numberline {3.4.2}Decision Process}{15}{section*.26}%
+\contentsline {subsection}{\numberline {3.4.3}Training Process}{16}{section*.28}%
+\contentsline {subsection}{\numberline {3.4.4}Cost Complexity Pruning}{17}{section*.29}%
+\contentsline {section}{\numberline {3.5}Evaluation Metrics}{18}{section*.30}%
+\contentsline {subsection}{\numberline {3.5.1}Accuracy}{18}{section*.31}%
+\contentsline {subsection}{\numberline {3.5.2}Demographic Parity}{18}{section*.32}%
+\contentsline {section}{\numberline {3.6}Formalized Problem Statement}{20}{section*.33}%
+\contentsline {chapter}{\numberline {4}Methodology}{21}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Data Gathering}{21}{section*.35}%
+\contentsline {subsection}{\numberline {4.1.1}Event Log Simulation}{21}{section*.36}%
+\contentsline {subsection}{\numberline {4.1.2}Event Log Enrichment}{22}{section*.38}%
+\contentsline {section}{\numberline {4.2}Preprocessing}{23}{section*.39}%
+\contentsline {section}{\numberline {4.3}Training the Neural Network}{25}{section*.41}%
+\contentsline {section}{\numberline {4.4}Knowledge Distillation}{26}{section*.42}%
+\contentsline {section}{\numberline {4.5}Training the Decision Tree}{26}{section*.43}%
+\contentsline {section}{\numberline {4.6}Modification of the Decision Tree}{27}{section*.44}%
+\contentsline {section}{\numberline {4.7}Finetuning of the Model}{28}{section*.46}%
+\contentsline {chapter}{\numberline {5}Evaluation}{31}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Experimental Framework}{31}{section*.48}%
+\contentsline {section}{\numberline {5.2}Cancer Screening}{32}{section*.49}%
+\contentsline {section}{\numberline {5.3}Hospital Billing}{34}{section*.52}%
+\contentsline {section}{\numberline {5.4}BPI Challenge 2012}{36}{section*.56}%
+\contentsline {section}{\numberline {5.5}Discussion}{38}{section*.59}%
+\contentsline {chapter}{\numberline {6}Ablation Study}{41}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Bias Strength}{41}{section*.61}%
+\contentsline {section}{\numberline {6.2}Number of Sensitive Attributes}{42}{section*.64}%
+\contentsline {section}{\numberline {6.3}Number of biased Decisions}{44}{section*.67}%
+\contentsline {section}{\numberline {6.4}Discussion}{46}{section*.71}%
+\contentsline {chapter}{\numberline {7}Conclusions}{47}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Implications for theory and practise}{47}{section*.73}%
+\contentsline {section}{\numberline {7.2}Limitations and Challenges}{48}{section*.74}%
+\contentsline {section}{\numberline {7.3}Future Work}{49}{section*.79}%
+\contentsline {chapter}{\nonumberline Bibliography}{53}{chapter*.86}%
