@@ -556,3 +556,316 @@ def k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_
         plot_distribution(base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, folder_name, title, "Accuracy")
         plot_all_parity(stat_par_results, folder_name)
     return base_accuracy_values, enriched_accuracy_values, modified_accuracy_values, stat_par_results
+
+def get_critical_decisions(folder_name):
+    critical_decisions = []
+
+    if folder_name == "showcase":
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["expert treatment", "regular treatment"], to_remove=True, previous="register patient"))
+    elif "cs" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True, previous="asses eligibility"))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False, previous="collect history"))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["discuss options", "inform prevention"], to_remove=False, previous="prostate screening", threshold=60))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["discuss options", "inform prevention"], to_remove=False, previous="mammary screening", threshold=60))
+    elif "hb_" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW"))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE"))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW", threshold=85))
+        critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE", threshold=85))
+    elif "bpi_" in folder_name:
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=False, previous="A_FINALIZED"))
+        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=True, previous="A_PARTLYSUBMITTED"))
+    
+    return critical_decisions
+
+def run_ablation_decisions():
+    folder_name = "ablation_decisions"
+    numerical_attributes = ["time_delta"]
+    base_attributes = ["time_delta"]
+    bias = 0.7
+
+    x_values = []
+    base_accuracies = []
+    enriched_accuracies = []
+    modified_accuracies = []
+    base_fairness = []
+    enriched_fairness = []
+    modified_fairness = []
+    base_accuracies_std = []
+    enriched_accuracies_std = []
+    modified_accuracies_std = []
+    base_fairness_std = []
+    enriched_fairness_std = []
+    modified_fairness_std = []
+
+    for num_decisions in np.arange(0, 11, 2):
+        if num_decisions == 0:
+            num_decisions = 1
+        print(f"Analyzing num_decisions: {num_decisions}")
+        critical_decisions = []
+        categorical_attributes = ["a_0"]
+        process_model = build_process_model("ablation_num_decisions")
+        process_model.add_categorical_attribute("a_0", [("A", 0.5), ("B", 0.5)])
+        process_model.add_activity("A_0")
+        process_model.add_activity("B_0")
+        process_model.add_activity("C_0")
+        process_model.add_activity("D_0")
+        conditions_top = {("a_0", "A"): bias, ("a_0", "B"): 1-bias}
+        conditions_bottom = {("a_0", "A"): 1-bias, ("a_0", "B"): bias}
+        process_model.add_transition("start", "A_0", conditions=conditions_top)
+        process_model.add_transition("start", "B_0", conditions=conditions_bottom)
+        process_model.add_transition("A_0", "C_0", conditions=conditions_top)
+        process_model.add_transition("A_0", "D_0", conditions=conditions_bottom)
+        process_model.add_transition("B_0", "C_0", conditions=conditions_top)
+        process_model.add_transition("B_0", "D_0", conditions=conditions_bottom)
+        critical_decisions.append(Decision(attributes=["a_0"], possible_events=["A_0", "B_0"], to_remove=True, previous="start"))
+
+        for n in range(1, num_decisions):
+            activity_name_a = f"A_{n}"
+            activity_name_b = f"B_{n}"
+            activity_name_c = f"C_{n}"
+            activity_name_d = f"D_{n}"
+            previous_activity_name_c = f"C_{n-1}"
+            previous_activity_name_d = f"D_{n-1}"
+            attribute_name = f"a_{n}"
+            conditions_top = {(attribute_name, "A"): bias, (attribute_name, "B"): 1-bias}
+            conditions_bottom = {(attribute_name, "A"): 1-bias, (attribute_name, "B"): bias}
+
+            process_model.add_activity(activity_name_a)
+            process_model.add_activity(activity_name_b)
+            process_model.add_activity(activity_name_c)
+            process_model.add_activity(activity_name_d)
+            process_model.add_categorical_attribute(attribute_name, [("A", 0.5), ("B", 0.5)])
+            categorical_attributes.append(attribute_name)
+
+            process_model.add_transition(previous_activity_name_c, activity_name_a, conditions=conditions_top)
+            process_model.add_transition(previous_activity_name_c, activity_name_b, conditions=conditions_bottom)
+            process_model.add_transition(previous_activity_name_d, activity_name_a, conditions=conditions_top)
+            process_model.add_transition(previous_activity_name_d, activity_name_b, conditions=conditions_bottom)
+            process_model.add_transition(activity_name_a, activity_name_c, conditions=conditions_top)
+            process_model.add_transition(activity_name_a, activity_name_d, conditions=conditions_bottom)
+            process_model.add_transition(activity_name_b, activity_name_c, conditions=conditions_top)
+            process_model.add_transition(activity_name_b, activity_name_d, conditions=conditions_bottom)
+
+            critical_decisions.append(Decision(attributes=[attribute_name], possible_events=[activity_name_a, activity_name_b], to_remove=True, previous=previous_activity_name_c))
+            critical_decisions.append(Decision(attributes=[attribute_name], possible_events=[activity_name_a, activity_name_b], to_remove=True, previous=previous_activity_name_d))
+
+        last_activity_name_c = f"C_{num_decisions-1}"
+        last_activity_name_d = f"D_{num_decisions-1}"
+
+        process_model.add_transition(last_activity_name_c, "end", conditions={})
+        process_model.add_transition(last_activity_name_d, "end", conditions={})
+
+        trace_generator = TraceGenerator(process_model=process_model)
+        cases = trace_generator.generate_traces(num_cases=10000)
+        df = cases_to_dataframe(cases)
+        
+        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, modify_mode="cut", folder_name=None)
+
+        x_values.append(num_decisions)
+        base_accuracies.append(np.mean(base_accuracy))
+        enriched_accuracies.append(np.mean(enriched_accuracy))
+        modified_accuracies.append(np.mean(modified_accuracy))
+        fairness = {"Base": [], "Enriched": [], "Modified": []}
+        for n in range(num_decisions):
+            fairness_n = stat_par_results[(f"a_{n} = A", f"A_{n}")]
+            print(fairness_n["Modified"])
+            fairness["Base"].append(np.mean(fairness_n["Base"]))
+            fairness["Enriched"].append(np.mean(fairness_n["Enriched"]))
+            fairness["Modified"].append(np.mean(fairness_n["Modified"]))
+        base_fairness.append(np.mean(np.array(fairness["Base"])))
+        enriched_fairness.append(np.mean(np.array(fairness["Enriched"])))
+        modified_fairness.append(np.mean(np.array(fairness["Modified"])))
+        base_accuracies_std.append(np.std(base_accuracy))
+        enriched_accuracies_std.append(np.std(enriched_accuracy))
+        modified_accuracies_std.append(np.std(modified_accuracy))
+        base_fairness_std.append(np.std(fairness["Base"]))
+        enriched_fairness_std.append(np.std(fairness["Enriched"]))
+        modified_fairness_std.append(np.std(fairness["Modified"]))
+
+    save_data(base_accuracies, folder_name, "base_accuracies")
+    save_data(enriched_accuracies, folder_name, "enriched_accuracies")
+    save_data(modified_accuracies, folder_name, "modified_accuracies")
+    save_data(base_fairness, folder_name, "base_fairness")
+    save_data(enriched_fairness, folder_name, "enriched_fairness")
+    save_data(modified_fairness, folder_name, "modified_fairness")
+    save_data(base_accuracies_std, folder_name, "base_accuracies_std")
+    save_data(enriched_accuracies_std, folder_name, "enriched_accuracies_std")
+    save_data(modified_accuracies_std, folder_name, "modified_accuracies_std")
+    save_data(base_fairness_std, folder_name, "base_fairness_std")
+    save_data(enriched_fairness_std, folder_name, "enriched_fairness_std")
+    save_data(modified_fairness_std, folder_name, "modified_fairness_std")
+
+    x_values = np.array(x_values)
+    x_values *= 2
+    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Number of Decisions", "Number of Decisions", "Accuracy", "ablation_decisions")
+    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Number of Decisions", "Number of Decisions", "Demographic Parity", "ablation_decisions")
+
+def run_ablation_attributes():
+    folder_name = "ablation_attributes"
+    numerical_attributes = ["time_delta", "age"]
+    base_attributes = ["time_delta", "age"]
+
+    x_values = []
+    base_accuracies = []
+    enriched_accuracies = []
+    modified_accuracies = []
+    base_fairness = []
+    enriched_fairness = []
+    modified_fairness = []
+    base_accuracies_std = []
+    enriched_accuracies_std = []
+    modified_accuracies_std = []
+    base_fairness_std = []
+    enriched_fairness_std = []
+    modified_fairness_std = []
+
+    for num_attributes in np.arange(0, 11, 2):
+        if num_attributes == 0:
+            num_attributes = 1
+        print(f"Analyzing num_attributes: {num_attributes}")
+        process_model = build_process_model("ablation_num_attributes")
+        categorical_attributes = []
+        critical_decisions = []
+
+        for n in range(num_attributes):
+            attribute_name = f"a_{n}"
+            bias = 0.7
+            process_model.add_categorical_attribute(attribute_name, [("A", 0.5), ("B", 0.5)])
+            categorical_attributes.append(attribute_name)
+            critical_decisions.append(Decision(attributes=[attribute_name], possible_events=["collect history", "refuse screening"], to_remove=True, previous="asses eligibility"))
+
+            process_model.add_transition("asses eligibility", "collect history", conditions={
+                (attribute_name, "A"): bias,
+                (attribute_name, "B"): 1-bias,  
+            })
+            process_model.add_transition("asses eligibility", "refuse screening", conditions={
+                (attribute_name, "A"): 1-bias,
+                (attribute_name, "B"): bias,  
+            })
+
+            if n % 2 == 1:
+                bias = 1-bias
+
+            process_model.add_transition("collect history", "prostate screening", conditions={
+                (attribute_name, "A"): bias,
+                (attribute_name, "B"): 1-bias,  
+            })
+            process_model.add_transition("collect history", "mammary screening", conditions={
+                (attribute_name, "A"): 1-bias,
+                (attribute_name, "B"): bias,  
+            })
+
+        trace_generator = TraceGenerator(process_model=process_model)
+        cases = trace_generator.generate_traces(num_cases=10000)
+        df = cases_to_dataframe(cases)
+        
+        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, modify_mode="cut", folds=5, n_gram=3, folder_name=None)
+
+        x_values.append(num_attributes)
+        base_accuracies.append(np.mean(base_accuracy))
+        enriched_accuracies.append(np.mean(enriched_accuracy))
+        modified_accuracies.append(np.mean(modified_accuracy))
+        fairness = {"Base": [], "Enriched": [], "Modified": []}
+        for n in range(num_attributes):
+            fairness_n = stat_par_results[(f"a_{n} = A", "collect history")]
+            fairness["Base"].append(np.mean(fairness_n["Base"]))
+            fairness["Enriched"].append(np.mean(fairness_n["Enriched"]))
+            fairness["Modified"].append(np.mean(fairness_n["Modified"]))
+        base_fairness.append(np.mean(np.array(fairness["Base"])))
+        enriched_fairness.append(np.mean(np.array(fairness["Enriched"])))
+        modified_fairness.append(np.mean(np.array(fairness["Modified"])))
+        base_accuracies_std.append(np.std(base_accuracy))
+        enriched_accuracies_std.append(np.std(enriched_accuracy))
+        modified_accuracies_std.append(np.std(modified_accuracy))
+        base_fairness_std.append(np.std(fairness["Base"]))
+        enriched_fairness_std.append(np.std(fairness["Enriched"]))
+        modified_fairness_std.append(np.std(fairness["Modified"]))
+
+    save_data(base_accuracies, folder_name, "base_accuracies")
+    save_data(enriched_accuracies, folder_name, "enriched_accuracies")
+    save_data(modified_accuracies, folder_name, "modified_accuracies")
+    save_data(base_fairness, folder_name, "base_fairness")
+    save_data(enriched_fairness, folder_name, "enriched_fairness")
+    save_data(modified_fairness, folder_name, "modified_fairness")
+    save_data(base_accuracies_std, folder_name, "base_accuracies_std")
+    save_data(enriched_accuracies_std, folder_name, "enriched_accuracies_std")
+    save_data(modified_accuracies_std, folder_name, "modified_accuracies_std")
+    save_data(base_fairness_std, folder_name, "base_fairness_std")
+    save_data(enriched_fairness_std, folder_name, "enriched_fairness_std")
+    save_data(modified_fairness_std, folder_name, "modified_fairness_std")
+
+    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Number of Attributes", "Number of Attributes", "Accuracy", "ablation_attributes")
+    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Number of Attributes", "Number of Attributes", "Demographic Parity", "ablation_attributes")
+
+def run_ablation_bias():
+    folder_name = "ablation_bias"
+    critical_decisions = []
+    critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True, previous="asses eligibility"))
+    critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False, previous="collect history"))
+    categorical_attributes = ["gender"]
+    numerical_attributes = ["time_delta", "age"]
+    base_attributes = ["time_delta", "age"]
+
+    x_values = []
+    base_accuracies = []
+    enriched_accuracies = []
+    modified_accuracies = []
+    base_fairness = []
+    enriched_fairness = []
+    modified_fairness = []
+    base_accuracies_std = []
+    enriched_accuracies_std = []
+    modified_accuracies_std = []
+    base_fairness_std = []
+    enriched_fairness_std = []
+    modified_fairness_std = []
+
+    for bias in np.arange(0.5, 1.05, 0.05):
+        print(f"Analyzing Bias strength: {bias}")
+        process_model = build_process_model("ablation_strength")
+        process_model.add_transition("asses eligibility", "collect history", conditions={
+            ("gender", "male"): bias,
+            ("gender", "female"): 1-bias,  
+        })
+        process_model.add_transition("asses eligibility", "refuse screening", conditions={
+            ("gender", "male"): 1-bias,
+            ("gender", "female"): bias,  
+        })
+        trace_generator = TraceGenerator(process_model=process_model)
+        cases = trace_generator.generate_traces(num_cases=10000)
+        df = cases_to_dataframe(cases)
+        
+        base_accuracy, enriched_accuracy, modified_accuracy, stat_par_results = k_fold_evaluation(df, critical_decisions, categorical_attributes, numerical_attributes, base_attributes, folds=5, n_gram=3, folder_name=None)
+
+        x_values.append(bias)
+        base_accuracies.append(np.mean(base_accuracy))
+        enriched_accuracies.append(np.mean(enriched_accuracy))
+        modified_accuracies.append(np.mean(modified_accuracy))
+        print(stat_par_results)
+        fairness = stat_par_results[("gender = male", "collect history")]
+        base_fairness.append(np.mean(fairness["Base"]))
+        enriched_fairness.append(np.mean(fairness["Enriched"]))
+        modified_fairness.append(np.mean(fairness["Modified"]))
+        base_accuracies_std.append(np.std(base_accuracy))
+        enriched_accuracies_std.append(np.std(enriched_accuracy))
+        modified_accuracies_std.append(np.std(modified_accuracy))
+        base_fairness_std.append(np.std(fairness["Base"]))
+        enriched_fairness_std.append(np.std(fairness["Enriched"]))
+        modified_fairness_std.append(np.std(fairness["Modified"]))
+
+    save_data(base_accuracies, folder_name, "base_accuracies")
+    save_data(enriched_accuracies, folder_name, "enriched_accuracies")
+    save_data(modified_accuracies, folder_name, "modified_accuracies")
+    save_data(base_fairness, folder_name, "base_fairness")
+    save_data(enriched_fairness, folder_name, "enriched_fairness")
+    save_data(modified_fairness, folder_name, "modified_fairness")
+    save_data(base_accuracies_std, folder_name, "base_accuracies_std")
+    save_data(enriched_accuracies_std, folder_name, "enriched_accuracies_std")
+    save_data(modified_accuracies_std, folder_name, "modified_accuracies_std")
+    save_data(base_fairness_std, folder_name, "base_fairness_std")
+    save_data(enriched_fairness_std, folder_name, "enriched_fairness_std")
+    save_data(modified_fairness_std, folder_name, "modified_fairness_std")
+
+    plot_ablation(x_values, base_accuracies, enriched_accuracies, modified_accuracies, "Accuracy for Bias Strength", "Bias", "Accuracy", folder_name, override_x_ticks=False)
+    plot_ablation(x_values, base_fairness, enriched_fairness, modified_fairness, "Demographic Parity for Bias Strength", "Bias", "Demographic Parity", folder_name, override_x_ticks=False)

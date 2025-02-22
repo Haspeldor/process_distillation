@@ -33,20 +33,20 @@
 \contentsline {section}{\numberline {4.4}Knowledge Distillation}{26}{section*.42}%
 \contentsline {section}{\numberline {4.5}Training the Decision Tree}{26}{section*.43}%
 \contentsline {section}{\numberline {4.6}Modification of the Decision Tree}{27}{section*.44}%
-\contentsline {section}{\numberline {4.7}Finetuning of the Model}{28}{section*.46}%
+\contentsline {section}{\numberline {4.7}Finetuning of the Model}{28}{section*.47}%
 \contentsline {chapter}{\numberline {5}Evaluation}{31}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Experimental Framework}{31}{section*.48}%
-\contentsline {section}{\numberline {5.2}Cancer Screening}{32}{section*.49}%
-\contentsline {section}{\numberline {5.3}Hospital Billing}{34}{section*.52}%
-\contentsline {section}{\numberline {5.4}BPI Challenge 2012}{36}{section*.56}%
-\contentsline {section}{\numberline {5.5}Discussion}{38}{section*.59}%
-\contentsline {chapter}{\numberline {6}Ablation Study}{41}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Bias Strength}{41}{section*.61}%
-\contentsline {section}{\numberline {6.2}Number of Sensitive Attributes}{42}{section*.64}%
-\contentsline {section}{\numberline {6.3}Number of biased Decisions}{44}{section*.67}%
-\contentsline {section}{\numberline {6.4}Discussion}{46}{section*.71}%
-\contentsline {chapter}{\numberline {7}Conclusions}{47}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Implications for theory and practise}{47}{section*.73}%
-\contentsline {section}{\numberline {7.2}Limitations and Challenges}{48}{section*.74}%
-\contentsline {section}{\numberline {7.3}Future Work}{49}{section*.79}%
-\contentsline {chapter}{\nonumberline Bibliography}{53}{chapter*.86}%
+\contentsline {section}{\numberline {5.1}Experimental Framework}{31}{section*.49}%
+\contentsline {section}{\numberline {5.2}Cancer Screening}{32}{section*.50}%
+\contentsline {section}{\numberline {5.3}Hospital Billing}{33}{section*.53}%
+\contentsline {section}{\numberline {5.4}BPI Challenge 2012}{36}{section*.57}%
+\contentsline {section}{\numberline {5.5}Discussion}{39}{section*.60}%
+\contentsline {chapter}{\numberline {6}Ablation Study}{43}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Bias Strength}{43}{section*.63}%
+\contentsline {section}{\numberline {6.2}Number of Sensitive Attributes}{44}{section*.66}%
+\contentsline {section}{\numberline {6.3}Number of biased Decisions}{46}{section*.69}%
+\contentsline {section}{\numberline {6.4}Discussion}{48}{section*.73}%
+\contentsline {chapter}{\numberline {7}Conclusions}{49}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Implications for theory and practise}{49}{section*.75}%
+\contentsline {section}{\numberline {7.2}Limitations and Challenges}{50}{section*.76}%
+\contentsline {section}{\numberline {7.3}Future Work}{51}{section*.81}%
+\contentsline {chapter}{\nonumberline Bibliography}{55}{chapter*.88}%

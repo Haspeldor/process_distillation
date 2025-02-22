@@ -15,7 +15,7 @@ Public real life event logs
 containing sensitive attributes are hard to come by.
 Additionally, in order to properly highlight the full capacity of our method,
 we require the data to have sensitive attributes
-that cause both positive and negative bias respectively.
+that cause both acceptable and unacceptable bias respectively.
 Although \cite{simulated_logs} recently published simulated event logs,
 seeking to address the scarcity of fairness-aware datasets in PBPM,
 those event logs didn't show the structure we were looking for in this thesis.
@@ -342,6 +342,13 @@ we have several possible options:
     \label{fig:modification}
 \end{figure}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{gfx/methodology.png}
+    \caption{This figure illustrates the complete pipeline of our proposed methodology.}
+    \label{fig:methodology}
+\end{figure}
+
 \section{Finetuning of the Model}
 By modifying the DT, our goal was to obtain a predictor that 
 makes fairer decisions, while maintaining most of the NN's predictive power.
@@ -400,5 +407,3 @@ We reduced the Adam optimizer's learning rate $\alpha$ from $0.001$
 to $0.00001$ to balance fairness improvements with maintaining the pre-trained weights.
 Additionally, the number of epochs was reduced from 10 to 5,
 as the NN's accuracy converges quicker on the modified distilled targets.
-
-%TODO: image: process - complete timeline?

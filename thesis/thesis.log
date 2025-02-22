@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  18 FEB 2025 18:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.1.17)  21 FEB 2025 12:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -958,46 +958,46 @@ Package tocloft Info: The document has chapter divisions on input line 51.
 \cfttabindent=\skip138
 \cfttabnumwidth=\skip139
 ))
-Package hyperref Info: Option `plainpages' set `false' on input line 87.
-Package hyperref Info: Option `colorlinks' set `false' on input line 87.
-Package hyperref Info: Option `breaklinks' set `true' on input line 87.
-Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 87.
-Package hyperref Info: Option `bookmarksopen' set `true' on input line 87.
-LaTeX Font Info:    Trying to load font information for T1+bch on input line 92.
+Package hyperref Info: Option `plainpages' set `false' on input line 89.
+Package hyperref Info: Option `colorlinks' set `false' on input line 89.
+Package hyperref Info: Option `breaklinks' set `true' on input line 89.
+Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 89.
+Package hyperref Info: Option `bookmarksopen' set `true' on input line 89.
+LaTeX Font Info:    Trying to load font information for T1+bch on input line 94.
  (c:/texlive/2023/texmf-dist/tex/latex/psnfss/t1bch.fd
 File: t1bch.fd 2004/10/18 font definitions for T1/bch.
 ) (./thesis.aux)
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-Package scrbase Info: activating english \abstractname on input line 92.
-Package scrbase Info: activating english \partname on input line 92.
-Package scrbase Info: activating english \chaptername on input line 92.
-Package scrbase Info: activating english \appendixname on input line 92.
-Package scrbase Info: activating english \figurename on input line 92.
-Package scrbase Info: activating english \tablename on input line 92.
-Package scrbase Info: activating english \contentsname on input line 92.
-Package scrbase Info: activating english \listfigurename on input line 92.
-Package scrbase Info: activating english \listtablename on input line 92.
-Package scrbase Info: activating english \bibname on input line 92.
-Package scrbase Info: activating english \indexname on input line 92.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 94.
+LaTeX Font Info:    ... okay on input line 94.
+Package scrbase Info: activating english \abstractname on input line 94.
+Package scrbase Info: activating english \partname on input line 94.
+Package scrbase Info: activating english \chaptername on input line 94.
+Package scrbase Info: activating english \appendixname on input line 94.
+Package scrbase Info: activating english \figurename on input line 94.
+Package scrbase Info: activating english \tablename on input line 94.
+Package scrbase Info: activating english \contentsname on input line 94.
+Package scrbase Info: activating english \listfigurename on input line 94.
+Package scrbase Info: activating english \listtablename on input line 94.
+Package scrbase Info: activating english \bibname on input line 94.
+Package scrbase Info: activating english \indexname on input line 94.
  (c:/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count459
@@ -1017,26 +1017,26 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (c:/texlive/2023/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-LaTeX Info: Redefining \microtypecontext on input line 92.
-Package microtype Info: Applying patch `item' on input line 92.
-Package microtype Info: Applying patch `toc' on input line 92.
-Package microtype Info: Applying patch `eqnum' on input line 92.
-Package microtype Info: Applying patch `footnote' on input line 92.
-Package microtype Info: Applying patch `verbatim' on input line 92.
+LaTeX Info: Redefining \microtypecontext on input line 94.
+Package microtype Info: Applying patch `item' on input line 94.
+Package microtype Info: Applying patch `toc' on input line 94.
+Package microtype Info: Applying patch `eqnum' on input line 94.
+Package microtype Info: Applying patch `footnote' on input line 94.
+Package microtype Info: Applying patch `verbatim' on input line 94.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 92.
+LaTeX Info: Redefining \showhyphens on input line 94.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
  (c:/texlive/2023/texmf-dist/tex/latex/microtype/mt-bch.cfg
 File: mt-bch.cfg 2007/03/03 v1.5 microtype config. file: Bitstream Charter (RS)
 )
-Package hyperref Info: Link coloring OFF on input line 92.
+Package hyperref Info: Link coloring OFF on input line 94.
  (./thesis.out) (./thesis.out)
 \@outlinefile=\write4
 \openout4 = `thesis.out'.
@@ -1048,7 +1048,7 @@ Class scrreprt Info: loading recommended package `bookmark'.
 (scrreprt)           `bookmarkpackage=false' before \begin{document} and
 (scrreprt)           you can avoid this message adding:
 (scrreprt)             \usepackage{bookmark}
-(scrreprt)           before \begin{document} on input line 92.
+(scrreprt)           before \begin{document} on input line 94.
  (c:/texlive/2023/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
  (c:/texlive/2023/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
@@ -1109,10 +1109,10 @@ Package biblatex Info: Data encoding 'utf8' specified.
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'thesis.bbl' found.
  (./thesis.bbl)
-Package biblatex Info: Reference section=0 on input line 92.
-Package biblatex Info: Reference segment=0 on input line 92.
-Package scrbase Info: activating english \figurename on input line 99.
-Package scrbase Info: activating english \tablename on input line 100.
+Package biblatex Info: Reference section=0 on input line 94.
+Package biblatex Info: Reference segment=0 on input line 94.
+Package scrbase Info: activating english \figurename on input line 101.
+Package scrbase Info: activating english \tablename on input line 102.
  (./content/titlepages.tex
 <gfx/AI4.png, id=4, 2283.53125pt x 832.10875pt>
 File: gfx/AI4.png Graphic file (type png)
@@ -1201,7 +1201,7 @@ Class scrreprt Warning: Redefinition of \@makeschapterhead detected.
 
 ]
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <20.74> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 118.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 120.
  (./thesis.toc
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <10.95> not available
 (Font)              Font shape `T1/lmss/bx/n' tried instead on input line 2.
@@ -1337,11 +1337,11 @@ LaTeX Warning: Citation 'relu' on page 10 undefined on input line 232.
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [10] [11] [12] [13] [14]
-<gfx/decision_tree.png, id=337, 302.63063pt x 463.7325pt>
+<gfx/decision_tree.png, id=337, 216.05719pt x 323.70938pt>
 File: gfx/decision_tree.png Graphic file (type png)
 <use gfx/decision_tree.png>
 Package pdftex.def Info: gfx/decision_tree.png  used on input line 424.
-(pdftex.def)             Requested size: 158.1783pt x 242.38057pt.
+(pdftex.def)             Requested size: 158.1783pt x 237.00233pt.
  [15 <./gfx/decision_tree.png>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -1400,12 +1400,21 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 7595) has occurred while \output is active []
 
  [26] [27]
-<gfx/modification.png, id=453, 700.11563pt x 459.21562pt>
+<gfx/modification.png, id=453, 493.0922pt x 322.95656pt>
 File: gfx/modification.png Graphic file (type png)
 <use gfx/modification.png>
 Package pdftex.def Info: gfx/modification.png  used on input line 335.
-(pdftex.def)             Requested size: 395.45181pt x 259.38724pt.
- [28 <./gfx/modification.png>] [29]) (./content/chapter-evaluation.tex [30]
+(pdftex.def)             Requested size: 395.45181pt x 259.01607pt.
+<gfx/methodology.png, id=455, 283.81032pt x 519.44063pt>
+File: gfx/methodology.png Graphic file (type png)
+<use gfx/methodology.png>
+Package pdftex.def Info: gfx/methodology.png  used on input line 347.
+(pdftex.def)             Requested size: 223.39786pt x 408.87143pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[28 <./gfx/modification.png>] [29 <./gfx/methodology.png>]) (./content/chapter-evaluation.tex [30]
 chapter 5.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1425,66 +1434,76 @@ Underfull \vbox (badness 2772) has occurred while \output is active []
 
 
 ]
-<gfx/cs_accuracy.png, id=484, 722.7pt x 433.62pt>
+<gfx/cs_accuracy.png, id=487, 722.7pt x 433.62pt>
 File: gfx/cs_accuracy.png Graphic file (type png)
 <use gfx/cs_accuracy.png>
-Package pdftex.def Info: gfx/cs_accuracy.png  used on input line 51.
+Package pdftex.def Info: gfx/cs_accuracy.png  used on input line 53.
 (pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
  [32 <./gfx/cs_accuracy.png>]
-<gfx/cancer_screening.png, id=494, 1430.34375pt x 2589.675pt>
+<gfx/cancer_screening.png, id=497, 1430.34375pt x 2589.675pt>
 File: gfx/cancer_screening.png Graphic file (type png)
 <use gfx/cancer_screening.png>
-Package pdftex.def Info: gfx/cancer_screening.png  used on input line 75.
+Package pdftex.def Info: gfx/cancer_screening.png  used on input line 77.
 (pdftex.def)             Requested size: 263.45271pt x 476.98808pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [33 <./gfx/cancer_screening.png>]
-<gfx/hb_age.png, id=504, 722.7pt x 433.62pt>
+ [33]
+<gfx/hb_age.png, id=506, 722.7pt x 433.62pt>
 File: gfx/hb_age.png Graphic file (type png)
 <use gfx/hb_age.png>
-Package pdftex.def Info: gfx/hb_age.png  used on input line 117.
+Package pdftex.def Info: gfx/hb_age.png  used on input line 119.
 (pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[34]
-Underfull \vbox (badness 8038) has occurred while \output is active []
-
- [35 <./gfx/hb_age.png>]
-<gfx/hb_accuracy.png, id=516, 722.7pt x 433.62pt>
+ [34 <./gfx/cancer_screening.png>] [35 <./gfx/hb_age.png>]
+<gfx/hb_accuracy.png, id=519, 722.7pt x 433.62pt>
 File: gfx/hb_accuracy.png Graphic file (type png)
 <use gfx/hb_accuracy.png>
-Package pdftex.def Info: gfx/hb_accuracy.png  used on input line 153.
+Package pdftex.def Info: gfx/hb_accuracy.png  used on input line 155.
 (pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
 
-Underfull \hbox (badness 10000) in alignment at lines 196--196
+Underfull \hbox (badness 10000) in alignment at lines 198--198
 [][][][][][][] 
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 200.
+(Font)              <10> on input line 202.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 200.
+(Font)              <7> on input line 202.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[36 <./gfx/hb_accuracy.png>] [37]
-<gfx/bpi_2012_accuracy.png, id=530, 722.7pt x 433.62pt>
+[36 <./gfx/hb_accuracy.png>]
+Underfull \vbox (badness 1005) has occurred while \output is active []
+
+ [37]
+<gfx/bpi_2012_accuracy.png, id=533, 722.7pt x 433.62pt>
 File: gfx/bpi_2012_accuracy.png Graphic file (type png)
 <use gfx/bpi_2012_accuracy.png>
-Package pdftex.def Info: gfx/bpi_2012_accuracy.png  used on input line 256.
+Package pdftex.def Info: gfx/bpi_2012_accuracy.png  used on input line 259.
 (pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
 
-Underfull \hbox (badness 10000) in alignment at lines 278--278
+Underfull \hbox (badness 10000) in alignment at lines 281--281
 [][][][][][][] 
  []
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-) (./content/chapter-ablation.tex [38 <./gfx/bpi_2012_accuracy.png>] [39] [40
+
+Underfull \vbox (badness 1454) has occurred while \output is active []
+
+ [38 <./gfx/bpi_2012_accuracy.png>]
+Underfull \vbox (badness 2671) has occurred while \output is active []
+
+ [39]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[40]) (./content/chapter-ablation.tex [41] [42
 
 
 ]
@@ -1500,7 +1519,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-<gfx/ablation_bias_accuracy.png, id=552, 722.7pt x 433.62pt>
+<gfx/ablation_bias_accuracy.png, id=570, 722.7pt x 433.62pt>
 File: gfx/ablation_bias_accuracy.png Graphic file (type png)
 <use gfx/ablation_bias_accuracy.png>
 Package pdftex.def Info: gfx/ablation_bias_accuracy.png  used on input line 34.
@@ -1519,11 +1538,11 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 Underfull \vbox (badness 4168) has occurred while \output is active []
 
- [41]
+ [43]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [42 <./gfx/ablation_bias_accuracy.png>] [43]
-<gfx/ablation_attributes_accuracy.png, id=575, 722.7pt x 433.62pt>
+ [44 <./gfx/ablation_bias_accuracy.png>] [45]
+<gfx/ablation_attributes_accuracy.png, id=594, 722.7pt x 433.62pt>
 File: gfx/ablation_attributes_accuracy.png Graphic file (type png)
 <use gfx/ablation_attributes_accuracy.png>
 Package pdftex.def Info: gfx/ablation_attributes_accuracy.png  used on input line 121.
@@ -1533,24 +1552,24 @@ Underfull \hbox (badness 10000) in alignment at lines 145--145
 [][][][][][][] 
  []
 
-[44 <./gfx/ablation_attributes_accuracy.png>]
-<gfx/ablation_decision.png, id=584, 2107.875pt x 876.27374pt>
+[46 <./gfx/ablation_attributes_accuracy.png>]
+<gfx/ablation_decision.png, id=603, 1002.74625pt x 418.56375pt>
 File: gfx/ablation_decision.png Graphic file (type png)
 <use gfx/ablation_decision.png>
 Package pdftex.def Info: gfx/ablation_decision.png  used on input line 181.
-(pdftex.def)             Requested size: 395.45181pt x 164.39452pt.
- [45 <./gfx/ablation_decision.png>]
-<gfx/ablation_decisions_accuracy.png, id=595, 722.7pt x 433.62pt>
+(pdftex.def)             Requested size: 395.45181pt x 165.07219pt.
+ [47 <./gfx/ablation_decision.png>]
+<gfx/ablation_decisions_accuracy.png, id=613, 722.7pt x 433.62pt>
 File: gfx/ablation_decisions_accuracy.png Graphic file (type png)
 <use gfx/ablation_decisions_accuracy.png>
-Package pdftex.def Info: gfx/ablation_decisions_accuracy.png  used on input line 198.
+Package pdftex.def Info: gfx/ablation_decisions_accuracy.png  used on input line 197.
 (pdftex.def)             Requested size: 355.9042pt x 213.54091pt.
 
-Underfull \hbox (badness 10000) in alignment at lines 221--221
+Underfull \hbox (badness 10000) in alignment at lines 220--220
 [][][][][][][] 
  []
 
-) (./content/chapter-conclusion.tex [46 <./gfx/ablation_decisions_accuracy.png>]
+) (./content/chapter-conclusion.tex [48 <./gfx/ablation_decisions_accuracy.png>]
 chapter 7.
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1566,20 +1585,20 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 
 Underfull \vbox (badness 2626) has occurred while \output is active []
 
- [47
+ [49
 
 
 ]
-Underfull \vbox (badness 2970) has occurred while \output is active []
+Underfull \vbox (badness 1281) has occurred while \output is active []
 
- [48]
+ [50]
+
+LaTeX Warning: Reference `sec:discussion_evaluation' on page 51 undefined on input line 94.
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [49] [50]
-
-LaTeX Warning: Reference `sec:bpi' on page 51 undefined on input line 150.
-
-) [51] [52]
+ [51] [52]) [53] [54]
 chapter without number
 
 Class scrreprt Warning: Redefinition of \@makechapterhead detected.
@@ -1592,7 +1611,7 @@ Class scrreprt Warning: Redefinition of \@makechapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 145.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 147.
 (c:/texlive/2023/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -1600,39 +1619,39 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [53
+ [55
 
 
 
 
 ]
-Overfull \hbox (27.93433pt too wide) in paragraph at lines 145--145
+Overfull \hbox (27.93433pt too wide) in paragraph at lines 147--147
 \T1/bch/m/n/10 (-20) Distribution-Level Met-rics for De-mo-graphic Par-ity^^P. In: \T1/bch/m/it/10 (-20) arXiv preprint arXiv:2301.13443
  []
 
-[54]
+[56]
 
-Package biblatex Warning: Type 'online' not found on input line 146.
+Package biblatex Warning: Type 'online' not found on input line 148.
 
 
 Package biblatex Warning: 'prefixnumbers' option to '\printbibliography' is no longer supported.
 (biblatex)                Please use 'labelprefix' option to '\newrefcontext'.
 
 
-LaTeX Warning: Empty bibliography on input line 146.
+LaTeX Warning: Empty bibliography on input line 148.
 
-[55] [56
+[57] [58
 
 
 ] (./thesis.lof
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [57])
+ [59])
 \tf@lof=\write6
 \openout6 = `thesis.lof'.
 
- [58] (./thesis.lot
-Overfull \hbox (2.64874pt too wide) in paragraph at lines 13--13
+ [60] (./thesis.lot
+Overfull \hbox (2.64874pt too wide) in paragraph at lines 14--14
  [][] [][]\T1/bch/m/n/10.95 (-20) Evaluation of ac-cu-racy and de-mo-graphic par-ity for vary-ing bias strengths. 
  []
 
@@ -1640,10 +1659,10 @@ Overfull \hbox (2.64874pt too wide) in paragraph at lines 13--13
 \tf@lot=\write7
 \openout7 = `thesis.lot'.
 
- [59
+ [61
 
 
-] [60
+] [62
 
 
 ] (./content/declaration.tex
@@ -1658,10 +1677,10 @@ Class scrreprt Warning: Redefinition of \@makeschapterhead detected.
 (scrreprt)              KOMA-Script and will not work with a coming version,
 (scrreprt)              that will remove this deprecated code.
 
-) [61
+) [63
 
 
-] [62
+] [64
 
 ] (./thesis.aux)
  ***********
@@ -1684,18 +1703,18 @@ Package logreq Info: Writing requests to 'thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 29708 strings out of 474166
- 536796 string characters out of 5749518
+ 29732 strings out of 474166
+ 537172 string characters out of 5749518
  1944542 words of memory out of 5000000
- 50778 multiletter control sequences out of 15000+600000
- 716825 words of font info for 439 fonts, out of 8000000 for 9000
+ 50789 multiletter control sequences out of 15000+600000
+ 717659 words of font info for 445 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,17n,131p,10972b,2303s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvb.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvr.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/tex-gyre/qhvri.pfb><c:/texlive/2023/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on thesis.pdf (72 pages, 1193662 bytes).
+Output written on thesis.pdf (74 pages, 1250575 bytes).
 PDF statistics:
- 1187 PDF objects out of 1200 (max. 8388607)
- 1034 compressed objects within 11 object streams
- 278 named destinations out of 1000 (max. 500000)
- 75778 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 1211 PDF objects out of 1440 (max. 8388607)
+ 1054 compressed objects within 11 object streams
+ 282 named destinations out of 1000 (max. 500000)
+ 75783 words of extra memory for PDF output out of 89155 (max. 10000000)
 

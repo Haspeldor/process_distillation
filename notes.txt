@@ -1,37 +1,18 @@
-60 seiten richtlinie
-    - 20 methodology
-    - 10 evaluation
-    - 10 basics und related work
-
-grundlagenkapitel: 10-20 seiten
-    - prelimenaries
-    - related work
-
-seitenverteilung:
-    - abstract:     1
-    - introduction: 2
-    - related work: 2
-    - background:   10
-    - methodology:  20
-    - evaluation:   20
-    - conclusion:   5
-
-aknowledgements:
-    - personen und chatgpt angeben
 
 fragen:
 
 todo:
 - abstract
-- background
-    - adam smasher
-- evaluation
-    - discussions
-- ablation
-    - discussion
+- background: adam smasher
+- ablation: discussion
+- future work: bullet points
+- appendix: DFGs
+- aknowledgements: personen und chatgpt angeben
+- eigenstänidgkeitserklärung
+
+correcting
+- abbreviations check
 - images check
 - tables check
 - citations check
 - ref check
-- appendix: DFG
-- layout for BPMN

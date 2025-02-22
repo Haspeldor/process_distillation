@@ -31,7 +31,7 @@ The corresponding results are presented in Table \ref{tab:ablation_bias} and Fig
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/ablation_bias_accuracy.png}
+    \includegraphics[width=\imagewidth]{gfx/ablation_bias_accuracy.png}
     \caption{Impact of varying bias strength on the accuracy.
     Each point in the graph represents the mean accuracy across validation folds for a certain bias strength.}
     \label{fig:ablation_bias_accuracy}
@@ -118,7 +118,7 @@ The results are reported in Table \ref{tab:ablation_attributes} and Figure \ref{
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/ablation_attributes_accuracy.png}
+    \includegraphics[width=\imagewidth]{gfx/ablation_attributes_accuracy.png}
     \caption{Impact of varying number of sensitive attributes on the accuracy.
     Each point in the graph represents the mean accuracy across validation folds for a certain number of attributes.}
 
@@ -180,7 +180,7 @@ As such, our approach should retain these biases while mitigating the unfair bia
     \centering
     \includegraphics[width=\textwidth]{gfx/ablation_decision.png}
     \caption{The process model with only a single group consisting of the activities $A_0, B_0, C_0$ and $D_0$, influenced by the attribute $a_0$.
-    Additional groups would be added between the last gateway, after activities $C_0$ and $D_0$, and the \textit{end} activity.}
+    Additional groups would be added between the last gateway and the \textit{end} activity.}
     \label{fig:ablation_decision_model}
 \end{figure}
 
@@ -192,10 +192,9 @@ As before, given the high number of biased decisions, applying the retraining me
 Therefore, we again use the method of cutting branches for node removal. 
 The results from applying 5-fold cross-validation for each increment and model are reported in Table \ref{tab:ablation_decisions} and Figure \ref{fig:ablation_decisions_accuracy}. 
 
-%TODO: correct text in image
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/ablation_decisions_accuracy.png}
+    \includegraphics[width=\imagewidth]{gfx/ablation_decisions_accuracy.png}
     \caption{Impact of varying number of biased decisions on the accuracy.
     Each point in the graph represents the mean accuracy across validation folds for a certain number of decisions.}
     \label{fig:ablation_decisions_accuracy}
@@ -227,4 +226,22 @@ The results from applying 5-fold cross-validation for each increment and model a
 \end{table}
 
 \section{Discussion}
-% 
+% varying bias strength
+    % results as expected: the accuracy of enriched model increases, while the accuracy of modified stays the same regardless of how strong 
+
+    % interesting results: base model accuracy also increases in accuracy, similar to enriched model
+    % makes sense in the context of process model
+    % even when considering that modified should have better accuracy because it can use the gender of patient to predict prostate or mammary screening
+    % however, as the bias increases and mostly male patient are classified as allegible for screening 
+    % the base model learns to predict prostate screening, since most of the allegible patients are male
+    % -> higher accuracy, the higher the bias
+
+% varying number attributes
+
+
+% varying number of decisions
+
+
+% tree characteristics
+    % unsurprisingly, no changes when varying bias strength
+    % 

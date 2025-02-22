@@ -378,8 +378,9 @@ def mine_bpm(file_name, folder_name):
     os.makedirs(output_dir, exist_ok=True)
 
     # the log is filtered on the top 5 variants
-    data_df = data_df[data_df['concept:name'].str.startswith('A_')]
-    data_df = pm4py.filter_variants_top_k(data_df, 20)
+    if "bpi" in folder_name:
+        data_df = data_df[data_df['concept:name'].str.startswith('A_')]
+    data_df = pm4py.filter_variants_top_k(data_df, 5)
 
     # a directly - follows graph (DFG) is discovered from the log
     dfg, start_activities, end_activities = pm4py.discover_dfg(data_df)

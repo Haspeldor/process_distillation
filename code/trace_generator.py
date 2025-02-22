@@ -342,7 +342,7 @@ def build_process_model(model_name) -> ProcessModel:
         process_model.add_transition("discuss options", "bill patient", conditions={})
         process_model.add_transition("inform prevention", "bill patient", conditions={})
 
-    elif model_name == "ablation_strength":
+    elif model_name == "ablation_bias":
         process_model.add_categorical_attribute("gender", [("male", 0.5), ("female", 0.5)])
         process_model.add_numerical_attribute("age", mean=45, stddev=10, min_val=20, max_val=85, int=True)
         process_model.add_activity("register", start_activity=True)
@@ -656,7 +656,6 @@ def get_attributes(folder_name):
 
     return categorical_attributes, numerical_attributes
 
-
 def get_critical_decisions(folder_name):
     critical_decisions = []
 
@@ -664,16 +663,20 @@ def get_critical_decisions(folder_name):
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["expert treatment", "regular treatment"], to_remove=True, previous="register patient"))
     elif "cs" in folder_name:
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["collect history", "refuse screening"], to_remove=True, previous="asses eligibility"))
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["prostate screening", "mammary screening"], to_remove=False, previous="collect history"))
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["discuss options", "inform prevention"], to_remove=False, previous="prostate screening", threshold=60))
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["discuss options", "inform prevention"], to_remove=False, previous="mammary screening", threshold=60))
     elif "hb_" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW"))
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE"))
-        critical_decisions.append(Decision(attributes=["age"], possible_events=["FIN", "CHANGE DIAGN"], to_remove=False, previous="NEW", threshold=85))
         critical_decisions.append(Decision(attributes=["age"], possible_events=["CODE OK", "CODE NOK"], to_remove=True, previous="RELEASE", threshold=85))
     elif "bpi_" in folder_name:
-        critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_CANCELLED", "A_APPROVED"], to_remove=False, previous="A_FINALIZED"))
         critical_decisions.append(Decision(attributes=["gender"], possible_events=["A_DECLINED", "A_PREACCEPTED"], to_remove=True, previous="A_PARTLYSUBMITTED"))
     
     return critical_decisions
+
+def get_parity_key(folder_name):
+    if "cs" in folder_name:
+        return [("gender = male", "collect history")]
+    elif "hb" in folder_name:
+        return [("gender = non conforming", "CODE OK"), ("age", "CODE OK")]
+    elif "bpi" in folder_name:
+        return [("gender = male", "A_PREACCEPTED")]
+    else:
+        return []

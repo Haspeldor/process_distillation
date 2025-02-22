@@ -34,10 +34,12 @@ This method involves partitioning the dataset into five approximately equal subs
 In five iterations, each fold serves as a test set exactly once, while the remaining four folds are used for training the model.
 We evaluate each model in each iteration using accuracy as the metric for predictive performance
 and demographic parity to measure the effect of negative bias from sensitive attributes.
+Additionally, we track the depth of the distilled decision tree, its total number of nodes,
+and how many were removed to assess whether performing these modifications is feasible for a human.
 
 \section{Cancer Screening}
 \label{sec:cancer_screening}
-Our first dataset was created by simulating the cancer screening process in a hospital.
+Our first event log was created by simulating the cancer screening process in a hospital.
 The underlying process model, consisting of ten distinct activities, can be seen in Figure \ref{fig:cancer_screening}.
 The dataset includes 10,000 simulated cases, each with the numerical attribute \textit{age}
 and the categorical attribute \textit{gender}.
@@ -48,7 +50,7 @@ constrained between 20 and 85, while \textit{gender} is assumed to be binary, ev
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/cs_accuracy.png}
+    \includegraphics[width=\imagewidth]{gfx/cs_accuracy.png}
     \caption{Distribution of accuracy values for the base, enriched, and modified models on the \textit{cancer screening (cs)} event log.
     The plot illustrates kernel density estimates of accuracy, with shaded regions representing the distribution spread.}
     \label{fig:cs_accuracy}
@@ -114,7 +116,7 @@ the artificially embedded biases in age and gender must be strong enough to crea
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/hb_age.png}
+    \includegraphics[width=\imagewidth]{gfx/hb_age.png}
     \caption{The distribution of the attribute \textit{age},
     when it causes bias in the \textit{hospital billing} event log.}
     \label{fig:hb_age}
@@ -150,7 +152,7 @@ These rules result in an assigment of around 55.8\% male, 41.4\% female and 2.8\
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/hb_accuracy.png}
+    \includegraphics[width=\imagewidth]{gfx/hb_accuracy.png}
     \caption{Distribution of accuracy values for the base, enriched, and modified models on the \textit{hospital billing} event log,
     where both \textit{age} and \textit{gender} cause bias \textit{(hb\_+age\_+gender)}.
     The plot illustrates kernel density estimates of accuracy, with shaded regions representing the distribution spread.}
@@ -204,6 +206,7 @@ For \textit{age}, we split the group into patients are 85 or older versus those 
 %TODO: DFG
 
 \section{BPI Challenge 2012}
+\label{sec:bpi_2012}
 The \textbf{BPI Challenge 2012} \cite{bpi_2012} event log, consisting of 13,087 cases, is a well-known dataset in process mining,
 sourced from a Dutch financial institution.
 It captures multiple subprocesses within a loan application procedure, each distinguished by specific prefixes.
@@ -253,9 +256,9 @@ we compare its impact on the probability of \textit{A\_PREACCEPTED} between \tex
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{gfx/bpi_2012_accuracy.png}
+    \includegraphics[width=\imagewidth]{gfx/bpi_2012_accuracy.png}
     \caption{Distribution of accuracy values for the base, enriched,
-    and modified models on the \textit{BPI Challenge 2012 (bpi\_2012)} event log.
+    and modified models on the \textit{BPI Challenge 2012 (bpi)} event log.
     The plot illustrates kernel density estimates of accuracy, with shaded regions representing the distribution spread.}
     \label{fig:bpi_accuracy}
 \end{figure}
@@ -271,15 +274,15 @@ we compare its impact on the probability of \textit{A\_PREACCEPTED} between \tex
         & Base & Modified & Enriched & Base & Modified & Enriched \\
         \midrule
         cs &  .821 $\pm$ .004 &  .850 $\pm$ .003 &  .895 $\pm$ .002 &  .001 $\pm$ .001 &  .013 $\pm$ .024 &  .999 $\pm$ .002 \\
-        hb\_gender &  .915 $\pm$ .003 &  .921 $\pm$ .002 &  .926 $\pm$ .002 &  .014 $\pm$ .013 &  .110 $\pm$ .168 &  .840 $\pm$ .036 \\
-        hb\_age &  .915 $\pm$ .003 &  .918 $\pm$ .005 &  .928 $\pm$ .005 &  .012 $\pm$ .011 &  .015 $\pm$ .023 &  .891 $\pm$ .023 \\
-        bpi\_2012 &  .818 $\pm$ .003 &  .823 $\pm$ .001 &  .832 $\pm$ .001 &  .058 $\pm$ .019 &  .054 $\pm$ .014 &  .525 $\pm$ .036 \\
+        hb (gender) &  .915 $\pm$ .003 &  .921 $\pm$ .002 &  .926 $\pm$ .002 &  .014 $\pm$ .013 &  .110 $\pm$ .168 &  .840 $\pm$ .036 \\
+        hb (age) &  .915 $\pm$ .003 &  .918 $\pm$ .005 &  .928 $\pm$ .005 &  .012 $\pm$ .011 &  .015 $\pm$ .023 &  .891 $\pm$ .023 \\
+        bpi &  .818 $\pm$ .003 &  .823 $\pm$ .001 &  .832 $\pm$ .001 &  .058 $\pm$ .019 &  .054 $\pm$ .014 &  .525 $\pm$ .036 \\
         \bottomrule
     \end{tabularx}
     \vspace{0.2cm} % adds a small space between the two tables
-    \caption{Evaluation of accuracy and demographic parity for the \textit{cancer screening} log (cs),
-    the \textit{BPI Challgenge 2012} log (bpi\_2012) and two versions of the \textit{Hospital Billing} log,
-    where only the attribute \textit{age} introduces a bias (hb\_age) and only the attribute \textit{gender} introduces a bias (hb\_gender).
+    \caption{Evaluation of accuracy and demographic parity for the \textit{Cancer Screening (cs)} log,
+    the \textit{BPI Challgenge 2012 (bpi)} log and two versions of the \textit{Hospital Billing (hb)} log,
+    where only one of the attributes \textit{age} or \textit{gender} introduce bias.
     The reported values represent the mean ($\mu$) and standard deviation ($\sigma$) across validation folds, expressed as $\mu \pm \sigma$.
     }
     \label{tab:evaluation_results}
@@ -287,37 +290,106 @@ we compare its impact on the probability of \textit{A\_PREACCEPTED} between \tex
 
 %TODO: DFG
 
+% TODO: discussion
 \section{Discussion}
-% we will now discuss the results stemming from our experiments, as presented in tables \ref{tab:hb_combined} and \ref{tab:evaluation_results}
+We now analyze the results of our experiments, as presented in Tables \ref{tab:hb_combined}, \ref{tab:evaluation_results} and \ref{tab:evaluation_nodes},
+as well as the Figures \ref{fig:cs_accuracy}, \ref{fig:hb_accuracy} and \ref{fig:bpi_accuracy}.
 
-% cancer screening
-    % due to its simulated nature and the very strong influence of the sensitive attributes, this event log has the most clear results
-    % clear improvement in accuracy over baseline
-    % delta DP is close to 0 for modified model, just as baseline
+Due to the simple nature of the \textit{cancer screening} event log's underlying process model
+and the strong influence of sensitive attributes on process transitions,
+this dataset produces the clearest results.
+The modified model achieves a notable improvement in accuracy over the baseline while effectively reducing $\Delta \textit{DP}$ to near zero,
+matching the fairness level of the baseline model.
 
-% bpi
-    % difference in accuracy between models diminished,
-    % since it's calculated over larger number of activities,
-    % gender only influence few transitions, even then impact not as strong as in the cancer screening log
-    % AMOUNT_REQ is also provided to base model, explains a lot of the transitions of application
-    % very low standard deviation -> implies that results are significant nevertheless
-    % would be bigger if the effect of the sensitive 
-    % nevertheless, our methodology effectively reduces bias to the base level, while keeping accuracy higher than base level
-    % not quite zero, possibly because of correlation gender with AMOUNT_REQ, influence not considered
+In the \textit{BPI} event log, the accuracy differences between models are less pronounced.
+Since accuracy is computed over a larger number of activities, and \textit{gender} only influences few transitions,
+its overall impact is weaker compared to the cancer screening log.
+Additionally, the attribute \textit{AMOUNT\_REQ}, which plays a crucial role in loan decisions,
+is available to the base model and explains much of the variation in transitions.
+Despite these factors, the low standard deviation in results suggests that these differences in accuracy carry statistical significance.
+Nevertheless, our methodology still successfully reduces bias to the baseline level, while maintaining a higher accuracy than the base model.
+However, $\Delta \textit{DP}$ is not as close to 0 as in the \textit{cancer screening} event log,
+even for the base model, likely due to the influence of the non-sensitive attribute \textit{AMOUNT\_REQ}, which was not explicitly addressed.
 
-% hospital billing
-    % difference in accuracy minimal here as well, for similar reasons
-    % even smaller, because the attributes have less impact
-    % finally 4 different variations: see impact on behavior whether attribute is biased or not
-    % both attributes not biased:
-        % modified is identical to enriched, since no nodes needed to be removed
-        % good, this means our methodology doesn't reduce accuracy when no unfairness present
-    % one attribute biased:
-        % similar to cancer screening
-        % delta DP close to baseline, while better accuracy than baseline
-    % both attributes biased:
-        % enhances effect from one biased: even more accurate than baseline
-        % delta DP heavily reduced for both attributes, compared to enriched model
+Similar to the \textit{BPI} dataset, the observed accuracy differences between models in the \textit{hospital billing} event log are minimal.
+When looking at the DFG, it becomes clear that next activity is highly predictable even without knowing the case attributes.
+Most patients transition to \textit{FIN} instead of \textit{CHANGE DIAGN},
+and the vast majority receive \textit{CODE OK} rather than \textit{CODE NOK}.
+As a result, the sensitive attributes exert less influence on these decisions than if they were evenly split.
+Nevertheless, we can still analyze the impact of the bias across the four variations of this dataset,
+which depend on whether the sensitive attributes \textit{age} and \textit{gender} introduce bias.
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+    \item If \textbf{neither attribute} is biased, the modified model performs identically to the enriched and base models.
+        Since the distilled decision tree contains no inner nodes, which split based on sensitive attributes,
+        no modifications takes place.
+        This demonstrates that our approach does not unnecessarily reduce accuracy when no unfairness is present.
+    \item When only \textbf{one attribute} is biased,
+        results align with those observed in the \textit{cancer screening} and \textit{BPI} event logs.
+        The modified model reduces $\Delta \textit{DP}$ for the biased attribute close to baseline levels, while maintaining better accuracy.
+        The inclusion of the unbiased attribute has no negative side effects,
+        considering that its $\Delta \textit{DP}$ is low for all models.
+    \item If \textbf{both attributes} introduce bias, their combined effect lead to a larger disparity in accuracy between the models,
+        with the modified model's accuracy still in between the base and the enriched model.
+        The modfied model's $\Delta \textit{DP}$ is significantly reduced for both attributes compared to the enriched model.
+\end{itemize}
 
-% in conclusion:
-%goal of finding a classifier that balances the accuracy of the enriched model and the fairness of the baseline model was successful
+Despite the substantial fairness improvements across all event logs compared to the enriched model,
+the modified model does not always achieve the same fairness level as the baseline.
+For instance, in the hospital billing dataset, when \textit{gender} introduces bias but \textit{age} does not,
+the modified model achieves a $\Delta \textit{DP}$ of 0.110 for the attribute \textit{gender},
+which is far lower than the 0.840 of the enriched model,
+but still higher than the baseline of 0.014.
+As the modfied model's comparatively high standard deviation of .168 indicates,
+analysis of individual folds reveals that this discrepancy is driven by outliers.
+In this case, the modified model's five-fold results of $\Delta \textit{DP}$ for \textit{gender} were: [0.441, 0.007, 0.008, 0.073, 0.018].
+The outlier 0.441 is likely due to our automated selection of the fine-tuning method,
+which prioritizes accuracy over $\Delta \textit{DP}$.
+As a result, we may occasionally select a variant that does not fully mitigate bias.
+Therefore, this issue of outliers is likely to be less problematic in practice,
+as domain experts can manually select the method of fine-tuning according to the desired results.
+
+\begin{table}[h!]
+    \centering
+    \scriptsize
+    \renewcommand{\arraystretch}{1.2}
+    \setlength{\tabcolsep}{6pt}
+    \begin{tabular}{>{\centering\arraybackslash}c | c | c | c}
+        \toprule
+        \textbf{Event Log} & \textbf{Number of Nodes} & \textbf{Number of removed Nodes} & \textbf{Depth} \\
+        \midrule
+        cs &  24.2 $\pm$ 1.6 &  1 $\pm$ 0 & 10.2 $\pm$ 0.7 \\
+        hb (-age, -gender) &  33.0 $\pm$ 3.0 &  0 $\pm$ 0 &  10.8 $\pm$ 0.7 \\
+        hb (-age, +gender) &  45.8 $\pm$ 3.2 &  1 $\pm$ 0 &  12.0 $\pm$ 0.9 \\
+        hb (+age, -gender) &  42.2 $\pm$ 4.3 &  1 $\pm$ 0 &  13.4 $\pm$ 1.2 \\
+        hb (+age, +gender) &  46.2 $\pm$ 3.7 &  2 $\pm$ 0 &  12.4 $\pm$ 0.8 \\
+        bpi &  37.4 $\pm$ 4.3 &  1 $\pm$ 0 &  11.0 $\pm$ 0.6 \\
+        \bottomrule
+    \end{tabular}
+    \vspace{0.2cm} % adds a small space between the two tables
+    \caption{Evaluation of the characteristics of the distilled decision tree for the \textit{Cancer Screening (cs)} log ,
+    the \textit{BPI Challgenge 2012 (bpi)} log and all versions of the \textit{Hospital Billing (hb)} log.
+    For \textit{hb}, the attributes \textit{age} and \textit{gender} are annotated based on whether they introduce bias (+) or not (-).
+    The reported values represent the mean ($\mu$) and standard deviation ($\sigma$) across validation folds, expressed as $\mu \pm \sigma$.
+    }
+    \label{tab:evaluation_nodes}
+\end{table}
+
+Beyond the quantitative results, we also analyzed the characteristics of the distilled decision tree.
+Our observations indicate that the model remains interpretable even for the more complex real-world event logs such as \textit{BPI} and \textit{hospital billing}.
+The tree depth does not exceed 10 levels significantly, and the number of total nodes generally remains below 50.
+As expected, these values are lower for the simpler \textit{cancer screening} dataset.
+The number of nodes requiring removal due to bias always matches the number of bias introducing attributes,
+which makes sense, considering that we opted to remove the attribute's influence for only one decision each.
+Interestingly however, the number of nodes showed no observed variance in these experiments.
+This finding suggests that unfair structures of the model are reliably identifiable in the distilled decision tree.
+Furthermore, biased nodes do not tend to appear in multiple locations within the tree, simplifying the modification process.
+As a result, we can conclude that the detection and correction of unfairness in our methodology is feasible for human analysts to perform.
+
+Overall, our approach successfully balances the accuracy of the enriched model with the fairness of the baseline model.
+In all cases, we were able to reduce bias significantly, while maintaining better accuracy than the baseline.
+However, we have to consider that the extent of bias mitigation and accuracy retention
+varies depending on factors such as the strength of the introduced bias,
+the number of biased attributes, and the number of affected decision points.
+To better understand how these factors influence our results,
+the next chapter presents an ablation study that systematically analyzes their impact.
